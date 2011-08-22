@@ -46,6 +46,7 @@
     <Compile Include="ConsoleSession.cs" />
     <Compile Include="ErrorWithReturnCodeException.cs" />
     <Compile Include="IFileNameListArgument.cs" />
+    <Compile Include="InvalidArgumentsException.cs" />
     <Compile Include="IVerbosityArgument.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ThirdParty\Options.cs" />

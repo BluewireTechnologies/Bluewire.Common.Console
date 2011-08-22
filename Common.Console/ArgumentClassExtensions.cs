@@ -9,12 +9,28 @@ namespace Bluewire.Common.Console
     {
         public static IEnumerable<string> ResolveWildcards(this IFileNameListArgument arguments)
         {
-            return arguments.FileNames.SelectMany(GetFilesInDirectory);
+            return ResolveWildcards(arguments, Directory.GetCurrentDirectory());
         }
 
-        private static string[] GetFilesInDirectory(string arg)
+        public static IEnumerable<string> ResolveWildcards(this IFileNameListArgument arguments, string relativeTo)
         {
-            return Directory.GetFiles(Path.GetFullPath(GetDirectoryOfArg(arg)), Path.GetFileName(arg));
+            if(!Path.IsPathRooted(relativeTo)) throw new InvalidOperationException(String.Format("Not an absolute path: {0}", relativeTo));
+            return arguments.FileNames.SelectMany(f => GetFilesInDirectory(relativeTo, f));
+        }
+
+        private static string[] GetFilesInDirectory(string relativeTo, string arg)
+        {
+            if (Path.GetInvalidPathChars().Intersect(arg).Any() || Path.GetInvalidFileNameChars().Intersect(arg).Any())
+            {
+                var directory = Path.Combine(relativeTo, GetDirectoryOfArg(arg));
+                var wildcard = Path.GetFileName(arg);
+                return Directory.GetFiles(directory, wildcard);
+            }
+            else
+            {
+                var fullPath = Path.Combine(relativeTo, arg);
+                return new string[] { fullPath };
+            }
         }
 
         private static string GetDirectoryOfArg(string arg)

@@ -17,6 +17,7 @@ namespace Bluewire.Common.Console
             Application = Assembly.GetEntryAssembly().Location;
 
             Usage = String.Format("{0} <options>", Path.GetFileName(Application));
+            ForArgumentsInterface<IFileNameListArgument>(a => Usage += " <file names ...>");
         }
 
         public string Application { get; set; }

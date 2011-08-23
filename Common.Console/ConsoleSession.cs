@@ -8,47 +8,78 @@ namespace Bluewire.Common.Console
 {
     public class ConsoleSession<T>
     {
+        public string Application { get; set; }
+        public string Usage { get; set; }
+
         public ConsoleSession(T arguments, OptionSet options)
         {
-            Arguments = arguments;
+            this.arguments = arguments;
             sessionArguments = new SessionArguments();
-            Options = options;
-            ForArgumentsInterface<IVerbosityArgument>(a => Options.Add("v|verbose", "Verbose mode.", v => a.Verbose()));
+            this.options = options;
             
-
             Application = Assembly.GetEntryAssembly().Location;
 
             Usage = String.Format("{0} <options>", Path.GetFileName(Application));
             ForArgumentsInterface<IFileNameListArgument>(a => Usage += " <file names ...>");
 
-            Options.Add("pause", "When finished, wait for the user to press <Enter> before terminating.", v => sessionArguments.PauseWhenDone = true);
-            Options.Add("h|?|help", "Show usage.", v => sessionArguments.ShowUsage = true);
+            AddStandardOptions();
         }
 
-        class SessionArguments
+        public int Run(string[] args, Func<T, int> application)
         {
-            public bool ShowUsage { get; set; }
-            public bool PauseWhenDone { get; set; }
+            if (hasRun) throw new NotSupportedException("ConsoleSession<T>#Run() may only be called once.");
+            hasRun = true;
+
+            try
+            {
+                ParseArguments(args);
+                if (OnBeforeRun())
+                {
+                    return application(this.arguments);
+                }
+                return 0;
+            }
+            catch (ErrorWithReturnCodeException ex)
+            {
+                OnHandledException(ex);
+                return ex.ExitCode;
+            }
+            catch (Exception ex)
+            {
+                OnUnhandledException(ex);
+                return 255;
+            }
+            finally
+            {
+                OnAfterRun();
+            }
         }
 
-        public string Application { get; set; }
-
-        public string Usage { get; set; }
-
-        protected T Arguments { get; private set; }
-
-        protected OptionSet Options { get; private set; }
-
-        protected bool HasArgumentsInterface<TInterface>()
+        private void AddStandardOptions()
         {
-            return Arguments is TInterface;
+            ForArgumentsInterface<IVerbosityArgument>(a => options.Add("v|verbose", "Verbose mode.", v => a.Verbose()));
+
+            options.Add("pause", "When finished, wait for the user to press <Enter> before terminating.", v => sessionArguments.PauseWhenDone = true);
+            options.Add("h|?|help", "Show usage.", v => sessionArguments.ShowUsage = true);
         }
 
-        protected bool ForArgumentsInterface<TInterface>(Action<TInterface> action)
+
+
+
+
+        private readonly T arguments;
+        private readonly OptionSet options;
+
+        private bool HasArgumentsInterface<TInterface>()
+        {
+            return this.arguments is TInterface;
+        }
+
+        private bool ForArgumentsInterface<TInterface>(Action<TInterface> action)
         {
             if (HasArgumentsInterface<TInterface>())
             {
-                action((TInterface)(object)Arguments);
+                action((TInterface)(object)this.arguments);
                 return true;
             }
             return false;
@@ -57,55 +88,42 @@ namespace Bluewire.Common.Console
         private bool hasRun;
         private SessionArguments sessionArguments;
 
-        public int Run(string[] args, Func<T, int> application)
+        private bool OnBeforeRun()
         {
-            if (hasRun)
+            if (sessionArguments.ShowUsage)
             {
-                throw new NotSupportedException("ConsoleSession<T>#Run() may only be called once.");
+                ShowUsage();
+                return false;
             }
-            hasRun = true;
+            return true;
+        }
 
-            try
+        private void OnAfterRun()
+        {
+            if (sessionArguments.PauseWhenDone)
             {
-                ParseArguments(args);
-                if (sessionArguments.ShowUsage)
-                {
-                    ShowUsage();
-                    return 0;
-                }
-                return application(Arguments);
+                System.Console.Error.WriteLine("Press Enter to continue...");
+                System.Console.In.ReadLine();
             }
-            catch (ErrorWithReturnCodeException ex)
-            {
-                System.Console.Error.WriteLine(ex.Message);
-                if (ex.ShowUsage)
-                {
-                    ShowUsage();
-                }
-                return ex.ExitCode;
-            }
-            catch (Exception ex)
-            {
-                System.Console.Error.WriteLine("Unhandled exception occurred:");
-                System.Console.Error.WriteLine(ex.Message);
-                System.Console.Error.WriteLine(ex.StackTrace);
+        }
 
-                return 255;
-            }
-            finally
-            {
-                if (sessionArguments.PauseWhenDone)
-                {
-                    System.Console.Error.WriteLine("Press Enter to continue...");
-                    System.Console.In.ReadLine();
-                }
-            }
+        private void OnHandledException(ErrorWithReturnCodeException ex)
+        {
+            System.Console.Error.WriteLine(ex.Message);
+            if (ex.ShowUsage) ShowUsage();
+        }
+
+        private void OnUnhandledException(Exception ex)
+        {
+            System.Console.Error.WriteLine("Unhandled exception occurred:");
+            System.Console.Error.WriteLine(ex.Message);
+            System.Console.Error.WriteLine(ex.StackTrace);
         }
 
         private void ShowUsage()
         {
             System.Console.Error.WriteLine("Usage: {0}", Usage);
-            Options.WriteOptionDescriptions(System.Console.Error);
+            this.options.WriteOptionDescriptions(System.Console.Error);
         }
 
         private void ParseArguments(string[] args)
@@ -114,7 +132,7 @@ namespace Bluewire.Common.Console
             {
                 var definitelyNotOptions = args.SkipWhile(a => a != "--");
 
-                var spareArguments = Options.Parse(args).ToArray();
+                var spareArguments = this.options.Parse(args).ToArray();
 
                 var possiblyUnprocessedOptions = spareArguments.Except(definitelyNotOptions).Where(a => a.StartsWith("-")).ToArray();
                 if (possiblyUnprocessedOptions.Any())
@@ -128,6 +146,12 @@ namespace Bluewire.Common.Console
             {
                 throw new InvalidArgumentsException(ex);
             }
+        }
+
+        class SessionArguments
+        {
+            public bool ShowUsage { get; set; }
+            public bool PauseWhenDone { get; set; }
         }
     }
 }

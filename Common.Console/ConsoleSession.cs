@@ -11,13 +11,24 @@ namespace Bluewire.Common.Console
         public ConsoleSession(T arguments, OptionSet options)
         {
             Arguments = arguments;
+            sessionArguments = new SessionArguments();
             Options = options;
             ForArgumentsInterface<IVerbosityArgument>(a => Options.Add("v|verbose", "Verbose mode.", v => a.Verbose()));
+            
 
             Application = Assembly.GetEntryAssembly().Location;
 
             Usage = String.Format("{0} <options>", Path.GetFileName(Application));
             ForArgumentsInterface<IFileNameListArgument>(a => Usage += " <file names ...>");
+
+            Options.Add("pause", "When finished, wait for the user to press <Enter> before terminating.", v => sessionArguments.PauseWhenDone = true);
+            Options.Add("h|?|help", "Show usage.", v => sessionArguments.ShowUsage = true);
+        }
+
+        class SessionArguments
+        {
+            public bool ShowUsage { get; set; }
+            public bool PauseWhenDone { get; set; }
         }
 
         public string Application { get; set; }
@@ -43,11 +54,25 @@ namespace Bluewire.Common.Console
             return false;
         }
 
+        private bool hasRun;
+        private SessionArguments sessionArguments;
+
         public int Run(string[] args, Func<T, int> application)
         {
+            if (hasRun)
+            {
+                throw new NotSupportedException("ConsoleSession<T>#Run() may only be called once.");
+            }
+            hasRun = true;
+
             try
             {
                 ParseArguments(args);
+                if (sessionArguments.ShowUsage)
+                {
+                    ShowUsage();
+                    return 0;
+                }
                 return application(Arguments);
             }
             catch (ErrorWithReturnCodeException ex)
@@ -55,8 +80,7 @@ namespace Bluewire.Common.Console
                 System.Console.Error.WriteLine(ex.Message);
                 if (ex.ShowUsage)
                 {
-                    System.Console.Error.WriteLine("Usage: {0}", Usage);
-                    Options.WriteOptionDescriptions(System.Console.Error);
+                    ShowUsage();
                 }
                 return ex.ExitCode;
             }
@@ -68,6 +92,20 @@ namespace Bluewire.Common.Console
 
                 return 255;
             }
+            finally
+            {
+                if (sessionArguments.PauseWhenDone)
+                {
+                    System.Console.Error.WriteLine("Press Enter to continue...");
+                    System.Console.In.ReadLine();
+                }
+            }
+        }
+
+        private void ShowUsage()
+        {
+            System.Console.Error.WriteLine("Usage: {0}", Usage);
+            Options.WriteOptionDescriptions(System.Console.Error);
         }
 
         private void ParseArguments(string[] args)

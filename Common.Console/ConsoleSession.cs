@@ -116,6 +116,12 @@ namespace Bluewire.Common.Console
         private void OnUnhandledException(Exception ex)
         {
             System.Console.Error.WriteLine("Unhandled exception occurred:");
+            WriteExceptionStack(ex);
+        }
+
+        private void WriteExceptionStack(Exception ex)
+        {
+            if(ex.InnerException != null) WriteExceptionStack(ex.InnerException);
             System.Console.Error.WriteLine(ex.Message);
             System.Console.Error.WriteLine(ex.StackTrace);
         }

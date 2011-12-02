@@ -62,7 +62,7 @@
     <Compile Include="ArgumentClassExtensions.cs" />
     <Compile Include="ConsoleSession.cs" />
     <Compile Include="ErrorWithReturnCodeException.cs" />
-    <Compile Include="IFileNameListArgument.cs" />
+    <Compile Include="IArgumentList.cs" />
     <Compile Include="InvalidArgumentsException.cs" />
     <Compile Include="IVerbosityArgument.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

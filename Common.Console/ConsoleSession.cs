@@ -9,7 +9,22 @@ namespace Bluewire.Common.Console
     public class ConsoleSession<T>
     {
         public string Application { get; set; }
-        public string Usage { get; set; }
+
+        private string GetUsageString()
+        {
+            var usage = String.Format("{0} <options>", Path.GetFileName(Application));
+            ForArgumentsInterface<IArgumentList>(a => Usage += " " + ListParameterUsage);
+            return usage;
+        }
+
+        private string usage;
+        public string Usage
+        {
+            get { return this.usage ?? GetUsageString(); }
+            set { this.usage = value; }
+        }
+
+        public string ListParameterUsage { get; set; }
 
         public ConsoleSession(T arguments, OptionSet options)
         {
@@ -18,10 +33,8 @@ namespace Bluewire.Common.Console
             this.options = options;
             
             Application = Assembly.GetEntryAssembly().Location;
-
-            Usage = String.Format("{0} <options>", Path.GetFileName(Application));
-            ForArgumentsInterface<IFileNameListArgument>(a => Usage += " <file names ...>");
-
+            ListParameterUsage = "<file names ...>";
+            
             AddStandardOptions();
         }
 
@@ -138,15 +151,15 @@ namespace Bluewire.Common.Console
             {
                 var definitelyNotOptions = args.SkipWhile(a => a != "--");
 
-                var spareArguments = this.options.Parse(args).ToArray();
+                var spareArguments = this.options.Parse(args.TakeWhile(a => a != "--")).ToArray();
 
-                var possiblyUnprocessedOptions = spareArguments.Except(definitelyNotOptions).Where(a => a.StartsWith("-")).ToArray();
+                var possiblyUnprocessedOptions = spareArguments.Where(a => a.StartsWith("-")).ToArray();
                 if (possiblyUnprocessedOptions.Any())
                 {
                     throw new InvalidArgumentsException("Unrecognised option(s): {0}", String.Join(", ", possiblyUnprocessedOptions));
                 }
 
-                ForArgumentsInterface<IFileNameListArgument>(a => { foreach (var s in spareArguments) a.FileNames.Add(s); });
+                ForArgumentsInterface<IArgumentList>(a => { foreach (var s in spareArguments.Concat(definitelyNotOptions)) a.ArgumentList.Add(s); });
             }
             catch (OptionException ex)
             {

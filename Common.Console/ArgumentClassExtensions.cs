@@ -7,15 +7,15 @@ namespace Bluewire.Common.Console
 {
     public static class ArgumentClassExtensions
     {
-        public static IEnumerable<string> ResolveWildcards(this IFileNameListArgument arguments)
+        public static IEnumerable<string> ResolveAsFileNameWildcards(this IEnumerable<string> arguments)
         {
-            return ResolveWildcards(arguments, Directory.GetCurrentDirectory());
+            return ResolveAsFileNameWildcards(arguments, Directory.GetCurrentDirectory());
         }
 
-        public static IEnumerable<string> ResolveWildcards(this IFileNameListArgument arguments, string relativeTo)
+        public static IEnumerable<string> ResolveAsFileNameWildcards(this IEnumerable<string> arguments, string relativeTo)
         {
             if(!Path.IsPathRooted(relativeTo)) throw new InvalidOperationException(String.Format("Not an absolute path: {0}", relativeTo));
-            return arguments.FileNames.SelectMany(f => GetFilesInDirectory(relativeTo, f));
+            return arguments.SelectMany(f => GetFilesInDirectory(relativeTo, f));
         }
 
         private static string[] GetFilesInDirectory(string relativeTo, string arg)

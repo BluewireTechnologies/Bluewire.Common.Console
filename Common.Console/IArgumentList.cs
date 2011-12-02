@@ -2,8 +2,8 @@
 
 namespace Bluewire.Common.Console
 {
-    public interface IFileNameListArgument
+    public interface IArgumentList
     {
-        IList<string> FileNames { get; }
+        IList<string> ArgumentList { get; }
     }
 }

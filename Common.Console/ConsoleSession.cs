@@ -13,15 +13,15 @@ namespace Bluewire.Common.Console
         private string GetUsageString()
         {
             var usage = String.Format("{0} <options>", Path.GetFileName(Application));
-            ForArgumentsInterface<IArgumentList>(a => Usage += " " + ListParameterUsage);
+            ForArgumentsInterface<IArgumentList>(a => usage += " " + ListParameterUsage);
             return usage;
         }
 
-        private string usage;
+        private string customUsageString;
         public string Usage
         {
-            get { return this.usage ?? GetUsageString(); }
-            set { this.usage = value; }
+            get { return this.customUsageString ?? GetUsageString(); }
+            set { this.customUsageString = value; }
         }
 
         public string ListParameterUsage { get; set; }

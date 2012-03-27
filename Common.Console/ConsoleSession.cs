@@ -1,54 +1,35 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using Mono.Options;
 
 namespace Bluewire.Common.Console
 {
+    
     public class ConsoleSession<T>
     {
-        public string Application { get; set; }
+        private ConsoleArguments consoleArguments;
+        private SessionArguments<T> session;
 
-        private string GetUsageString()
+        public ConsoleSession(T arguments, OptionSet options) : this(new SessionArguments<T>(arguments, options))
         {
-            var usage = String.Format("{0} <options>", Path.GetFileName(Application));
-            ForArgumentsInterface<IArgumentList>(a => usage += " " + ListParameterUsage);
-            return usage;
         }
 
-        private string customUsageString;
-        public string Usage
+        public ConsoleSession(SessionArguments<T> session)
         {
-            get { return this.customUsageString ?? GetUsageString(); }
-            set { this.customUsageString = value; }
-        }
-
-        public string ListParameterUsage { get; set; }
-
-        public ConsoleSession(T arguments, OptionSet options)
-        {
-            this.arguments = arguments;
-            sessionArguments = new SessionArguments();
-            this.options = options;
-            
-            Application = Assembly.GetEntryAssembly().Location;
             ListParameterUsage = "<file names ...>";
-            
-            AddStandardOptions();
+            this.session = session;
+            consoleArguments = new ConsoleArguments();
+            AddConsoleOptions();
         }
 
         public int Run(string[] args, Func<T, int> application)
         {
-            if (hasRun) throw new NotSupportedException("ConsoleSession<T>#Run() may only be called once.");
-            hasRun = true;
-
             try
             {
-                ParseArguments(args);
+                session.Parse(args);
                 if (OnBeforeRun())
                 {
-                    return application(this.arguments);
+                    return application(this.session.Arguments);
                 }
                 return 0;
             }
@@ -68,42 +49,33 @@ namespace Bluewire.Common.Console
             }
         }
 
-        private void AddStandardOptions()
-        {
-            ForArgumentsInterface<IVerbosityArgument>(a => options.Add("v|verbose", "Verbose mode.", v => a.Verbose()));
 
-            options.Add("pause", "When finished, wait for the user to press <Enter> before terminating.", v => sessionArguments.PauseWhenDone = true);
-            options.Add("h|?|help", "Show usage.", v => sessionArguments.ShowUsage = true);
+        private string GetUsageString()
+        {
+            var usage = String.Format("{0} <options>", Path.GetFileName(session.Application));
+            session.ForArgumentsInterface<IArgumentList>(a => usage += " " + ListParameterUsage);
+            return usage;
         }
 
-
-
-
-
-        private readonly T arguments;
-        private readonly OptionSet options;
-
-        private bool HasArgumentsInterface<TInterface>()
+        private string customUsageString;
+        public string Usage
         {
-            return this.arguments is TInterface;
+            get { return this.customUsageString ?? GetUsageString(); }
+            set { this.customUsageString = value; }
         }
 
-        private bool ForArgumentsInterface<TInterface>(Action<TInterface> action)
-        {
-            if (HasArgumentsInterface<TInterface>())
-            {
-                action((TInterface)(object)this.arguments);
-                return true;
-            }
-            return false;
-        }
+        public string ListParameterUsage { get; set; }
 
-        private bool hasRun;
-        private SessionArguments sessionArguments;
+
+        private void AddConsoleOptions()
+        {
+            session.Options.Add("pause", "When finished, wait for the user to press <Enter> before terminating.", v => consoleArguments.PauseWhenDone = true);
+            session.Options.Add("h|?|help", "Show usage.", v => consoleArguments.ShowUsage = true);
+        }
 
         private bool OnBeforeRun()
         {
-            if (sessionArguments.ShowUsage)
+            if (consoleArguments.ShowUsage)
             {
                 ShowUsage();
                 return false;
@@ -113,7 +85,7 @@ namespace Bluewire.Common.Console
 
         private void OnAfterRun()
         {
-            if (sessionArguments.PauseWhenDone)
+            if (consoleArguments.PauseWhenDone)
             {
                 System.Console.Error.WriteLine("Press Enter to continue...");
                 System.Console.In.ReadLine();
@@ -142,32 +114,10 @@ namespace Bluewire.Common.Console
         private void ShowUsage()
         {
             System.Console.Error.WriteLine("Usage: {0}", Usage);
-            this.options.WriteOptionDescriptions(System.Console.Error);
+            this.session.Options.WriteOptionDescriptions(System.Console.Error);
         }
 
-        private void ParseArguments(string[] args)
-        {
-            try
-            {
-                var definitelyNotOptions = args.SkipWhile(a => a != "--");
-
-                var spareArguments = this.options.Parse(args.TakeWhile(a => a != "--")).ToArray();
-
-                var possiblyUnprocessedOptions = spareArguments.Where(a => a.StartsWith("-")).ToArray();
-                if (possiblyUnprocessedOptions.Any())
-                {
-                    throw new InvalidArgumentsException("Unrecognised option(s): {0}", String.Join(", ", possiblyUnprocessedOptions));
-                }
-
-                ForArgumentsInterface<IArgumentList>(a => { foreach (var s in spareArguments.Concat(definitelyNotOptions)) a.ArgumentList.Add(s); });
-            }
-            catch (OptionException ex)
-            {
-                throw new InvalidArgumentsException(ex);
-            }
-        }
-
-        class SessionArguments
+        public class ConsoleArguments
         {
             public bool ShowUsage { get; set; }
             public bool PauseWhenDone { get; set; }

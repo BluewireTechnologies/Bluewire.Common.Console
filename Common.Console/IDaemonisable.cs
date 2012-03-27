@@ -6,4 +6,14 @@
 
         IDaemon Start(TArguments arguments);
     }
+
+    public abstract class DaemonisableBase : IDaemonisable<object>
+    {
+        public SessionArguments<object> Configure()
+        {
+            return new NoArguments();
+        }
+
+        public abstract IDaemon Start(object args);
+    }
 }

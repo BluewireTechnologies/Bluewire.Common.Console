@@ -43,7 +43,7 @@ namespace Bluewire.Common.Console
 
         public void Parse(string[] args)
         {
-            if (hasParsed) throw new NotSupportedException("An AbstractSession object may only parse arguments once.");
+            if (hasParsed) throw new NotSupportedException("SessionArguments#Parse may only be called once.");
             hasParsed = true;
 
             try

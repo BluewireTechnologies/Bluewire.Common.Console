@@ -39,7 +39,7 @@ namespace Bluewire.Common.Console
             {
                 try
                 {
-                    instance.Stop();
+                    instance.Dispose();
                 }
                 finally
                 {
@@ -71,7 +71,7 @@ namespace Bluewire.Common.Console
             public int WaitForTermination()
             {
                 terminationEvent.WaitOne();
-                daemon.Stop();
+                daemon.Dispose();
                 return 0;
             }
         }

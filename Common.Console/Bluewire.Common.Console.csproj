@@ -52,6 +52,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml.Linq" />
@@ -61,17 +62,27 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentClassExtensions.cs" />
+    <Compile Include="Daemons\ConsoleDaemonMonitor.cs" />
     <Compile Include="ConsoleSession.cs" />
     <Compile Include="DaemonRunner.cs" />
+    <Compile Include="Daemons\DaemonRunner.cs" />
+    <Compile Include="Daemons\DaemonService.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ErrorWithReturnCodeException.cs" />
     <Compile Include="IArgumentList.cs" />
     <Compile Include="IDaemon.cs" />
     <Compile Include="IDaemonisable.cs" />
+    <Compile Include="IExecutionEnvironment.cs" />
     <Compile Include="InvalidArgumentsException.cs" />
+    <Compile Include="Daemons\IRunAsConsoleApplication.cs" />
+    <Compile Include="Daemons\IRunAsService.cs" />
+    <Compile Include="Daemons\IRunAsServiceInstaller.cs" />
     <Compile Include="IVerbosityArgument.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NoArguments.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Daemons\ServiceInstallerArguments.cs" />
     <Compile Include="SessionArguments.cs" />
     <Compile Include="ThirdParty\Options.cs" />
   </ItemGroup>

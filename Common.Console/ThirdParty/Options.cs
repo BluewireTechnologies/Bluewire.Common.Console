@@ -130,7 +130,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
@@ -149,7 +148,7 @@ using NDesk.Options;
 namespace NDesk.Options
 #else
 // ReSharper disable CheckNamespace
-namespace Mono.Options
+namespace Bluewire.Common.Console.ThirdParty
 #endif
 {
 	static class StringCoda {

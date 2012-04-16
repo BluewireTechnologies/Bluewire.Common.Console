@@ -1,6 +1,12 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Configuration.Install;
+using System.Linq;
+using System.Reflection;
 using System.ServiceProcess;
-using System.Threading;
+using Bluewire.Common.Console.Daemons;
+using Microsoft.Win32;
 
 namespace Bluewire.Common.Console
 {
@@ -8,72 +14,103 @@ namespace Bluewire.Common.Console
     {
         public static int Run<T>(string[] args, IDaemonisable<T> daemon)
         {
-            if (NativeMethods.IsRunningAsService())
+            return new DaemonRunner<T>(
+                new DefaultExecutionEnvironment(),
+                new RunAsConsoleApplication(),
+                new RunAsService(),
+                new RunAsServiceInstaller()).Run(daemon, args);
+        }
+
+
+
+        public class RunAsService : IRunAsService
+        {
+            public void Run<T>(IDaemonisable<T> daemon, string[] staticArgs)
             {
-                var servicesToRun = new ServiceBase[] { new DaemonService<T>(daemon) };
+                var servicesToRun = new ServiceBase[] { new DaemonService<T>(daemon, staticArgs) };
                 ServiceBase.Run(servicesToRun);
+            }
+        }
+
+        public class RunAsConsoleApplication : IRunAsConsoleApplication
+        {
+            public int Run<T>(IDaemonisable<T> daemon, T arguments)
+            {
+                return new ConsoleDaemonMonitor(daemon.Start(arguments)).WaitForTermination();
+            }
+        }
+
+        public class DefaultExecutionEnvironment : IExecutionEnvironment
+        {
+            public bool IsRunningAsService()
+            {
+                return NativeMethods.IsRunningAsService();
+            }
+        }
+
+        public class RunAsServiceInstaller : IRunAsServiceInstaller
+        {
+            public int Run<T>(IDaemonisable<T> daemon, ServiceInstallerArguments arguments, string[] serviceArguments)
+            {
+                var installer = CreateServiceInstaller(daemon);
+
+                if (arguments.RunUninstall)
+                {
+                    installer.Uninstall(null);
+                }
+                if (arguments.RunInstall)
+                {
+                    installer.Install(new Hashtable());
+
+                    SetServiceArguments(daemon, serviceArguments);
+                }
+
                 return 0;
             }
 
-            return new ConsoleSession<T>(daemon.Configure()).Run(args, a => new ConsoleDaemonMonitor(daemon.Start(a)).WaitForTermination());
-        }
-
-        class DaemonService<TArguments> : ServiceBase
-        {
-            private readonly IDaemonisable<TArguments> daemon;
-
-            public DaemonService(IDaemonisable<TArguments> daemon)
+            private TransactedInstaller CreateServiceInstaller<T>(IDaemonisable<T> daemon)
             {
-                this.daemon = daemon;
-            }
-
-            private IDaemon instance;
-            protected override void OnStart(string[] args)
-            {
-                var session = daemon.Configure();
-                session.Parse(args);
-                instance = daemon.Start(session.Arguments);
-            }
-
-            protected override void OnStop()
-            {
-                try
+                var serviceProcessInstaller = new ServiceProcessInstaller();
+                var serviceInstaller = new ServiceInstaller();
+                serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
+                serviceProcessInstaller.Password = null;
+                serviceProcessInstaller.Username = null;
+                serviceInstaller.ServiceName = daemon.Name;
+                serviceInstaller.StartType = ServiceStartMode.Automatic;
+                
+                var context = new InstallContext();
+                context.Parameters["assemblyPath"] = Assembly.GetEntryAssembly().Location;
+                return new TransactedInstaller()
                 {
-                    instance.Dispose();
-                }
-                finally
+                    Context = context,
+                    Installers =
+                        {
+                            serviceProcessInstaller,
+                            serviceInstaller
+                        }
+                };
+            }
+
+            private void SetServiceArguments<T>(IDaemonisable<T> daemon, string[] serviceArguments)
+            {
+                using (var configKey = Registry.LocalMachine.OpenSubKey(String.Format(@"SYSTEM\CurrentControlSet\services\{0}", daemon.Name), true)) 
                 {
-                    instance = null;
+                    var existingImagePath = configKey.GetValue("ImagePath");
+                    var argumentString = String.Join(" ", serviceArguments.Select(FormatArgument).ToArray());
+                    configKey.SetValue("ImagePath", existingImagePath + " " + argumentString);
                 }
             }
-        }
 
-        
-        class ConsoleDaemonMonitor
-        {
-            private readonly IDaemon daemon;
-            ManualResetEvent terminationEvent = new ManualResetEvent(false);
-            public ConsoleDaemonMonitor(IDaemon daemon)
+            private string FormatArgument(string arg)
             {
-                this.daemon = daemon;
-                System.Console.CancelKeyPress += Cancel;
-                System.Console.Out.WriteLine("Press CTRL-C to terminate.");
-            }
-
-            private void Cancel(object sender, ConsoleCancelEventArgs e)
-            {
-                System.Console.WriteLine("Shutting down.");
-                e.Cancel = false;
-                terminationEvent.Set();
-                System.Console.CancelKeyPress -= Cancel;
-            }
-
-            public int WaitForTermination()
-            {
-                terminationEvent.WaitOne();
-                daemon.Dispose();
-                return 0;
+                if (arg.Any(Char.IsWhiteSpace))
+                {
+                    return '"' + arg + '"';
+                }
+                return arg;
             }
         }
+
     }
+
 }

@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<log4net>
+  <appender name="ConfiguredRootAppender" type="log4net.Appender.MemoryAppender">
+  </appender>
+  <root>
+    <appender-ref ref="ConfiguredRootAppender" />
+  </root>
+</log4net>

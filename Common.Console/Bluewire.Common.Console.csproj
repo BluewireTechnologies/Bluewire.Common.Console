@@ -51,7 +51,11 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\log4net.2.0.0\lib\net35-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.Core" />
     <Reference Include="System.ServiceProcess" />
@@ -79,6 +83,12 @@
     <Compile Include="Daemons\IRunAsService.cs" />
     <Compile Include="Daemons\IRunAsServiceInstaller.cs" />
     <Compile Include="IVerbosityArgument.cs" />
+    <Compile Include="Logging\ConsoleOutputDescriptor.cs" />
+    <Compile Include="Logging\IOutputDescriptor.cs" />
+    <Compile Include="Logging\Log.cs" />
+    <Compile Include="Logging\LoggingConfigurer.cs" />
+    <Compile Include="Logging\OutputDescriptorBase.cs" />
+    <Compile Include="Logging\ServiceLogOutputDescriptor.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NoArguments.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -103,6 +113,10 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(EproDirPath)\Build\Epro.Common.Tasks" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

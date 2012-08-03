@@ -25,7 +25,11 @@ namespace Bluewire.Common.Console.Logging
             ConfigureDefaultLogging(repository);
             // No idea if this is the correct thing to do to cope with the situation where logging is never configured (ie. the
             // config file is invalid, or the configurator is never invoked) but it appears to pass the tests:
-            ((Hierarchy)repository).Configured = true;
+            if (!((Hierarchy)repository).Configured)
+            {
+                GetRootLogger(repository).Level = Level.Warn; // default
+                ((Hierarchy) repository).Configured = true;
+            }
         }
 
         private void OnConfigurationChanged(object sender, EventArgs args)
@@ -103,7 +107,7 @@ namespace Bluewire.Common.Console.Logging
         {
             var appender = outputDescriptor.CreateDefaultLog();
             appender.Name = "DefaultLogAppender";
-            return appender;
+            return Init(appender);
         }
 
         private static IAppender GetOrCreateConsoleAppender(ILoggerRepository repository, string name,
@@ -117,18 +121,22 @@ namespace Bluewire.Common.Console.Logging
                 appender = defaultAppender();
                 appender.Name = name;
             }
-            if (appender is AppenderSkeleton)
-            {
-                var filterable = (AppenderSkeleton)appender;
-                if (!EnumerateFilters(filterable.FilterHead).OfType<LevelRangeFilter>().Any())
-                {
-                    filterable.AddFilter(Init(filter));
-                }
-            }
+            AddFilterIfPossible(appender, filter);
             Init(appender);
             return appender;
         }
 
+        private static void AddFilterIfPossible<T>(IAppender appender, T filter) where T : IFilter
+        {
+            if (appender is AppenderSkeleton)
+            {
+                var filterable = (AppenderSkeleton)appender;
+                if (!EnumerateFilters(filterable.FilterHead).OfType<T>().Any())
+                {
+                    filterable.AddFilter(Init(filter));
+                }
+            }
+        }
 
 
         private static void AddAppenderIfMissing(Logger logger, IAppender appender)

@@ -74,6 +74,22 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ErrorWithReturnCodeException.cs" />
+    <Compile Include="Formatting\Alignment.cs" />
+    <Compile Include="Formatting\AlignmentFormatter.cs" />
+    <Compile Include="Formatting\Column.cs" />
+    <Compile Include="Formatting\ColumnFormatter.cs" />
+    <Compile Include="Formatting\ColumnSpacingFormatter.cs" />
+    <Compile Include="Formatting\EmptyRow.cs" />
+    <Compile Include="Formatting\FixedColumn.cs" />
+    <Compile Include="Formatting\FormattedColumn.cs" />
+    <Compile Include="Formatting\HeaderRow.cs" />
+    <Compile Include="Formatting\IColumn.cs" />
+    <Compile Include="Formatting\IColumnFormatter.cs" />
+    <Compile Include="Formatting\IFormattedColumn.cs" />
+    <Compile Include="Formatting\IRow.cs" />
+    <Compile Include="Formatting\Row.cs" />
+    <Compile Include="Formatting\Spacer.cs" />
+    <Compile Include="Formatting\TableFormatter.cs" />
     <Compile Include="IArgumentList.cs" />
     <Compile Include="IDaemon.cs" />
     <Compile Include="IDaemonisable.cs" />

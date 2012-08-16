@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -22,6 +23,24 @@ namespace Bluewire.Common.Console.Tests.Logging
             var resource = assembly.GetManifestResourceStream(resourceName);
             if (resource == null) throw new ArgumentException(String.Format("Resource {0} was not found.", resourceName), "name");
             return resource;
+        }
+
+        private Configuration OpenConfigurationFile(string filename)
+        {
+            return ConfigurationManager.OpenMappedExeConfiguration(new ExeConfigurationFileMap { ExeConfigFilename = filename }, ConfigurationUserLevel.None);
+        }
+
+        private string GetConfigurationStreamAsTempFile(string name)
+        {
+            var file = Path.GetTempFileName();
+            using (var configStream = GetConfigurationStream(name))
+            {
+                using (var reader = new StreamReader(configStream))
+                {
+                    File.WriteAllText(file, reader.ReadToEnd());
+                }
+                return file;
+            }
         }
 
         private TextWriter NULL_DEVICE;
@@ -50,20 +69,15 @@ namespace Bluewire.Common.Console.Tests.Logging
         [Test]
         public void ConfiguresDefaultLogging_If_EmptyConfiguration()
         {
+            using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
+            {
+                XmlConfigurator.Configure(config);
+            }
             using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", NULL_DEVICE, NULL_DEVICE)))
             {
-                using(var config = GetConfigurationStream("EmptyConfiguration.xml"))
-                {
-                    XmlConfigurator.Configure(config);
-                }
-
                 var appenders = LogManager.GetRepository().GetAppenders();
 
-                Assert.AreElementsEqualIgnoringOrder(new[]{
-                    "Console.STDOUT",
-                    "Console.STDERR",
-                    "DefaultLogAppender"
-                }, appenders.Select(a => a.Name));
+                AssertDefaultAppenders(appenders);
 
                 Assert.IsTrue(configurer.Console.IsWarnEnabled);
             }
@@ -72,35 +86,50 @@ namespace Bluewire.Common.Console.Tests.Logging
         [Test]
         public void ConfiguresDefaultLogging_If_NoConfiguration()
         {
+            using (var config = GetConfigurationStream("NoConfiguration.xml"))
+            {
+                XmlConfigurator.Configure(config);
+            }
             using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", NULL_DEVICE, NULL_DEVICE)))
             {
-                using (var config = GetConfigurationStream("NoConfiguration.xml"))
-                {
-                    XmlConfigurator.Configure(config);
-                }
-
                 var appenders = LogManager.GetRepository().GetAppenders();
 
-                Assert.AreElementsEqualIgnoringOrder(new[]{
-                    "Console.STDOUT",
-                    "Console.STDERR",
-                    "DefaultLogAppender"
-                }, appenders.Select(a => a.Name));
+                AssertDefaultAppenders(appenders);
+
+                Assert.IsTrue(configurer.Console.IsWarnEnabled);
+            }
+        }
+        [Test]
+        public void ConfiguresDefaultLogging_If_Log4NetIsNotConfigured()
+        {
+            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", NULL_DEVICE, NULL_DEVICE)))
+            {
+                var appenders = LogManager.GetRepository().GetAppenders();
+
+                AssertDefaultAppenders(appenders);
 
                 Assert.IsTrue(configurer.Console.IsWarnEnabled);
             }
         }
 
+        private void AssertDefaultAppenders(IAppender[] appenders)
+        {
+            Assert.AreElementsEqualIgnoringOrder(new[]{
+                "Console.STDOUT",
+                "Console.STDERR",
+                "DefaultLogAppender"
+            }, appenders.Select(a => a.Name));
+        }
+
         [Test]
         public void ConfiguresOnlyConsoleLogging_If_ConfigurationProvidesAppendersForTheRoot()
         {
+            using (var config = GetConfigurationStream("ConfigureRootAppender.xml"))
+            {
+                XmlConfigurator.Configure(config);
+            }
             using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", NULL_DEVICE, NULL_DEVICE)))
             {
-                using (var config = GetConfigurationStream("ConfigureRootAppender.xml"))
-                {
-                    XmlConfigurator.Configure(config);
-                }
-
                 var appenders = LogManager.GetRepository().GetAppenders();
 
                 Assert.AreElementsEqualIgnoringOrder(new[]{
@@ -116,14 +145,13 @@ namespace Bluewire.Common.Console.Tests.Logging
         [Test]
         public void ConsoleErrorsGoTo_STDERR()
         {
+            using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
+            {
+                XmlConfigurator.Configure(config);
+            }
             const string error = "Error Message";
             using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDOUT, STDERR)))
             {
-                using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
-                {
-                    XmlConfigurator.Configure(config);
-                }
-
                 configurer.Console.Error(error);
             }
             Assert.Contains(STDERR.ToString(), error);
@@ -133,14 +161,13 @@ namespace Bluewire.Common.Console.Tests.Logging
         [Test]
         public void ConsoleMessagesGoTo_STDOUT()
         {
+            using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
+            {
+                XmlConfigurator.Configure(config);
+            }
             const string message = "Info Message";
             using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDOUT, STDERR)))
             {
-                using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
-                {
-                    XmlConfigurator.Configure(config);
-                }
-
                 configurer.Console.Warn(message);
             }
             Assert.Contains(STDOUT.ToString(), message);
@@ -150,6 +177,11 @@ namespace Bluewire.Common.Console.Tests.Logging
         [Test]
         public void ConsoleMessagesDoNotGoTo_LogFile()
         {
+            using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
+            {
+                XmlConfigurator.Configure(config);
+            }
+
             const string message = "Info Message";
             using(var defaultLog = new StringWriter())
             {
@@ -157,11 +189,6 @@ namespace Bluewire.Common.Console.Tests.Logging
                 descriptor.Setup(d => d.CreateDefaultLog()).Returns(new TextWriterAppender { Writer = defaultLog });
                 using (var configurer = new LoggingConfigurer(descriptor.Object))
                 {
-                    using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
-                    {
-                        XmlConfigurator.Configure(config);
-                    }
-
                     configurer.Console.Warn(message);
                 }
                 Assert.DoesNotContain(defaultLog.ToString(), message);
@@ -171,14 +198,13 @@ namespace Bluewire.Common.Console.Tests.Logging
         [Test]
         public void RootMessagesDoNotGoTo_STDERR_Or_STDOUT()
         {
+            using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
+            {
+                XmlConfigurator.Configure(config);
+            }
             const string message = "Info Message";
             using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDOUT, STDERR)))
             {
-                using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
-                {
-                    XmlConfigurator.Configure(config);
-                }
-
                 LogManager.GetLogger("none").Info(message);
             }
             Assert.DoesNotContain(STDOUT.ToString(), message);
@@ -188,15 +214,15 @@ namespace Bluewire.Common.Console.Tests.Logging
         [Test]
         public void DefaultConsoleVerbosity_OnlyShowsWarnings()
         {
+            using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
+            {
+                XmlConfigurator.Configure(config);
+            }
+
             const string info = "Info Message";
             const string warning = "Warning Message";
             using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDOUT, STDERR)))
             {
-                using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
-                {
-                    XmlConfigurator.Configure(config);
-                }
-
                 configurer.Console.Info(info);
                 configurer.Console.Warn(warning);
             }
@@ -210,14 +236,13 @@ namespace Bluewire.Common.Console.Tests.Logging
         [Test]
         public void SettingConsoleVerbosity_AfterInitialConfig_CanEnableInfoMessages()
         {
+            using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
+            {
+                XmlConfigurator.Configure(config);
+            }
             const string info = "Info Message";
             using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDOUT, STDERR)))
             {
-                using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
-                {
-                    XmlConfigurator.Configure(config);
-                }
-
                 configurer.ConsoleVerbosity = Level.Info;
 
                 configurer.Console.Info(info);
@@ -229,15 +254,15 @@ namespace Bluewire.Common.Console.Tests.Logging
         [Test]
         public void SettingConsoleVerbosity_BeforeInitialConfig_CanEnableInfoMessages()
         {
+            using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
+            {
+                XmlConfigurator.Configure(config);
+            }
+
             const string info = "Info Message";
             using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDOUT, STDERR)))
             {
-                configurer.ConsoleVerbosity = Level.Info;
-
-                using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
-                {
-                    XmlConfigurator.Configure(config);
-                }
+                configurer.ConsoleVerbosity = Level.Info;   
 
                 configurer.Console.Info(info);
             }
@@ -245,5 +270,33 @@ namespace Bluewire.Common.Console.Tests.Logging
             Assert.DoesNotContain(STDERR.ToString(), info);
         }
 
+        [Test]
+        public void CanGetRunningApplicationsConfigurationFile()
+        {
+            var configuration = Log.GetApplicationConfiguration();
+            Assert.AreEqual("TestValue", configuration.AppSettings.Settings["TestKey"].Value);
+        }
+
+        [Test]
+        public void CanDetectLog4NetSectionInConfigurationFile()
+        {
+            var file = GetConfigurationStreamAsTempFile("ApplicationConfigurationWithEmptySection.xml");
+            var configuration = OpenConfigurationFile(file);
+
+            Assert.IsTrue(Log.HasLog4NetConfiguration(configuration));
+
+            File.Delete(file);
+        }
+
+        [Test]
+        public void CanDetectAbsentLog4NetSectionInConfigurationFile()
+        {
+            var file = GetConfigurationStreamAsTempFile("NoConfiguration.xml");
+            var configuration = OpenConfigurationFile(file);
+
+            Assert.IsFalse(Log.HasLog4NetConfiguration(configuration));
+
+            File.Delete(file);
+        }
     }
 }

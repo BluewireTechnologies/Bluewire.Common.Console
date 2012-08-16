@@ -101,6 +101,7 @@
     <Compile Include="IVerbosityArgument.cs" />
     <Compile Include="Logging\ConsoleOutputDescriptor.cs" />
     <Compile Include="Logging\IOutputDescriptor.cs" />
+    <Compile Include="Logging\IOutputDescriptorConfiguration.cs" />
     <Compile Include="Logging\Log.cs" />
     <Compile Include="Logging\LoggingConfigurer.cs" />
     <Compile Include="Logging\OutputDescriptorBase.cs" />

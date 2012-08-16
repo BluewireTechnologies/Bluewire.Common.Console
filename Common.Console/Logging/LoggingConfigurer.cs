@@ -15,6 +15,18 @@ namespace Bluewire.Common.Console.Logging
     {
         private readonly IOutputDescriptor outputDescriptor;
 
+        public static void EnsureLog4NetIsConfigured()
+        {
+            var repository = LogManager.GetRepository();
+            // No idea if this is the correct thing to do to cope with the situation where logging is never configured (ie. the
+            // config file is invalid, or the configurator is never invoked) but it appears to pass the tests:
+            if (!((Hierarchy)repository).Configured)
+            {
+                GetRootLogger(repository).Level = Level.Warn; // default
+                ((Hierarchy)repository).Configured = true;
+            }
+        }
+
         public LoggingConfigurer(IOutputDescriptor outputDescriptor)
         {
             this.outputDescriptor = outputDescriptor;
@@ -23,13 +35,7 @@ namespace Bluewire.Common.Console.Logging
             repository.ConfigurationChanged += OnConfigurationChanged;
 
             ConfigureDefaultLogging(repository);
-            // No idea if this is the correct thing to do to cope with the situation where logging is never configured (ie. the
-            // config file is invalid, or the configurator is never invoked) but it appears to pass the tests:
-            if (!((Hierarchy)repository).Configured)
-            {
-                GetRootLogger(repository).Level = Level.Warn; // default
-                ((Hierarchy) repository).Configured = true;
-            }
+            EnsureLog4NetIsConfigured();
         }
 
         private void OnConfigurationChanged(object sender, EventArgs args)
@@ -76,7 +82,7 @@ namespace Bluewire.Common.Console.Logging
             ConfigureConsoleLogging(repository, (Logger)Console.Logger);
         }
 
-        private Logger GetRootLogger(ILoggerRepository repository)
+        private static Logger GetRootLogger(ILoggerRepository repository)
         {
             return ((Hierarchy)repository).Root;
         }

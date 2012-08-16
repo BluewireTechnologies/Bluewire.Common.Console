@@ -14,7 +14,7 @@ namespace Bluewire.Common.Console.Logging
         private IAppender CreateAppender()
         {
             var appender = (FileAppender)CreateDefaultLog();
-            appender.File = String.Format("{0}.console.log", ApplicationName);
+            appender.File = GetLogFilePath("{0}.console.log", ApplicationName);
             return appender;
         }
 

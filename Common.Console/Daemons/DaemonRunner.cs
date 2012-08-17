@@ -51,6 +51,7 @@ namespace Bluewire.Common.Console.Daemons
             sessionArguments.Options.Add("install", i => serviceInstallerArguments.Install());
             sessionArguments.Options.Add("uninstall", i => serviceInstallerArguments.Uninstall());
             sessionArguments.Options.Add("reinstall", i => serviceInstallerArguments.Reinstall());
+            sessionArguments.Options.Add("service-name=", i => serviceInstallerArguments.ServiceName = i);
             return sessionArguments;
         }
 

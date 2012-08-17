@@ -13,6 +13,8 @@
         public bool RunInstall { get; private set; }
         public bool RunUninstall { get; private set; }
 
+        public string ServiceName {get;set;}
+
         public void Install()
         {
             AssertOnlyOneRequest();

@@ -56,6 +56,14 @@ namespace Bluewire.Common.Console.Tests
         }
 
         [Test]
+        public void CanOverrideServiceName()
+        {
+            runner.Run(daemon, "--install", "--service-name", "Test Name", "arg");
+
+            runAsServiceInstaller.Verify(s => s.Run(daemon, It.Is<ServiceInstallerArguments>(a => a.ServiceName == "Test Name"), new[] { "arg" }));
+        }
+
+        [Test]
         public void IfInvokedWithUninstallSwitch_UninstallsDaemon()
         {
             runner.Run(daemon, "--uninstall", "arg");

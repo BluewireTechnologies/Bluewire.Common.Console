@@ -52,7 +52,7 @@ namespace Bluewire.Common.Console
         {
             public int Run<T>(IDaemonisable<T> daemon, ServiceInstallerArguments arguments, string[] serviceArguments)
             {
-                var installer = CreateServiceInstaller(daemon);
+                var installer = CreateServiceInstaller(daemon, arguments);
 
                 if (arguments.RunUninstall)
                 {
@@ -68,14 +68,14 @@ namespace Bluewire.Common.Console
                 return 0;
             }
 
-            private TransactedInstaller CreateServiceInstaller<T>(IDaemonisable<T> daemon)
+            private TransactedInstaller CreateServiceInstaller<T>(IDaemonisable<T> daemon, ServiceInstallerArguments arguments)
             {
                 var serviceProcessInstaller = new ServiceProcessInstaller();
                 var serviceInstaller = new ServiceInstaller();
                 serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
                 serviceProcessInstaller.Password = null;
                 serviceProcessInstaller.Username = null;
-                serviceInstaller.ServiceName = daemon.Name;
+                serviceInstaller.ServiceName = String.IsNullOrEmpty(arguments.ServiceName) ? daemon.Name : arguments.ServiceName;
                 serviceInstaller.StartType = ServiceStartMode.Automatic;
                 
                 var context = new InstallContext();

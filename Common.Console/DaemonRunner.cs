@@ -68,13 +68,13 @@ namespace Bluewire.Common.Console
                 return 0;
             }
 
-            private TransactedInstaller CreateServiceInstaller<T>(IDaemonisable<T> daemon, ServiceInstallerArguments arguments)
+            private static TransactedInstaller CreateServiceInstaller<T>(IDaemonisable<T> daemon, ServiceInstallerArguments arguments)
             {
                 var serviceProcessInstaller = new ServiceProcessInstaller();
                 var serviceInstaller = new ServiceInstaller();
-                serviceProcessInstaller.Account = ServiceAccount.LocalSystem;
-                serviceProcessInstaller.Password = null;
-                serviceProcessInstaller.Username = null;
+
+                arguments.GetAccount().Apply(serviceProcessInstaller);
+
                 serviceInstaller.ServiceName = String.IsNullOrEmpty(arguments.ServiceName) ? daemon.Name : arguments.ServiceName;
                 serviceInstaller.StartType = ServiceStartMode.Automatic;
                 
@@ -101,7 +101,7 @@ namespace Bluewire.Common.Console
                 }
             }
 
-            private string FormatArgument(string arg)
+            private static string FormatArgument(string arg)
             {
                 if (arg.Any(Char.IsWhiteSpace))
                 {

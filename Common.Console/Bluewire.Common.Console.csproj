@@ -73,6 +73,8 @@
     <Compile Include="Daemons\DaemonService.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Daemons\ServiceAccountCredentials.cs" />
+    <Compile Include="Daemons\ServiceAccountCredentialsFactory.cs" />
     <Compile Include="ErrorWithReturnCodeException.cs" />
     <Compile Include="Formatting\Alignment.cs" />
     <Compile Include="Formatting\AlignmentFormatter.cs" />

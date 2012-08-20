@@ -15,6 +15,14 @@
 
         public string ServiceName {get;set;}
 
+        public string ServiceUser { get; set; }
+        public string ServicePassword { get; set; }
+
+        public ServiceAccountCredentials GetAccount()
+        {
+            return new ServiceAccountCredentialsFactory().Create(ServiceUser, ServicePassword);
+        }
+
         public void Install()
         {
             AssertOnlyOneRequest();

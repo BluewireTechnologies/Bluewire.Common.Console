@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
 using Bluewire.Common.Console.Daemons;
+using Bluewire.Common.Console.Logging;
 using Microsoft.Win32;
 
 namespace Bluewire.Common.Console
@@ -52,35 +53,34 @@ namespace Bluewire.Common.Console
         {
             public int Run<T>(IDaemonisable<T> daemon, ServiceInstallerArguments arguments, string[] serviceArguments)
             {
-                var installer = CreateServiceInstaller(daemon, arguments);
+                var serviceInstaller = CreateServiceInstaller(daemon, arguments);
+                var serviceName = serviceInstaller.ServiceName;
+                var installer = CreateInstaller(serviceInstaller, arguments);
 
                 if (arguments.RunUninstall)
                 {
+                    Log.Console.InfoFormat("Uninstalling service {0}", serviceName);
                     installer.Uninstall(null);
                 }
                 if (arguments.RunInstall)
                 {
+                    Log.Console.InfoFormat("Installing service {0}\n\tstart type:{1}\n\targuments:{2}", serviceInstaller.ServiceName, serviceInstaller.StartType, String.Join(", ", serviceArguments));
                     installer.Install(new Hashtable());
 
-                    SetServiceArguments(daemon, serviceArguments);
+                    SetServiceArguments(serviceName, serviceArguments);
                 }
 
                 return 0;
             }
-
-            private static TransactedInstaller CreateServiceInstaller<T>(IDaemonisable<T> daemon, ServiceInstallerArguments arguments)
+            
+            private static TransactedInstaller CreateInstaller(ServiceInstaller serviceInstaller, ServiceInstallerArguments arguments)
             {
                 var serviceProcessInstaller = new ServiceProcessInstaller();
-                var serviceInstaller = new ServiceInstaller();
-
                 arguments.GetAccount().Apply(serviceProcessInstaller);
 
-                serviceInstaller.ServiceName = String.IsNullOrEmpty(arguments.ServiceName) ? daemon.Name : arguments.ServiceName;
-                serviceInstaller.StartType = ServiceStartMode.Automatic;
-                
                 var context = new InstallContext();
                 context.Parameters["assemblyPath"] = Assembly.GetEntryAssembly().Location;
-                return new TransactedInstaller()
+                return new TransactedInstaller
                 {
                     Context = context,
                     Installers =
@@ -91,12 +91,22 @@ namespace Bluewire.Common.Console
                 };
             }
 
-            private void SetServiceArguments<T>(IDaemonisable<T> daemon, string[] serviceArguments)
+            private static ServiceInstaller CreateServiceInstaller<T>(IDaemonisable<T> daemon, ServiceInstallerArguments arguments)
             {
-                using (var configKey = Registry.LocalMachine.OpenSubKey(String.Format(@"SYSTEM\CurrentControlSet\services\{0}", daemon.Name), true)) 
+                var serviceInstaller = new ServiceInstaller();
+                serviceInstaller.ServiceName = String.IsNullOrEmpty(arguments.ServiceName) ? daemon.Name : arguments.ServiceName;
+                serviceInstaller.StartType = ServiceStartMode.Automatic;
+                return serviceInstaller;
+            }
+
+            private void SetServiceArguments(string serviceName, string[] serviceArguments)
+            {
+                var argumentString = String.Join(" ", serviceArguments.Select(FormatArgument).ToArray());
+                Log.Console.InfoFormat("Setting service arguments for {0}: {1}", serviceName, argumentString);
+
+                using (var configKey = Registry.LocalMachine.OpenSubKey(String.Format(@"SYSTEM\CurrentControlSet\services\{0}", serviceName), true)) 
                 {
                     var existingImagePath = configKey.GetValue("ImagePath");
-                    var argumentString = String.Join(" ", serviceArguments.Select(FormatArgument).ToArray());
                     configKey.SetValue("ImagePath", existingImagePath + " " + argumentString);
                 }
             }

@@ -30,7 +30,7 @@ namespace Bluewire.Common.Console.Daemons
                 return 0;
             }
 
-            var serviceInstallerArguments = new ServiceInstallerArguments();
+            var serviceInstallerArguments = new ServiceInstallerArguments<T>(daemon);
 
             var sessionArguments = AddInstallerOptions(daemon.Configure(), serviceInstallerArguments);
             var session = new ConsoleSession<T>(sessionArguments);
@@ -39,14 +39,14 @@ namespace Bluewire.Common.Console.Daemons
                 if (serviceInstallerArguments.ServiceInstallationRequested)
                 {
                     // reparse, stripping out only the installer-related arguments.
-                    var consoleArguments = AddInstallerOptions(new SessionArguments(new OptionSet()), new ServiceInstallerArguments()).Strip(args);
-                    return runAsServiceInstaller.Run(daemon, serviceInstallerArguments, consoleArguments);
+                    var consoleArguments = AddInstallerOptions(new SessionArguments(new OptionSet()), new ServiceInstallerArguments<T>(daemon)).Strip(args);
+                    return runAsServiceInstaller.Run(serviceInstallerArguments, consoleArguments);
                 }
                 return runAsConsoleApplication.Run(daemon, a);
             });
         }
 
-        private TArgs AddInstallerOptions<TArgs>(TArgs sessionArguments, ServiceInstallerArguments serviceInstallerArguments) where TArgs : SessionArguments
+        private TArgs AddInstallerOptions<TArgs, T>(TArgs sessionArguments, ServiceInstallerArguments<T> serviceInstallerArguments) where TArgs : SessionArguments
         {
             sessionArguments.Options.Add("install", i => serviceInstallerArguments.Install());
             sessionArguments.Options.Add("uninstall", i => serviceInstallerArguments.Uninstall());

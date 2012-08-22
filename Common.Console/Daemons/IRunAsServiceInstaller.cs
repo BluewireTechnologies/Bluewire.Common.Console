@@ -2,6 +2,6 @@
 {
     public interface IRunAsServiceInstaller
     {
-        int Run<T>(IDaemonisable<T> daemon, ServiceInstallerArguments arguments, string[] serviceArguments);
+        int Run<T>(ServiceInstallerArguments<T> arguments, string[] serviceArguments);
     }
 }

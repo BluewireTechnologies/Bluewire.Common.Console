@@ -8,6 +8,7 @@ using System.ServiceProcess;
 using Bluewire.Common.Console.Daemons;
 using Bluewire.Common.Console.Logging;
 using Microsoft.Win32;
+using Console = System.Console;
 
 namespace Bluewire.Common.Console
 {
@@ -51,29 +52,30 @@ namespace Bluewire.Common.Console
 
         public class RunAsServiceInstaller : IRunAsServiceInstaller
         {
-            public int Run<T>(IDaemonisable<T> daemon, ServiceInstallerArguments arguments, string[] serviceArguments)
+            public int Run<T>(ServiceInstallerArguments<T> arguments, string[] serviceArguments)
             {
-                var serviceInstaller = CreateServiceInstaller(daemon, arguments);
-                var serviceName = serviceInstaller.ServiceName;
+                var serviceInstaller = CreateServiceInstaller(arguments);
                 var installer = CreateInstaller(serviceInstaller, arguments);
 
                 if (arguments.RunUninstall)
                 {
-                    Log.Console.InfoFormat("Uninstalling service {0}", serviceName);
+                    System.Console.Out.WriteLine("Uninstalling service {0}", serviceInstaller.ServiceName);
                     installer.Uninstall(null);
                 }
                 if (arguments.RunInstall)
                 {
-                    Log.Console.InfoFormat("Installing service {0}\n\tstart type:{1}\n\targuments:{2}", serviceInstaller.ServiceName, serviceInstaller.StartType, String.Join(", ", serviceArguments));
+                    System.Console.Out.WriteLine("Installing service {0}", serviceInstaller.ServiceName);
+                    System.Console.Out.WriteLine("\tStart type: {0}", serviceInstaller.StartType);
+                    System.Console.Out.WriteLine("\tArguments:  {0}", String.Join(" ", serviceArguments));
                     installer.Install(new Hashtable());
 
-                    SetServiceArguments(serviceName, serviceArguments);
+                    SetServiceArguments(serviceInstaller.ServiceName, serviceArguments);
                 }
 
                 return 0;
             }
             
-            private static TransactedInstaller CreateInstaller(ServiceInstaller serviceInstaller, ServiceInstallerArguments arguments)
+            private static TransactedInstaller CreateInstaller<T>(ServiceInstaller serviceInstaller, ServiceInstallerArguments<T> arguments)
             {
                 var serviceProcessInstaller = new ServiceProcessInstaller();
                 arguments.GetAccount().Apply(serviceProcessInstaller);
@@ -91,10 +93,10 @@ namespace Bluewire.Common.Console
                 };
             }
 
-            private static ServiceInstaller CreateServiceInstaller<T>(IDaemonisable<T> daemon, ServiceInstallerArguments arguments)
+            private static ServiceInstaller CreateServiceInstaller<T>(ServiceInstallerArguments<T> arguments)
             {
                 var serviceInstaller = new ServiceInstaller();
-                serviceInstaller.ServiceName = String.IsNullOrEmpty(arguments.ServiceName) ? daemon.Name : arguments.ServiceName;
+                serviceInstaller.ServiceName = arguments.ServiceName;
                 serviceInstaller.StartType = ServiceStartMode.Automatic;
                 return serviceInstaller;
             }
@@ -102,7 +104,7 @@ namespace Bluewire.Common.Console
             private void SetServiceArguments(string serviceName, string[] serviceArguments)
             {
                 var argumentString = String.Join(" ", serviceArguments.Select(FormatArgument).ToArray());
-                Log.Console.InfoFormat("Setting service arguments for {0}: {1}", serviceName, argumentString);
+                System.Console.Out.WriteLine("Setting service arguments for {0}: {1}", serviceName, argumentString);
 
                 using (var configKey = Registry.LocalMachine.OpenSubKey(String.Format(@"SYSTEM\CurrentControlSet\services\{0}", serviceName), true)) 
                 {

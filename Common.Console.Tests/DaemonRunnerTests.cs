@@ -16,8 +16,10 @@ namespace Bluewire.Common.Console.Tests
         private DaemonRunner<NoArguments> runner;
         private IDaemonisable<NoArguments> daemon;
 
-        private ServiceInstallerArguments serviceInstallerArguments;
+        private ServiceInstallerArguments<NoArguments> serviceInstallerArguments;
         private string[] passthroughArguments;
+
+        private const string DAEMON_NAME = "Daemon";
 
         [SetUp]
         public void SetUp()
@@ -32,19 +34,20 @@ namespace Bluewire.Common.Console.Tests
 
             var daemon = new Mock<IDaemonisable<NoArguments>>();
             daemon.Setup(d => d.Configure()).Returns(() => new SessionArguments<NoArguments>(new NoArguments(), new OptionSet()));
+            daemon.SetupGet(d => d.Name).Returns(DAEMON_NAME);
             this.daemon = daemon.Object;
 
             // I can't figure out if Moq provides direct access to recorded invocations. The docs are unhelpful.
             serviceInstallerArguments = null;
             passthroughArguments = null;
-            runAsServiceInstaller.Setup(s => s.Run(this.daemon, It.IsAny<ServiceInstallerArguments>(), It.IsAny<string[]>())).Callback((IDaemonisable<NoArguments> d, ServiceInstallerArguments sia, string[] a) =>
+            runAsServiceInstaller.Setup(s => s.Run(It.IsAny<ServiceInstallerArguments<NoArguments>>(), It.IsAny<string[]>())).Callback((ServiceInstallerArguments<NoArguments> sia, string[] a) =>
             {
                 serviceInstallerArguments = sia;
                 passthroughArguments = a;
             });
         }
 
-        private void VerifyServiceArguments(Action<ServiceInstallerArguments, string[]> asserts)
+        private void VerifyServiceArguments(Action<ServiceInstallerArguments<NoArguments>, string[]> asserts)
         {
             Assert.IsNotNull(serviceInstallerArguments, "IRunAsServiceInstaller#Run(IDaemon, ServiceInstallerArguments, string[]) was not called.");
             Assert.IsNotNull(passthroughArguments, "IRunAsServiceInstaller#Run(IDaemon, ServiceInstallerArguments, string[]) was not called.");
@@ -82,13 +85,21 @@ namespace Bluewire.Common.Console.Tests
             });
         }
 
+
+        [Test]
+        public void ServiceNameDefaultsToDaemonName()
+        {
+            runner.Run(daemon, "--install", "arg");
+
+            VerifyServiceArguments((sa, ca) => Assert.AreEqual(DAEMON_NAME, sa.ServiceName));
+        }
+
         [Test]
         public void CanOverrideServiceName()
         {
             runner.Run(daemon, "--install", "--service-name", "Test Name", "arg");
 
             VerifyServiceArguments((sa, ca) => Assert.AreEqual("Test Name", sa.ServiceName));
-            runAsServiceInstaller.Verify(s => s.Run(daemon, It.Is<ServiceInstallerArguments>(a => a.ServiceName == "Test Name"), new[] { "arg" }));
         }
 
 

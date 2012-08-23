@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ServiceProcess;
 
 namespace Bluewire.Common.Console.Daemons
 {
@@ -40,7 +41,7 @@ namespace Bluewire.Common.Console.Daemons
 
         public ServiceAccountCredentials GetAccount()
         {
-            return new ServiceAccountCredentialsFactory().Create(ServiceUser, ServicePassword);
+            return new ServiceAccountCredentialsFactory().Create(ServiceUser, ServicePassword) ?? new ServiceAccountCredentials();
         }
 
         public void Install()

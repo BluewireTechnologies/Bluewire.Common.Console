@@ -5,9 +5,9 @@ using System.ServiceProcess;
 
 namespace Bluewire.Common.Console.Daemons
 {
-    public class ServiceAccountCredentials
+    public struct ServiceAccountCredentials
     {
-        public ServiceAccountCredentials(string userName, string password, string domain = null)
+        public ServiceAccountCredentials(string userName, string password, string domain = null) : this()
         {
             if (userName == null) throw new ArgumentNullException("userName");
             if (password == null) throw new ArgumentNullException("password");
@@ -17,14 +17,19 @@ namespace Bluewire.Common.Console.Daemons
         }
 
 
-        public ServiceAccountCredentials(ServiceAccount serviceAccount)
+        public ServiceAccountCredentials(ServiceAccount serviceAccount) : this()
         {
             if (serviceAccount == ServiceAccount.User) throw new ArgumentException("User account requires name and password.");
             ServiceAccount = serviceAccount;
         }
 
-
+        /// <summary>
+        /// Account type. Default is LocalService (enum value 0).
+        /// </summary>
         public ServiceAccount ServiceAccount { get; private set; }
+        /// <summary>
+        /// Credentials, if account type is User.
+        /// </summary>
         public NetworkCredential Credentials { get; private set; }
 
         public void Apply(ServiceProcessInstaller installer)

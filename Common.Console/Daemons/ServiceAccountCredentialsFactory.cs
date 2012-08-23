@@ -6,8 +6,9 @@ namespace Bluewire.Common.Console.Daemons
 {
     public class ServiceAccountCredentialsFactory
     {
-        public ServiceAccountCredentials Create(string userName, string password)
+        public ServiceAccountCredentials? Create(string userName, string password)
         {
+            if (userName == null) return null;
             if (password == null)
             {
                 switch (userName.ToLowerInvariant())

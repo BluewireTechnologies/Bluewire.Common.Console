@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Bluewire.Common.Console.ThirdParty;
 
 namespace Bluewire.Common.Console.Daemons
@@ -46,13 +47,13 @@ namespace Bluewire.Common.Console.Daemons
             });
         }
 
-        private TArgs AddInstallerOptions<TArgs, T>(TArgs sessionArguments, ServiceInstallerArguments<T> serviceInstallerArguments) where TArgs : SessionArguments
+        private static TArgs AddInstallerOptions<TArgs>(TArgs sessionArguments, ServiceInstallerArguments<T> serviceInstallerArguments) where TArgs : SessionArguments
         {
-            sessionArguments.Options.Add("install", i => serviceInstallerArguments.Install());
-            sessionArguments.Options.Add("uninstall", i => serviceInstallerArguments.Uninstall());
-            sessionArguments.Options.Add("reinstall", i => serviceInstallerArguments.Reinstall());
-            sessionArguments.Options.Add("service-name=", i => serviceInstallerArguments.ServiceName = i);
-            sessionArguments.Options.Add("service-user=", i => serviceInstallerArguments.ServiceUser = i);
+            sessionArguments.Options.Add("install", "Install this application as a service.", i => serviceInstallerArguments.Install());
+            sessionArguments.Options.Add("uninstall", "Uninstall this service.", i => serviceInstallerArguments.Uninstall());
+            sessionArguments.Options.Add("reinstall", "Reinstall this service.", i => serviceInstallerArguments.Reinstall());
+            sessionArguments.Options.Add("service-name=", String.Format("Use the specified name for the service. Default: {0}", serviceInstallerArguments.ServiceName), i => serviceInstallerArguments.ServiceName = i);
+            sessionArguments.Options.Add("service-user=", "Run the service under the specified account. Default: LocalService", i => serviceInstallerArguments.ServiceUser = i);
             sessionArguments.Options.Add("service-password=", i => serviceInstallerArguments.ServicePassword = i);
             return sessionArguments;
         }

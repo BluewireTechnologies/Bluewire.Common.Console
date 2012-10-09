@@ -39,7 +39,6 @@ namespace Bluewire.Common.Console.Daemons
 
         public string ServiceUser { get; set; }
         public string ServicePassword { get; set; }
-        public string DependsOn { get; set; }
 
         public ServiceAccountCredentials GetAccount()
         {

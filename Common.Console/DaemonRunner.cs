@@ -98,11 +98,7 @@ namespace Bluewire.Common.Console
                 var serviceInstaller = new ServiceInstaller();
                 serviceInstaller.ServiceName = arguments.ServiceName;
                 serviceInstaller.StartType = ServiceStartMode.Automatic;
-
-                if (!string.IsNullOrEmpty(arguments.DependsOn))
-                {
-                    serviceInstaller.ServicesDependedOn = new [] {arguments.DependsOn};
-                }
+                serviceInstaller.ServicesDependedOn = arguments.Daemon.GetDependencies();
 
                 return serviceInstaller;
             }

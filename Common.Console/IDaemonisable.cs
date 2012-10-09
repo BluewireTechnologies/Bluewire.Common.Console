@@ -9,6 +9,7 @@ namespace Bluewire.Common.Console
         SessionArguments<TArguments> Configure();
 
         IDaemon Start(TArguments arguments);
+        string[] GetDependencies();
     }
 
     public abstract class DaemonisableBase : IDaemonisable<object>
@@ -25,5 +26,10 @@ namespace Bluewire.Common.Console
         }
 
         public abstract IDaemon Start(object args);
+
+        public virtual string[] GetDependencies()
+        {
+            return new string[0];
+        }
     }
 }

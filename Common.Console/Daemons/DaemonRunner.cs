@@ -55,7 +55,6 @@ namespace Bluewire.Common.Console.Daemons
             sessionArguments.Options.Add("service-name=", String.Format("Use the specified name for the service. Default: {0}", serviceInstallerArguments.ServiceName), i => serviceInstallerArguments.ServiceName = i);
             sessionArguments.Options.Add("service-user=", "Run the service under the specified account. Default: LocalService", i => serviceInstallerArguments.ServiceUser = i);
             sessionArguments.Options.Add("service-password=", i => serviceInstallerArguments.ServicePassword = i);
-            sessionArguments.Options.Add("depends-on=", "Depends on service name", i => serviceInstallerArguments.DependsOn = i);
             return sessionArguments;
         }
 

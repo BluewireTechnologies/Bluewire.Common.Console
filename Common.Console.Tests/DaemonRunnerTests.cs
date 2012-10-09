@@ -102,6 +102,14 @@ namespace Bluewire.Common.Console.Tests
             VerifyServiceArguments((sa, ca) => Assert.AreEqual("Test Name", sa.ServiceName));
         }
 
+        [Test]
+        public void CanSpecifyDependency()
+        {
+            runner.Run(daemon, "--install", "--depends-on", "Test Service", "arg");
+
+            VerifyServiceArguments((sa, ca) => Assert.AreEqual("Test Service", sa.DependsOn));
+        }
+
 
         [Test]
         public void CanSpecifyServiceAccount()

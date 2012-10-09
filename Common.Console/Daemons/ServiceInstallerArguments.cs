@@ -13,6 +13,7 @@ namespace Bluewire.Common.Console.Daemons
         }
 
         public bool ServiceInstallationRequested { get; private set; }
+        
 
         private void AssertOnlyOneRequest()
         {
@@ -38,6 +39,7 @@ namespace Bluewire.Common.Console.Daemons
 
         public string ServiceUser { get; set; }
         public string ServicePassword { get; set; }
+        public string DependsOn { get; set; }
 
         public ServiceAccountCredentials GetAccount()
         {

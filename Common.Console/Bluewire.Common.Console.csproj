@@ -110,6 +110,8 @@
     <Compile Include="Logging\ServiceLogOutputDescriptor.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="NoArguments.cs" />
+    <Compile Include="Progress\IProgressReceiver.cs" />
+    <Compile Include="Progress\PowerOfTenMilestoneCounter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Daemons\ServiceInstallerArguments.cs" />
     <Compile Include="SessionArguments.cs" />

@@ -39,34 +39,5 @@ namespace Bluewire.Common.Console.Progress
             this.stopwatch.Stop();
             Milestone(this.count, this.stopwatch.Elapsed);
         }
-
-        /// <summary>
-        /// Implementation of rounding for duration.
-        /// For 0: returns 0.
-        /// For 1 >= x > 0: returns 1.
-        /// Else: returns round(x).
-        /// Rounds 0 to 0.
-        /// Rounds numbers between zero and one to
-        /// </summary>
-        /// <param name="num"></param>
-        /// <returns></returns>
-        protected static long RoundDuration(double num)
-        {
-            if (num == 0) return 0;
-            if (num <= 1) return 1;
-            return (long)Math.Round(num);
-        }
-
-        protected static object FormatItemDuration(TimeSpan totalDuration, long count)
-        {
-            var itemDuration = TimeSpan.FromTicks(totalDuration.Ticks / count);
-
-            if (itemDuration.TotalMilliseconds < 3000)
-            {
-                return String.Format("{0}ms", itemDuration.TotalMilliseconds);
-            }
-            return TimeSpan.FromSeconds(RoundDuration(itemDuration.TotalSeconds));
-        }
-
     }
 }

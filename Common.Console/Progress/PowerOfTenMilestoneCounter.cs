@@ -21,11 +21,11 @@ namespace Bluewire.Common.Console.Progress
             this.stopwatch.Start();
         }
 
-        public void Increment()
+        public void Increment(int increment = 1)
         {
-            this.count++;
+            this.count += increment;
 
-            if (this.count == this.nextMilestone)
+            while (this.count >= this.nextMilestone)
             {
                 Milestone(this.count, this.stopwatch.Elapsed);
                 this.nextMilestone *= 10;

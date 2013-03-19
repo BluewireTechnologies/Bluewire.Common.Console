@@ -16,12 +16,10 @@ namespace Bluewire.Common.Console.Progress
         /// For 0: returns 0.
         /// For 1 >= x > 0: returns 1.
         /// Else: returns round(x).
-        /// Rounds 0 to 0.
-        /// Rounds numbers between zero and one to
         /// </summary>
         /// <param name="num"></param>
         /// <returns></returns>
-        private static long RoundDuration(double num)
+        public static long RoundDuration(double num)
         {
             if (num == 0) return 0;
             if (num <= 1) return 1;

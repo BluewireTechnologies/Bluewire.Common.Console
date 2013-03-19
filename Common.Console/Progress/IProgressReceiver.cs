@@ -3,7 +3,7 @@
     public interface IProgressReceiver
     {
         void Start();
-        void Increment();
+        void Increment(int increment = 1);
         void End();
     }
 }

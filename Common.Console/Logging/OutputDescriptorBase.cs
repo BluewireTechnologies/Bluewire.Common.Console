@@ -26,9 +26,12 @@ namespace Bluewire.Common.Console.Logging
 
         public virtual IAppender CreateDefaultLog()
         {
-            return new FileAppender
+            return new RollingFileAppender
             {
-                File = GetLogFilePath("{0}.log", this.ApplicationName),
+                File = GetLogFilePath("{0}", this.ApplicationName),
+                RollingStyle = RollingFileAppender.RollingMode.Date,
+                StaticLogFileName = true,
+                DatePattern = @"'.'yyyy-MM-dd'.log'",
                 Layout = Init(new PatternLayout("%date [%3thread] %-5level %logger %ndc - %message%newline")),
                 LockingModel = new FileAppender.MinimalLock()
             };

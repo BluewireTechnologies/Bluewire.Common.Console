@@ -1,7 +1,9 @@
-﻿namespace Bluewire.Common.Console.Daemons
+﻿using Bluewire.Common.Console.Environment;
+
+namespace Bluewire.Common.Console.Daemons
 {
     public interface IRunAsConsoleApplication
     {
-        int Run<T>(IDaemonisable<T> daemon, T arguments);
+        int Run<T>(ApplicationEnvironment environment, IDaemonisable<T> daemon, T arguments);
     }
 }

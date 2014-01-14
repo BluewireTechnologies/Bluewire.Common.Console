@@ -71,8 +71,18 @@
     <Compile Include="Daemons\DaemonService.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Daemons\HostedDaemonMonitor.cs" />
+    <Compile Include="Daemons\IHostedDaemonInstance.cs" />
+    <Compile Include="Daemons\IRunAsHostedService.cs" />
     <Compile Include="Daemons\ServiceAccountCredentials.cs" />
     <Compile Include="Daemons\ServiceAccountCredentialsFactory.cs" />
+    <Compile Include="Environment\ApplicationEnvironment.cs" />
+    <Compile Include="Environment\EnvironmentAnalyser.cs" />
+    <Compile Include="Environment\ExecutionEnvironmentHelpers.cs" />
+    <Compile Include="Environment\HostedEnvironment.cs" />
+    <Compile Include="Environment\InitialisedHostedEnvironment.cs" />
+    <Compile Include="Environment\IRunningEnvironment.cs" />
+    <Compile Include="Environment\ServiceEnvironment.cs" />
     <Compile Include="ErrorWithReturnCodeException.cs" />
     <Compile Include="Formatting\Alignment.cs" />
     <Compile Include="Formatting\AlignmentFormatter.cs" />
@@ -90,10 +100,11 @@
     <Compile Include="Formatting\Row.cs" />
     <Compile Include="Formatting\Spacer.cs" />
     <Compile Include="Formatting\TableFormatter.cs" />
+    <Compile Include="Hosting\HostingDomain.cs" />
     <Compile Include="IArgumentList.cs" />
     <Compile Include="IDaemon.cs" />
     <Compile Include="IDaemonisable.cs" />
-    <Compile Include="IExecutionEnvironment.cs" />
+    <Compile Include="Environment\IExecutionEnvironment.cs" />
     <Compile Include="InvalidArgumentsException.cs" />
     <Compile Include="Daemons\IRunAsConsoleApplication.cs" />
     <Compile Include="Daemons\IRunAsService.cs" />
@@ -136,6 +147,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets. -->

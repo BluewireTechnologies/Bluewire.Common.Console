@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
 using Bluewire.Common.Console.Daemons;
+using Bluewire.Common.Console.Environment;
 using Bluewire.Common.Console.Logging;
 using Microsoft.Win32;
 using Console = System.Console;
@@ -16,18 +17,42 @@ namespace Bluewire.Common.Console
     {
         public static int Run<T>(string[] args, IDaemonisable<T> daemon)
         {
+            return Run(args, daemon, new EnvironmentAnalyser().GetEnvironment());
+        }
+
+        /// <summary>
+        /// Intended for testing. This override permits the execution environment to be specified explicitly.
+        /// </summary>
+        /// <remarks>
+        /// Refrain from using this. In real applications it will cause incorrect behaviour whenever the daemon
+        /// is not actually running in the specified execution environment.
+        /// </remarks>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="args"></param>
+        /// <param name="daemon"></param>
+        /// <param name="environment"></param>
+        /// <returns></returns>
+        public static int Run<T>(string[] args, IDaemonisable<T> daemon, IExecutionEnvironment environment)
+        {
             return new DaemonRunner<T>(
-                new DefaultExecutionEnvironment(),
                 new RunAsConsoleApplication(),
                 new RunAsService(),
-                new RunAsServiceInstaller()).Run(daemon, args);
+                new RunAsServiceInstaller(),
+                new RunAsHostedService()).Run(environment, daemon, args);
         }
 
 
 
+        public class RunAsHostedService : IRunAsHostedService
+        {
+            public void Run<T>(InitialisedHostedEnvironment environment, IDaemonisable<T> daemon, string[] staticArgs)
+            {
+            }
+        }
+
         public class RunAsService : IRunAsService
         {
-            public void Run<T>(IDaemonisable<T> daemon, string[] staticArgs)
+            public void Run<T>(ServiceEnvironment environment, IDaemonisable<T> daemon, string[] staticArgs)
             {
                 var servicesToRun = new ServiceBase[] { new DaemonService<T>(daemon, staticArgs) };
                 ServiceBase.Run(servicesToRun);
@@ -36,23 +61,15 @@ namespace Bluewire.Common.Console
 
         public class RunAsConsoleApplication : IRunAsConsoleApplication
         {
-            public int Run<T>(IDaemonisable<T> daemon, T arguments)
+            public int Run<T>(ApplicationEnvironment environment, IDaemonisable<T> daemon, T arguments)
             {
                 return new ConsoleDaemonMonitor(daemon.Start(arguments)).WaitForTermination();
             }
         }
 
-        public class DefaultExecutionEnvironment : IExecutionEnvironment
-        {
-            public bool IsRunningAsService()
-            {
-                return NativeMethods.IsRunningAsService();
-            }
-        }
-
         public class RunAsServiceInstaller : IRunAsServiceInstaller
         {
-            public int Run<T>(ServiceInstallerArguments<T> arguments, string[] serviceArguments)
+            public int Run<T>(ApplicationEnvironment environment, ServiceInstallerArguments<T> arguments, string[] serviceArguments)
             {
                 var serviceInstaller = CreateServiceInstaller(arguments);
                 var installer = CreateInstaller(serviceInstaller, arguments);

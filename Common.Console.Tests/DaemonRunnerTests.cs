@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using Bluewire.Common.Console.Daemons;
+using Bluewire.Common.Console.Environment;
 using Bluewire.Common.Console.ThirdParty;
 using NUnit.Framework;
 using Moq;
@@ -12,7 +14,7 @@ namespace Bluewire.Common.Console.Tests
         private Mock<IRunAsConsoleApplication> runAsConsoleApplication;
         private Mock<IRunAsService> runAsService;
         private Mock<IRunAsServiceInstaller> runAsServiceInstaller;
-        private Mock<IExecutionEnvironment> executionEnvironment;
+        private Mock<IRunAsHostedService> runAsHostedService;
         private DaemonRunner<NoArguments> runner;
         private IDaemonisable<NoArguments> daemon;
 
@@ -27,10 +29,9 @@ namespace Bluewire.Common.Console.Tests
             runAsConsoleApplication = new Mock<IRunAsConsoleApplication>();
             runAsService = new Mock<IRunAsService>();
             runAsServiceInstaller = new Mock<IRunAsServiceInstaller>();
+            runAsHostedService = new Mock<IRunAsHostedService>();
             
-
-            executionEnvironment = new Mock<IExecutionEnvironment>();
-            runner = new DaemonRunner<NoArguments>(executionEnvironment.Object, runAsConsoleApplication.Object, runAsService.Object, runAsServiceInstaller.Object);
+            runner = new DaemonRunner<NoArguments>(runAsConsoleApplication.Object, runAsService.Object, runAsServiceInstaller.Object, runAsHostedService.Object);
 
             var daemon = new Mock<IDaemonisable<NoArguments>>();
             daemon.Setup(d => d.Configure()).Returns(() => new SessionArguments<NoArguments>(new NoArguments(), new OptionSet()));
@@ -40,7 +41,7 @@ namespace Bluewire.Common.Console.Tests
             // I can't figure out if Moq provides direct access to recorded invocations. The docs are unhelpful.
             serviceInstallerArguments = null;
             passthroughArguments = null;
-            runAsServiceInstaller.Setup(s => s.Run(It.IsAny<ServiceInstallerArguments<NoArguments>>(), It.IsAny<string[]>())).Callback((ServiceInstallerArguments<NoArguments> sia, string[] a) =>
+            runAsServiceInstaller.Setup(s => s.Run(It.IsAny<ApplicationEnvironment>(), It.IsAny<ServiceInstallerArguments<NoArguments>>(), It.IsAny<string[]>())).Callback((ApplicationEnvironment env, ServiceInstallerArguments<NoArguments> sia, string[] a) =>
             {
                 serviceInstallerArguments = sia;
                 passthroughArguments = a;
@@ -57,25 +58,38 @@ namespace Bluewire.Common.Console.Tests
         [Test]
         public void IfInvokedAsAService_RunsDaemonAsAService()
         {
-            executionEnvironment.Setup(e => e.IsRunningAsService()).Returns(true);
-            runner.Run(daemon, "arg");
+            runner.Run(new ServiceEnvironment(), daemon, "arg");
 
-            runAsService.Verify(s => s.Run(daemon, new [] { "arg" }));
+            runAsService.Verify(s => s.Run(It.IsAny<ServiceEnvironment>(), daemon, new [] { "arg" }));
+        }
+
+        [Test]
+        public void IfInvokedInAnInitialisedHostedEnvironment_RunsDaemonAsAHostedService()
+        {
+            runner.Run(new InitialisedHostedEnvironment(new HostedEnvironmentDefinition(), new HostedEnvironment()), daemon, "arg");
+
+            runAsHostedService.Verify(s => s.Run(It.IsAny<InitialisedHostedEnvironment>(), daemon, new[] { "arg" }));
+        }
+
+        [Test]
+        public void IfInvokedInAnUninitialisedHostedEnvironment_ThrowsException()
+        {
+            Assert.Throws<ErrorWithReturnCodeException>(() => runner.Run(new HostedEnvironment(), daemon, "arg"));
         }
 
 
         [Test]
         public void IfInvokedFromTheConsole_RunsDaemonAsAConsoleApplication()
         {
-            runner.Run(daemon, "arg");
+            runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "arg");
 
-            runAsConsoleApplication.Verify(s => s.Run(daemon, It.IsAny<NoArguments>()));
+            runAsConsoleApplication.Verify(s => s.Run(It.IsAny<ApplicationEnvironment>(), daemon, It.IsAny<NoArguments>()));
         }
 
         [Test]
         public void IfInvokedWithInstallSwitch_InstallsDaemon()
         {
-            runner.Run(daemon, "--install", "arg");
+            runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "--install", "arg");
 
             VerifyServiceArguments((sa, ca) =>
             {
@@ -89,7 +103,7 @@ namespace Bluewire.Common.Console.Tests
         [Test]
         public void ServiceNameDefaultsToDaemonName()
         {
-            runner.Run(daemon, "--install", "arg");
+            runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "--install", "arg");
 
             VerifyServiceArguments((sa, ca) => Assert.AreEqual(DAEMON_NAME, sa.ServiceName));
         }
@@ -97,7 +111,7 @@ namespace Bluewire.Common.Console.Tests
         [Test]
         public void CanOverrideServiceName()
         {
-            runner.Run(daemon, "--install", "--service-name", "Test Name", "arg");
+            runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "--install", "--service-name", "Test Name", "arg");
 
             VerifyServiceArguments((sa, ca) => Assert.AreEqual("Test Name", sa.ServiceName));
         }
@@ -105,7 +119,7 @@ namespace Bluewire.Common.Console.Tests
         [Test]
         public void CanSpecifyServiceAccount()
         {
-            runner.Run(daemon, "--install", "--service-user", "User", "--service-password", "Password", "arg");
+            runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "--install", "--service-user", "User", "--service-password", "Password", "arg");
 
             VerifyServiceArguments((sa, ca) =>
             {
@@ -117,7 +131,7 @@ namespace Bluewire.Common.Console.Tests
         [Test]
         public void IfInvokedWithUninstallSwitch_UninstallsDaemon()
         {
-            runner.Run(daemon, "--uninstall", "arg");
+            runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "--uninstall", "arg");
 
             VerifyServiceArguments((sa, ca) =>
             {
@@ -130,7 +144,7 @@ namespace Bluewire.Common.Console.Tests
         [Test]
         public void IfInvokedWithReinstallSwitch_UninstallsAndInstallsDaemon()
         {
-            runner.Run(daemon, "--reinstall", "arg");
+            runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "--reinstall", "arg");
             VerifyServiceArguments((sa, ca) =>
             {
                 Assert.IsTrue(sa.RunInstall);
@@ -143,9 +157,9 @@ namespace Bluewire.Common.Console.Tests
         [Test]
         public void IfInstallSwitchIsAfterDoubleDash_RunsDaemonAsAConsoleApplication()
         {
-            runner.Run(daemon, "--", "--install", "arg");
+            runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "--", "--install", "arg");
 
-            runAsConsoleApplication.Verify(s => s.Run(daemon, It.IsAny<NoArguments>()));
+            runAsConsoleApplication.Verify(s => s.Run(It.IsAny<ApplicationEnvironment>(), daemon, It.IsAny<NoArguments>()));
         }
     }
 }

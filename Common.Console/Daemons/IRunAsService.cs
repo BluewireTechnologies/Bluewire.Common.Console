@@ -1,7 +1,9 @@
-﻿namespace Bluewire.Common.Console.Daemons
+﻿using Bluewire.Common.Console.Environment;
+
+namespace Bluewire.Common.Console.Daemons
 {
     public interface IRunAsService
     {
-        void Run<T>(IDaemonisable<T> daemon, string[] staticArgs);
+        void Run<T>(ServiceEnvironment environment, IDaemonisable<T> daemon, string[] staticArgs);
     }
 }

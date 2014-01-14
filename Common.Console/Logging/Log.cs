@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Diagnostics;
 using System.Reflection;
+using Bluewire.Common.Console.Environment;
 using log4net;
 using log4net.Config;
 using log4net.Core;
@@ -12,17 +13,9 @@ namespace Bluewire.Common.Console.Logging
     {
         private static LoggingConfigurer configurer;
 
-        private static OutputDescriptorBase CreateDescriptor()
+        private static OutputDescriptorBase CreateDescriptor(IExecutionEnvironment environment)
         {
-            var applicationName = Assembly.GetEntryAssembly().GetName().Name;
-            if (NativeMethods.IsRunningAsService())
-            {
-                return new ServiceLogOutputDescriptor(applicationName);
-            }
-            else
-            {
-                return new ConsoleOutputDescriptor(applicationName, System.Console.Out, System.Console.Error);
-            }
+            return environment.CreateOutputDescriptor();
         }
 
         /// <summary>
@@ -56,7 +49,8 @@ namespace Bluewire.Common.Console.Logging
         public static void ConfigureWith(Action<IOutputDescriptorConfiguration> action)
         {
             Debug.Assert(configurer == null);
-            var descriptor = CreateDescriptor();
+            var environment = new EnvironmentAnalyser().GetEnvironment();
+            var descriptor = environment.CreateOutputDescriptor();
             action(descriptor);
             configurer = new LoggingConfigurer(descriptor);
         }

@@ -1,7 +1,9 @@
-﻿namespace Bluewire.Common.Console.Daemons
+﻿using Bluewire.Common.Console.Environment;
+
+namespace Bluewire.Common.Console.Daemons
 {
     public interface IRunAsServiceInstaller
     {
-        int Run<T>(ServiceInstallerArguments<T> arguments, string[] serviceArguments);
+        int Run<T>(ApplicationEnvironment environment, ServiceInstallerArguments<T> arguments, string[] serviceArguments);
     }
 }

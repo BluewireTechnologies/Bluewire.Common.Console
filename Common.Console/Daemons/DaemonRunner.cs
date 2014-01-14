@@ -1,36 +1,59 @@
 ﻿using System;
 using System.Linq;
+using Bluewire.Common.Console.Environment;
 using Bluewire.Common.Console.ThirdParty;
 
 namespace Bluewire.Common.Console.Daemons
 {
     public class DaemonRunner<T>
     {
-        private readonly IExecutionEnvironment executionEnvironment;
         private readonly IRunAsConsoleApplication runAsConsoleApplication;
         private readonly IRunAsService runAsService;
         private readonly IRunAsServiceInstaller runAsServiceInstaller;
+        private readonly IRunAsHostedService runAsHostedService;
 
         public DaemonRunner(
-            IExecutionEnvironment executionEnvironment,
             IRunAsConsoleApplication runAsConsoleApplication,
             IRunAsService runAsService,
-            IRunAsServiceInstaller runAsServiceInstaller)
+            IRunAsServiceInstaller runAsServiceInstaller,
+            IRunAsHostedService runAsHostedService)
         {
-            this.executionEnvironment = executionEnvironment;
             this.runAsConsoleApplication = runAsConsoleApplication;
             this.runAsService = runAsService;
             this.runAsServiceInstaller = runAsServiceInstaller;
+            this.runAsHostedService = runAsHostedService;
         }
 
-        public int Run(IDaemonisable<T> daemon, params string[] args)
+        public int Run(IExecutionEnvironment environment, IDaemonisable<T> daemon, params string[] args)
         {
-            if (executionEnvironment.IsRunningAsService())
+            var serviceEnvironment = environment as ServiceEnvironment;
+            if (serviceEnvironment != null)
             {
-                runAsService.Run(daemon, args);
+                runAsService.Run(serviceEnvironment, daemon, args);
                 return 0;
             }
 
+            var applicationEnvironment = environment as ApplicationEnvironment;
+            if (applicationEnvironment != null)
+            {
+                return RunInApplicationEnvironment(applicationEnvironment, daemon, args);
+            }
+
+            var hostedEnvironment = environment as InitialisedHostedEnvironment;
+            if (hostedEnvironment != null)
+            {
+                runAsHostedService.Run(hostedEnvironment, daemon, args);
+                return 0;
+            }
+
+            // Exit code 10 is a Windows standard exit code meaning 'The environment is incorrect'.
+            // Try 'net helpmsg 10' at the shell.
+            throw new ErrorWithReturnCodeException(10, "The detected environment is not valid for execution: {0}", environment.GetType().Name);
+        }
+
+
+        private int RunInApplicationEnvironment(ApplicationEnvironment applicationEnvironment, IDaemonisable<T> daemon, string[] args)
+        {
             var serviceInstallerArguments = new ServiceInstallerArguments<T>(daemon);
 
             var sessionArguments = AddInstallerOptions(daemon.Configure(), serviceInstallerArguments);
@@ -40,10 +63,12 @@ namespace Bluewire.Common.Console.Daemons
                 if (serviceInstallerArguments.ServiceInstallationRequested)
                 {
                     // reparse, stripping out only the installer-related arguments.
-                    var consoleArguments = AddInstallerOptions(new SessionArguments(new OptionSet()), new ServiceInstallerArguments<T>(daemon)).Strip(args);
-                    return runAsServiceInstaller.Run(serviceInstallerArguments, consoleArguments);
+                    var consoleArguments =
+                        AddInstallerOptions(new SessionArguments(new OptionSet()), new ServiceInstallerArguments<T>(daemon))
+                            .Strip(args);
+                    return runAsServiceInstaller.Run(applicationEnvironment, serviceInstallerArguments, consoleArguments);
                 }
-                return runAsConsoleApplication.Run(daemon, a);
+                return runAsConsoleApplication.Run(applicationEnvironment, daemon, a);
             });
         }
 

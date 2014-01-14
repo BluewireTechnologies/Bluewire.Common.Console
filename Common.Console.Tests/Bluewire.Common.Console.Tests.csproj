@@ -80,12 +80,6 @@
     <EmbeddedResource Include="Logging\ApplicationConfigurationWithEmptySection.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="Test">
-	<Message Text="Use NUnit to run these tests." />
-  </Target>
-  <Target Name="TeamCity">
-	<Message Text="MSBuild is no longer required for running these tests. Use TeamCity's NUnit runner instead." />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

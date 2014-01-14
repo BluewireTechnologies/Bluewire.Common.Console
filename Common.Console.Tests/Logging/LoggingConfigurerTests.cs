@@ -8,7 +8,7 @@ using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
-using MbUnit.Framework;
+using NUnit.Framework;
 using Moq;
 
 namespace Bluewire.Common.Console.Tests.Logging
@@ -114,7 +114,7 @@ namespace Bluewire.Common.Console.Tests.Logging
 
         private void AssertDefaultAppenders(IAppender[] appenders)
         {
-            Assert.AreElementsEqualIgnoringOrder(new[]{
+            CollectionAssert.AreEquivalent(new[]{
                 "Console.STDOUT",
                 "Console.STDERR",
                 "DefaultLogAppender"
@@ -132,7 +132,7 @@ namespace Bluewire.Common.Console.Tests.Logging
             {
                 var appenders = LogManager.GetRepository().GetAppenders();
 
-                Assert.AreElementsEqualIgnoringOrder(new[]{
+                CollectionAssert.AreEquivalent(new[]{
                     "Console.STDOUT",
                     "Console.STDERR",
                     "ConfiguredRootAppender"
@@ -154,8 +154,8 @@ namespace Bluewire.Common.Console.Tests.Logging
             {
                 configurer.Console.Error(error);
             }
-            Assert.Contains(STDERR.ToString(), error);
-            Assert.DoesNotContain(STDOUT.ToString(), error);
+            Assert.That(STDERR.ToString(), Is.StringContaining(error));
+            Assert.That(STDOUT.ToString(), Is.Not.StringContaining(error));
         }
 
         [Test]
@@ -170,8 +170,8 @@ namespace Bluewire.Common.Console.Tests.Logging
             {
                 configurer.Console.Warn(message);
             }
-            Assert.Contains(STDOUT.ToString(), message);
-            Assert.DoesNotContain(STDERR.ToString(), message);
+            Assert.That(STDOUT.ToString(), Is.StringContaining(message));
+            Assert.That(STDERR.ToString(), Is.Not.StringContaining(message));
         }
 
         [Test]
@@ -191,7 +191,7 @@ namespace Bluewire.Common.Console.Tests.Logging
                 {
                     configurer.Console.Warn(message);
                 }
-                Assert.DoesNotContain(defaultLog.ToString(), message);
+                Assert.That(defaultLog.ToString(),  Is.Not.StringContaining(message));
             }
         }
 
@@ -207,8 +207,8 @@ namespace Bluewire.Common.Console.Tests.Logging
             {
                 LogManager.GetLogger("none").Info(message);
             }
-            Assert.DoesNotContain(STDOUT.ToString(), message);
-            Assert.DoesNotContain(STDERR.ToString(), message);
+            Assert.That(STDOUT.ToString(), Is.Not.StringContaining(message));
+            Assert.That(STDERR.ToString(), Is.Not.StringContaining(message));
         }
 
         [Test]
@@ -226,11 +226,11 @@ namespace Bluewire.Common.Console.Tests.Logging
                 configurer.Console.Info(info);
                 configurer.Console.Warn(warning);
             }
-            Assert.DoesNotContain(STDOUT.ToString(), info);
-            Assert.Contains(STDOUT.ToString(), warning);
+            Assert.That(STDOUT.ToString(), Is.Not.StringContaining(info));
+            Assert.That(STDOUT.ToString(), Is.StringContaining(warning));
 
-            Assert.DoesNotContain(STDERR.ToString(), info);
-            Assert.DoesNotContain(STDERR.ToString(), warning);
+            Assert.That(STDERR.ToString(), Is.Not.StringContaining(info));
+            Assert.That(STDERR.ToString(), Is.Not.StringContaining(warning));
         }
 
         [Test]
@@ -247,8 +247,8 @@ namespace Bluewire.Common.Console.Tests.Logging
 
                 configurer.Console.Info(info);
             }
-            Assert.Contains(STDOUT.ToString(), info);
-            Assert.DoesNotContain(STDERR.ToString(), info);
+            Assert.That(STDOUT.ToString(), Is.StringContaining(info));
+            Assert.That(STDERR.ToString(), Is.Not.StringContaining(info));
         }
 
         [Test]
@@ -266,8 +266,8 @@ namespace Bluewire.Common.Console.Tests.Logging
 
                 configurer.Console.Info(info);
             }
-            Assert.Contains(STDOUT.ToString(), info);
-            Assert.DoesNotContain(STDERR.ToString(), info);
+            Assert.That(STDOUT.ToString(), Is.StringContaining(info));
+            Assert.That(STDERR.ToString(), Is.Not.StringContaining(info));
         }
 
         [Test]

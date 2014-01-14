@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
+﻿using System.ServiceProcess;
 using Bluewire.Common.Console.Daemons;
-using Gallio.Framework;
-using MbUnit.Framework;
-using MbUnit.Framework.ContractVerifiers;
+using NUnit.Framework;
 
 namespace Bluewire.Common.Console.Tests
 {
@@ -15,9 +9,8 @@ namespace Bluewire.Common.Console.Tests
     {
         private readonly ServiceAccountCredentialsFactory factory = new ServiceAccountCredentialsFactory();
 
-        [Test]
-        [Row("LOCAL SYSTEM")]
-        [Row("SYSTEM")]
+        [TestCase("LOCAL SYSTEM")]
+        [TestCase("SYSTEM")]
         public void LocalSystem(string localSystem)
         {
             var account = factory.Create(localSystem, null).Value;

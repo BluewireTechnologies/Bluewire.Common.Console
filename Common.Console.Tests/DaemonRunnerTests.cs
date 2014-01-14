@@ -1,7 +1,7 @@
 ﻿using System;
 using Bluewire.Common.Console.Daemons;
 using Bluewire.Common.Console.ThirdParty;
-using MbUnit.Framework;
+using NUnit.Framework;
 using Moq;
 
 namespace Bluewire.Common.Console.Tests
@@ -51,7 +51,7 @@ namespace Bluewire.Common.Console.Tests
         {
             Assert.IsNotNull(serviceInstallerArguments, "IRunAsServiceInstaller#Run(IDaemon, ServiceInstallerArguments, string[]) was not called.");
             Assert.IsNotNull(passthroughArguments, "IRunAsServiceInstaller#Run(IDaemon, ServiceInstallerArguments, string[]) was not called.");
-            Assert.Multiple(() => asserts(serviceInstallerArguments, passthroughArguments));
+            asserts(serviceInstallerArguments, passthroughArguments);
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace Bluewire.Common.Console.Tests
             {
                 Assert.IsTrue(sa.RunInstall);
                 Assert.IsFalse(sa.RunUninstall);
-                Assert.AreElementsEqual(new[] { "arg" }, ca);
+                CollectionAssert.AreEqual(new[] { "arg" }, ca);
             });
         }
 
@@ -123,7 +123,7 @@ namespace Bluewire.Common.Console.Tests
             {
                 Assert.IsFalse(sa.RunInstall);
                 Assert.IsTrue(sa.RunUninstall);
-                Assert.AreElementsEqual(new[] { "arg" }, ca);
+                CollectionAssert.AreEqual(new[] { "arg" }, ca);
             });
         }
 
@@ -135,7 +135,7 @@ namespace Bluewire.Common.Console.Tests
             {
                 Assert.IsTrue(sa.RunInstall);
                 Assert.IsTrue(sa.RunUninstall);
-                Assert.AreElementsEqual(new[] { "arg" }, ca);
+                CollectionAssert.AreEqual(new[] { "arg" }, ca);
             });
         }
 

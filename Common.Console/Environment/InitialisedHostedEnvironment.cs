@@ -1,17 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Bluewire.Common.Console.Daemons;
+using Bluewire.Common.Console.Hosting;
 using Bluewire.Common.Console.Logging;
 
 namespace Bluewire.Common.Console.Environment
 {
+    /// <summary>
+    /// Represents a hosted environment which has been initialised by its parent for hosting daemon instances.
+    /// </summary>
+    /// <remarks>
+    /// Tracks daemon instances and provides methods for cleanly shutting down.
+    /// </remarks>
     public class InitialisedHostedEnvironment : IExecutionEnvironment
     {
         private readonly HostedEnvironmentDefinition definition;
         private readonly IExecutionEnvironment detected;
-        private readonly object instanceLock = new object();
-        private List<IHostedDaemonInstance> instances = new List<IHostedDaemonInstance>();
-
+        private readonly HostedDaemonTracker instanceTracker = new HostedDaemonTracker();
+        
         public InitialisedHostedEnvironment(HostedEnvironmentDefinition definition, IExecutionEnvironment detected)
         {
             this.definition = definition;
@@ -20,41 +27,27 @@ namespace Bluewire.Common.Console.Environment
 
         public void RegisterForShutdownNotification(IHostedDaemonInstance instance)
         {
-            lock (instanceLock)
-            {
-                instances.Add(instance);
-            }
+            instanceTracker.Add(instance);
         }
 
-        private IHostedDaemonInstance[] CaptureCurrentInstances()
+        public Task RequestShutdown()
         {
-            lock (instanceLock)
-            {
-                var current = instances.ToArray();
-                instances = new List<IHostedDaemonInstance>();
-                return current;
-            }
-        }
-
-        public void RequestShutdown(TimeSpan timeout)
-        {
-            var victims = CaptureCurrentInstances();
-            foreach (var victim in victims)
-            {
-                victim.RequestShutdown();
-            }
-            var deadline = DateTimeOffset.Now + timeout;
-            foreach (var victim in victims)
-            {
-                victim.WaitForShutdown(deadline - DateTimeOffset.Now);
-            }
+            return instanceTracker.Shutdown();
         }
 
         public OutputDescriptorBase CreateOutputDescriptor()
         {
             var descriptor = new ServiceLogOutputDescriptor(definition.ApplicationName);
-            ((IOutputDescriptorConfiguration)descriptor).SetLogRootDirectory(definition.ConsoleLogDirectory);
+            if (!String.IsNullOrEmpty(definition.ConsoleLogDirectory))
+            {
+                ((IOutputDescriptorConfiguration)descriptor).SetLogRootDirectory(definition.ConsoleLogDirectory);
+            }
             return descriptor;
+        }
+
+        public IHostedDaemonInfo[] GetDaemonInfo()
+        {
+            return instanceTracker.GetInfo().ToArray();
         }
     }
 }

@@ -77,8 +77,10 @@
     <Compile Include="Daemons\ServiceAccountCredentials.cs" />
     <Compile Include="Daemons\ServiceAccountCredentialsFactory.cs" />
     <Compile Include="Environment\ApplicationEnvironment.cs" />
+    <Compile Include="Hosting\AwaitMultipleTasks.cs" />
     <Compile Include="Environment\EnvironmentAnalyser.cs" />
     <Compile Include="Environment\ExecutionEnvironmentHelpers.cs" />
+    <Compile Include="Hosting\HostedDaemonTracker.cs" />
     <Compile Include="Environment\HostedEnvironment.cs" />
     <Compile Include="Environment\InitialisedHostedEnvironment.cs" />
     <Compile Include="Environment\IRunningEnvironment.cs" />
@@ -100,7 +102,11 @@
     <Compile Include="Formatting\Row.cs" />
     <Compile Include="Formatting\Spacer.cs" />
     <Compile Include="Formatting\TableFormatter.cs" />
-    <Compile Include="Hosting\HostingDomain.cs" />
+    <Compile Include="Hosting\DaemonContainer.cs" />
+    <Compile Include="Hosting\DaemonContainerBase.cs" />
+    <Compile Include="Hosting\DaemonContainerMediator.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="IArgumentList.cs" />
     <Compile Include="IDaemon.cs" />
     <Compile Include="IDaemonisable.cs" />

@@ -42,7 +42,9 @@ namespace Bluewire.Common.Console.Daemons
             var hostedEnvironment = environment as InitialisedHostedEnvironment;
             if (hostedEnvironment != null)
             {
-                runAsHostedService.Run(hostedEnvironment, daemon, args);
+                var session = daemon.Configure();
+                session.Parse(args);
+                runAsHostedService.Run(hostedEnvironment, daemon, session.Arguments);
                 return 0;
             }
 

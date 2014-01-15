@@ -1,8 +1,16 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Bluewire.Common.Console.Daemons
 {
-    public interface IHostedDaemonInstance
+    public interface IHostedDaemonInfo
+    {
+        string Name { get; }
+        Type Type { get; }
+    }
+
+    public interface IHostedDaemonInstance : IHostedDaemonInfo
     {
         /// <summary>
         /// Request that the monitored daemon instance should shut down.
@@ -10,15 +18,14 @@ namespace Bluewire.Common.Console.Daemons
         /// <remarks>
         /// This method MAY NEVER throw exceptions.
         /// </remarks>
-        void RequestShutdown();
+        Task RequestShutdown();
         /// <summary>
         /// Wait the specified time for shutdown to complete. If the timeout
         /// expires, throws a TimeoutException.
         /// </summary>
         /// <remarks>
         /// There is no guarantee that this method will be called after RequestShutdown.
-        /// If more than one instance is being waited on, an earlier exception might prevent
-        /// this one being waited upon. Therefore, do no critical processing in this method.
+        /// Nothing is required to call it after RequestShutdown.
         /// </remarks>
         /// <param name="timeout"></param>
         void WaitForShutdown(TimeSpan timeout);

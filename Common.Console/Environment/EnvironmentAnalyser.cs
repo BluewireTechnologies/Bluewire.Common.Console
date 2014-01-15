@@ -19,6 +19,13 @@ namespace Bluewire.Common.Console.Environment
             }
         }
 
+        public InitialisedHostedEnvironment GetHostedEnvironment()
+        {
+            var environment = GetEnvironment() as InitialisedHostedEnvironment;
+            if (environment == null) throw new InvalidOperationException("Not a hosted environment, or the environment has not yet been defined.");
+            return environment;
+        }
+
         private static IExecutionEnvironment DetermineEnvironment()
         {
             var entryAssembly = Assembly.GetEntryAssembly();
@@ -37,13 +44,13 @@ namespace Bluewire.Common.Console.Environment
             return new ApplicationEnvironment(entryAssembly);
         }
 
-        public void DefineHostedEnvironment(HostedEnvironmentDefinition definition)
+        public InitialisedHostedEnvironment DefineHostedEnvironment(HostedEnvironmentDefinition definition)
         {
             lock (initLock)
             {
                 AssertThatEnvironmentWasNotAlreadyConfiguredAsSomethingElse();
 
-                InitialiseHostedEnvironment(definition, thisEnvironment);
+                return InitialiseHostedEnvironment(definition, thisEnvironment);
             }
         }
 
@@ -61,9 +68,11 @@ namespace Bluewire.Common.Console.Environment
             throw new InvalidOperationException(String.Format("Environment has already been initialised as {0}.", environment.GetType().Name));
         }
 
-        private static void InitialiseHostedEnvironment(HostedEnvironmentDefinition definition, IExecutionEnvironment detected)
+        private static InitialisedHostedEnvironment InitialiseHostedEnvironment(HostedEnvironmentDefinition definition, IExecutionEnvironment detected)
         {
-            thisEnvironment = new InitialisedHostedEnvironment(definition, detected);
+            var hostedEnvironment = new InitialisedHostedEnvironment(definition, detected);
+            thisEnvironment = hostedEnvironment;
+            return hostedEnvironment;
         }
     }
 }

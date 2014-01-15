@@ -50,6 +50,10 @@
   <ItemGroup>
     <Compile Include="CancelMonitorTests.cs" />
     <Compile Include="DaemonRunnerTests.cs" />
+    <Compile Include="Daemons\HostedDaemonMonitorTests.cs" />
+    <Compile Include="Hosting\AwaitMultipleTasksTests.cs" />
+    <Compile Include="Hosting\DaemonExeContainerTests.cs" />
+    <Compile Include="Hosting\HostedDaemonTrackerTests.cs" />
     <Compile Include="Logging\LoggingConfigurerTests.cs" />
     <Compile Include="Progress\FormattingHelpersTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -59,6 +63,10 @@
     <ProjectReference Include="..\Common.Console\Bluewire.Common.Console.csproj">
       <Project>{63C2CCD8-973D-4611-B5D4-D5A5CEF7E53C}</Project>
       <Name>Bluewire.Common.Console</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\TestDaemon\TestDaemon.csproj">
+      <Project>{b267916a-ac3b-4c34-8e71-72c0098b69f4}</Project>
+      <Name>TestDaemon</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +88,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Logging\ApplicationConfigurationWithEmptySection.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

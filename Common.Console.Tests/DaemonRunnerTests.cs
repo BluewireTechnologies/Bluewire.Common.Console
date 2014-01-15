@@ -68,7 +68,7 @@ namespace Bluewire.Common.Console.Tests
         {
             runner.Run(new InitialisedHostedEnvironment(new HostedEnvironmentDefinition(), new HostedEnvironment()), daemon, "arg");
 
-            runAsHostedService.Verify(s => s.Run(It.IsAny<InitialisedHostedEnvironment>(), daemon, new[] { "arg" }));
+            runAsHostedService.Verify(s => s.Run(It.IsAny<InitialisedHostedEnvironment>(), daemon, It.IsAny<NoArguments>()));
         }
 
         [Test]

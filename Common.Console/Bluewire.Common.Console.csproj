@@ -80,6 +80,7 @@
     <Compile Include="Hosting\AwaitMultipleTasks.cs" />
     <Compile Include="Environment\EnvironmentAnalyser.cs" />
     <Compile Include="Environment\ExecutionEnvironmentHelpers.cs" />
+    <Compile Include="Hosting\EntryPointInvoker.cs" />
     <Compile Include="Hosting\HostedDaemonTracker.cs" />
     <Compile Include="Environment\HostedEnvironment.cs" />
     <Compile Include="Environment\InitialisedHostedEnvironment.cs" />
@@ -102,7 +103,7 @@
     <Compile Include="Formatting\Row.cs" />
     <Compile Include="Formatting\Spacer.cs" />
     <Compile Include="Formatting\TableFormatter.cs" />
-    <Compile Include="Hosting\DaemonContainer.cs" />
+    <Compile Include="Hosting\DaemonExeContainer.cs" />
     <Compile Include="Hosting\DaemonContainerBase.cs" />
     <Compile Include="Hosting\DaemonContainerMediator.cs">
       <SubType>Code</SubType>

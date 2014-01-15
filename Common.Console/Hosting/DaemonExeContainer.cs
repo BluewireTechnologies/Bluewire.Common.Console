@@ -15,15 +15,19 @@ namespace Bluewire.Common.Console.Hosting
     public class DaemonExeContainer : DaemonContainerBase
     {
         private readonly AssemblyName daemonAssemblyName;
+        private readonly HostedEnvironmentDefinition definition;
         private Task<int> entryAssemblyTask;
 
-        public DaemonExeContainer(AssemblyName daemonAssemblyName) : this(daemonAssemblyName, AppDomain.CurrentDomain.SetupInformation)
+        public DaemonExeContainer(AssemblyName daemonAssemblyName, HostedEnvironmentDefinition definition = new HostedEnvironmentDefinition()) : this(daemonAssemblyName, AppDomain.CurrentDomain.SetupInformation, definition)
         {
         }
 
-        public DaemonExeContainer(AssemblyName daemonAssemblyName, AppDomainSetup setupInfo) : base(daemonAssemblyName.Name, setupInfo)
+        public DaemonExeContainer(AssemblyName daemonAssemblyName, AppDomainSetup setupInfo, HostedEnvironmentDefinition definition = new HostedEnvironmentDefinition())
+            : base(daemonAssemblyName.Name, setupInfo)
         {
             this.daemonAssemblyName = daemonAssemblyName;
+            this.definition = definition;
+            if (String.IsNullOrEmpty(definition.ApplicationName)) definition.ApplicationName = daemonAssemblyName.Name;
         }
 
         /// <summary>
@@ -43,11 +47,12 @@ namespace Bluewire.Common.Console.Hosting
                 AssertNotDisposing();
                 if (entryAssemblyTask != null) throw new InvalidOperationException("The container is already running an assembly.");
                 // warning: shutdown may be initiated between now and ExecuteAssemblyByName!
-                entryAssemblyTask = Task.Factory.StartNew(() =>
-                {
-                    var appdomain = GetContainer();
-                    return appdomain.ExecuteAssemblyByName(daemonAssemblyName, args);
-                });
+
+                var appdomain = GetContainer();
+
+                var invoker = (EntryPointInvoker)appdomain.CreateInstanceAndUnwrap(typeof(EntryPointInvoker).Assembly.FullName, typeof(EntryPointInvoker).FullName, false, BindingFlags.Instance | BindingFlags.Public, null, new object[] { daemonAssemblyName }, null, null);
+
+                entryAssemblyTask = Task.Factory.StartNew(() => invoker.Invoke(args));
                 entryAssemblyTask.ContinueWith(_ =>
                 {
                     lock (Lock)
@@ -61,7 +66,7 @@ namespace Bluewire.Common.Console.Hosting
 
         protected override void Initialise(DaemonContainerMediator mediator)
         {
-            mediator.InitialiseHostedEnvironment(new HostedEnvironmentDefinition { ApplicationName = daemonAssemblyName.Name });
+            mediator.InitialiseHostedEnvironment(definition);
         }
 
         protected override void ShutDownContainer(DateTimeOffset deadline)

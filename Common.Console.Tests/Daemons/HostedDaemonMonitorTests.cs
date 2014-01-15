@@ -72,7 +72,7 @@ namespace Bluewire.Common.Console.Tests.Daemons
 
             monitor.RequestShutdown();
 
-            monitor.WaitForShutdown(TimeSpan.Zero);
+            monitor.WaitForShutdown(TimeSpan.FromSeconds(5));
         }
 
         [Test]

@@ -9,9 +9,9 @@ namespace TestDaemon
 {
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            DaemonRunner.Run(args, new TestDaemon());
+            return DaemonRunner.Run(args, new TestDaemon());
         }
     }
 }

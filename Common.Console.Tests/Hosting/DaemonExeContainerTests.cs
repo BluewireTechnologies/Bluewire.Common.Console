@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Bluewire.Common.Console.Hosting;
 using NUnit.Framework;
@@ -18,7 +14,9 @@ namespace Bluewire.Common.Console.Tests.Hosting
         {
             var assemblyName = typeof(TestDaemon.TestDaemon).Assembly.GetName();
 
-            using(var container = new DaemonExeContainer(assemblyName, AppDomain.CurrentDomain.SetupInformation))
+            var daemon = new HostedDaemon(assemblyName);
+
+            using (var container = new DaemonExeContainer(daemon))
             {
                 var task = container.Run();
                 Assert.True(WaitUntilDaemonStarts(container, task));
@@ -35,7 +33,7 @@ namespace Bluewire.Common.Console.Tests.Hosting
         /// </summary>
         /// <param name="container"></param>
         /// <param name="task"></param>
-        private bool WaitUntilDaemonStarts(DaemonExeContainer container, Task task)
+        private static bool WaitUntilDaemonStarts(DaemonExeContainer container, Task task)
         {
             while (!task.Wait(10))
             {

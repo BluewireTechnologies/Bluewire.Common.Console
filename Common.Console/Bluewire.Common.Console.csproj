@@ -77,6 +77,7 @@
     <Compile Include="Daemons\ServiceAccountCredentials.cs" />
     <Compile Include="Daemons\ServiceAccountCredentialsFactory.cs" />
     <Compile Include="Environment\ApplicationEnvironment.cs" />
+    <Compile Include="Hosting\AsyncExitCodeReceiver.cs" />
     <Compile Include="Hosting\AwaitMultipleTasks.cs" />
     <Compile Include="Environment\EnvironmentAnalyser.cs" />
     <Compile Include="Environment\ExecutionEnvironmentHelpers.cs" />

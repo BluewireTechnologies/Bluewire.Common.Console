@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Bluewire.Common.Console.Hosting
 {
@@ -38,6 +39,21 @@ namespace Bluewire.Common.Console.Hosting
                 return (int)result;
             }
             return 0;
+        }
+
+        public void InvokeAsync(AsyncExitCodeReceiver receiver, string[] arguments)
+        {
+            Task.Factory.StartNew(() => Invoke(arguments)).ContinueWith(t =>
+            {
+                if (t.IsFaulted)
+                {
+                    receiver.Exception(t.Exception);
+                }
+                else
+                {
+                    receiver.ExitCode(t.Result);
+                }
+            });
         }
     }
 }

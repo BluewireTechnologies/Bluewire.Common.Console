@@ -18,14 +18,10 @@ namespace Bluewire.Common.Console.Hosting
         private readonly HostedEnvironmentDefinition definition;
         private Task<int> entryAssemblyTask;
 
-        public DaemonExeContainer(AssemblyName daemonAssemblyName, HostedEnvironmentDefinition definition = new HostedEnvironmentDefinition()) : this(daemonAssemblyName, AppDomain.CurrentDomain.SetupInformation, definition)
+        public DaemonExeContainer(HostedDaemon daemon, HostedEnvironmentDefinition definition = new HostedEnvironmentDefinition())
+            : base(daemon.AssemblyName.Name, daemon.AppDomainSetup)
         {
-        }
-
-        public DaemonExeContainer(AssemblyName daemonAssemblyName, AppDomainSetup setupInfo, HostedEnvironmentDefinition definition = new HostedEnvironmentDefinition())
-            : base(daemonAssemblyName.Name, setupInfo)
-        {
-            this.daemonAssemblyName = daemonAssemblyName;
+            this.daemonAssemblyName = daemon.AssemblyName;
             this.definition = definition;
             if (String.IsNullOrEmpty(definition.ApplicationName)) definition.ApplicationName = daemonAssemblyName.Name;
         }
@@ -52,7 +48,7 @@ namespace Bluewire.Common.Console.Hosting
 
                 var invoker = (EntryPointInvoker)appdomain.CreateInstanceAndUnwrap(typeof(EntryPointInvoker).Assembly.FullName, typeof(EntryPointInvoker).FullName, false, BindingFlags.Instance | BindingFlags.Public, null, new object[] { daemonAssemblyName }, null, null);
 
-                entryAssemblyTask = Task.Factory.StartNew(() => invoker.Invoke(args));
+                entryAssemblyTask = InvokeAsync(invoker, args);
                 entryAssemblyTask.ContinueWith(_ =>
                 {
                     lock (Lock)
@@ -62,6 +58,13 @@ namespace Bluewire.Common.Console.Hosting
                 });
                 return entryAssemblyTask;
             }
+        }
+
+        private static Task<int> InvokeAsync(EntryPointInvoker invoker, string[] args)
+        {
+            var exitCodeReceiver = new AsyncExitCodeReceiver();
+            invoker.InvokeAsync(exitCodeReceiver, args);
+            return exitCodeReceiver.Task;
         }
 
         protected override void Initialise(DaemonContainerMediator mediator)
@@ -97,9 +100,21 @@ namespace Bluewire.Common.Console.Hosting
             }
         }
 
-        public static DaemonExeContainer Run(AssemblyName daemonAssemblyName, AppDomainSetup setupInfo, params string[] args)
+
+        public static DaemonExeContainer Run(HostedDaemon daemon, params string[] args)
         {
-            var container = new DaemonExeContainer(daemonAssemblyName, setupInfo);
+            var container = new DaemonExeContainer(daemon);
+            return RunWithCleanupOnError(container, args);
+        }
+
+        public static DaemonExeContainer Run(HostedDaemon daemon, HostedEnvironmentDefinition environment, params string[] args)
+        {
+            var container = new DaemonExeContainer(daemon, environment);
+            return RunWithCleanupOnError(container, args);
+        }
+
+        private static DaemonExeContainer RunWithCleanupOnError(DaemonExeContainer container, params string[] args)
+        {
             try
             {
                 container.Run(args);
@@ -109,6 +124,30 @@ namespace Bluewire.Common.Console.Hosting
             {
                 container.Dispose();
                 throw;
+            }
+        }
+    }
+
+    public class HostedDaemon
+    {
+        public HostedDaemon(AssemblyName daemonAssemblyName)
+        {
+            if (daemonAssemblyName == null) throw new ArgumentNullException("daemonAssemblyName");
+            AssemblyName = daemonAssemblyName;
+            AppDomainSetup = AppDomain.CurrentDomain.SetupInformation;
+        }
+
+        public AssemblyName AssemblyName { get; private set; }
+        public AppDomainSetup AppDomainSetup { get; private set; }
+        public string ConfigurationFile
+        {
+            get
+            {
+                return AppDomainSetup.ConfigurationFile;
+            }
+            set
+            {
+                AppDomainSetup.ConfigurationFile = value;
             }
         }
     }

@@ -81,7 +81,9 @@
     <Compile Include="Hosting\AwaitMultipleTasks.cs" />
     <Compile Include="Environment\EnvironmentAnalyser.cs" />
     <Compile Include="Environment\ExecutionEnvironmentHelpers.cs" />
+    <Compile Include="Hosting\DefaultHostingBehaviour.cs" />
     <Compile Include="Hosting\EntryPointInvoker.cs" />
+    <Compile Include="Hosting\HostedDaemonExe.cs" />
     <Compile Include="Hosting\HostedDaemonTracker.cs" />
     <Compile Include="Environment\HostedEnvironment.cs" />
     <Compile Include="Environment\InitialisedHostedEnvironment.cs" />
@@ -109,6 +111,7 @@
     <Compile Include="Hosting\DaemonContainerMediator.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Hosting\IHostingBehaviour.cs" />
     <Compile Include="IArgumentList.cs" />
     <Compile Include="IDaemon.cs" />
     <Compile Include="IDaemonisable.cs" />

@@ -18,8 +18,8 @@ namespace Bluewire.Common.Console.Hosting
         private readonly HostedEnvironmentDefinition definition;
         private Task<int> entryAssemblyTask;
 
-        public DaemonExeContainer(HostedDaemon daemon, HostedEnvironmentDefinition definition = new HostedEnvironmentDefinition())
-            : base(daemon.AssemblyName.Name, daemon.AppDomainSetup)
+        public DaemonExeContainer(HostedDaemonExe daemon, HostedEnvironmentDefinition definition = new HostedEnvironmentDefinition())
+            : base(daemon.AssemblyName.Name, daemon)
         {
             this.daemonAssemblyName = daemon.AssemblyName;
             this.definition = definition;
@@ -36,7 +36,7 @@ namespace Bluewire.Common.Console.Hosting
         /// </remarks>
         /// <param name="args"></param>
         /// <returns></returns>
-        public Task Run(params string[] args)
+        public Task<int> Run(params string[] args)
         {
             lock (Lock)
             {
@@ -101,13 +101,13 @@ namespace Bluewire.Common.Console.Hosting
         }
 
 
-        public static DaemonExeContainer Run(HostedDaemon daemon, params string[] args)
+        public static DaemonExeContainer Run(HostedDaemonExe daemon, params string[] args)
         {
             var container = new DaemonExeContainer(daemon);
             return RunWithCleanupOnError(container, args);
         }
 
-        public static DaemonExeContainer Run(HostedDaemon daemon, HostedEnvironmentDefinition environment, params string[] args)
+        public static DaemonExeContainer Run(HostedDaemonExe daemon, HostedEnvironmentDefinition environment, params string[] args)
         {
             var container = new DaemonExeContainer(daemon, environment);
             return RunWithCleanupOnError(container, args);
@@ -124,30 +124,6 @@ namespace Bluewire.Common.Console.Hosting
             {
                 container.Dispose();
                 throw;
-            }
-        }
-    }
-
-    public class HostedDaemon
-    {
-        public HostedDaemon(AssemblyName daemonAssemblyName)
-        {
-            if (daemonAssemblyName == null) throw new ArgumentNullException("daemonAssemblyName");
-            AssemblyName = daemonAssemblyName;
-            AppDomainSetup = AppDomain.CurrentDomain.SetupInformation;
-        }
-
-        public AssemblyName AssemblyName { get; private set; }
-        public AppDomainSetup AppDomainSetup { get; private set; }
-        public string ConfigurationFile
-        {
-            get
-            {
-                return AppDomainSetup.ConfigurationFile;
-            }
-            set
-            {
-                AppDomainSetup.ConfigurationFile = value;
             }
         }
     }

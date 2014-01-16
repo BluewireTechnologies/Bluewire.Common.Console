@@ -30,20 +30,34 @@ namespace Bluewire.Common.Console.Hosting
             AssertSingletonInstance();
         }
 
+        private int InvokeEntryPointAsConsoleApplication(string[] arguments)
+        {
+            try
+            {
+                var result = assembly.EntryPoint.Invoke(null, new object[] { arguments });
+                if (result is int)
+                {
+                    return (int)result;
+                }
+                return 0;
+            }
+            catch (TargetInvocationException ex)
+            {
+                if (ex.InnerException == null) throw; // Failed to invoke entry point?
+
+                // Unhandled exceptions thrown by the entry point generate an exit code of 255 for console apps.
+                return 255;
+            }
+        }
+
         public int Invoke(string[] arguments)
         {
-            var result = assembly.EntryPoint.Invoke(null, new object[] { arguments });
-            if(assembly.EntryPoint.ReturnType == typeof(void)) return 0;
-            if (result is int)
-            {
-                return (int)result;
-            }
-            return 0;
+            return InvokeEntryPointAsConsoleApplication(arguments);
         }
 
         public void InvokeAsync(AsyncExitCodeReceiver receiver, string[] arguments)
         {
-            Task.Factory.StartNew(() => Invoke(arguments)).ContinueWith(t =>
+            Task.Factory.StartNew(() => InvokeEntryPointAsConsoleApplication(arguments)).ContinueWith(t =>
             {
                 if (t.IsFaulted)
                 {

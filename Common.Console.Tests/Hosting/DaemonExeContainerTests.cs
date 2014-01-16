@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
 using Bluewire.Common.Console.Hosting;
 using NUnit.Framework;
 
@@ -14,7 +15,7 @@ namespace Bluewire.Common.Console.Tests.Hosting
         {
             var assemblyName = typeof(TestDaemon.TestDaemon).Assembly.GetName();
 
-            var daemon = new HostedDaemon(assemblyName);
+            var daemon = new HostedDaemonExe(assemblyName);
 
             using (var container = new DaemonExeContainer(daemon))
             {
@@ -23,6 +24,65 @@ namespace Bluewire.Common.Console.Tests.Hosting
 
                 Assert.AreEqual(1, container.GetDaemonNames().Length);
             }
+        }
+
+
+        [Test, Ignore("Not sure how to implement this currently. We need to disable Unmanaged Code permissions in the child appdomain.")]
+        [Timeout(10000)]
+        public void DaemonCannotKillHostingProcess()
+        {
+            var assemblyName = typeof(TestDaemon.TestDaemon).Assembly.GetName();
+
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(@"
+<configuration>
+  <appSettings>
+    <add key='Key' value='PassingValue' />
+  </appSettings>
+</configuration>");
+
+            var daemon = new HostedDaemonExe(assemblyName).UseConfiguration(xmlDocument);
+
+            using (var container = new DaemonExeContainer(daemon))
+            {
+                var task = container.Run("--environment-exit", "5");
+
+                Assume.That(!WaitUntilDaemonStarts(container, task)); // Not expecting a successful start.
+
+                // TestDaemon throws an unhandled exception when --value doesn't match the configured value.
+                Assert.AreNotEqual(0, task.Result);
+            }
+
+        }
+
+        [TestCase("PassingValue", 0)]
+        [TestCase("FailingValue", 255)]
+        [Timeout(10000)]
+        public void CanStartDaemonExeWithAlternateConfiguration(string sentinelValue, int expectedReturnCode)
+        {
+            var assemblyName = typeof(TestDaemon.TestDaemon).Assembly.GetName();
+
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(@"
+<configuration>
+  <appSettings>
+    <add key='Key' value='PassingValue' />
+  </appSettings>
+</configuration>");
+
+            var daemon = new HostedDaemonExe(assemblyName).UseConfiguration(xmlDocument);
+
+            using (var container = new DaemonExeContainer(daemon))
+            {
+                var task = container.Run("--key", "Key", "--value", sentinelValue);
+
+                if(WaitUntilDaemonStarts(container, task)) container.Dispose();
+
+                // TestDaemon throws an unhandled exception when --value doesn't match the configured value.
+                Assert.AreEqual(expectedReturnCode, task.Result);
+            }
+
+            
         }
 
         /// <summary>

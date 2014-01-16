@@ -45,20 +45,22 @@ namespace Bluewire.Common.Console
 
         public class RunAsHostedService : IRunAsHostedService
         {
-            public void Run<T>(InitialisedHostedEnvironment environment, IDaemonisable<T> daemon, T arguments)
+            public int Run<T>(InitialisedHostedEnvironment environment, IDaemonisable<T> daemon, T arguments)
             {
                 var instance = new HostedDaemonMonitor(daemon.Start(arguments), daemon.Name);
                 environment.RegisterForShutdownNotification(instance);
                 instance.WaitForTermination();
+                return 0;
             }
         }
 
         public class RunAsService : IRunAsService
         {
-            public void Run<T>(ServiceEnvironment environment, IDaemonisable<T> daemon, string[] staticArgs)
+            public int Run<T>(ServiceEnvironment environment, IDaemonisable<T> daemon, string[] staticArgs)
             {
                 var servicesToRun = new ServiceBase[] { new DaemonService<T>(daemon, staticArgs) };
                 ServiceBase.Run(servicesToRun);
+                return 0;
             }
         }
 

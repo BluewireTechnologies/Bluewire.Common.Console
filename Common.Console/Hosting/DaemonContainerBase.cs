@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Security.Permissions;
+using System.Security.Policy;
 using log4net;
 
 namespace Bluewire.Common.Console.Hosting
@@ -12,26 +14,25 @@ namespace Bluewire.Common.Console.Hosting
     /// </remarks>
     public abstract class DaemonContainerBase : IDisposable
     {
+        protected IHostingBehaviour Behaviour { get; private set; }
         protected readonly ILog Log;
 
         private readonly string containerName;
-        private readonly AppDomainSetup setupInfo;
 
         protected readonly object Lock = new object();
         private bool disposing;
         private AppDomain container;
         private DaemonContainerMediator mediator;
 
-
-        protected DaemonContainerBase(string containerName) : this(containerName, AppDomain.CurrentDomain.SetupInformation)
+        protected DaemonContainerBase(string containerName) : this(containerName, new DefaultHostingBehaviour(AppDomain.CurrentDomain.SetupInformation))
         {
         }
 
-        protected DaemonContainerBase(string containerName, AppDomainSetup setupInfo)
+        protected DaemonContainerBase(string containerName, IHostingBehaviour behaviour)
         {
+            Behaviour = behaviour;
             Log = LogManager.GetLogger(containerName + ".Container");
             this.containerName = containerName;
-            this.setupInfo = setupInfo;
             ShutdownTimeout = TimeSpan.FromSeconds(15);
         }
         
@@ -70,7 +71,9 @@ namespace Bluewire.Common.Console.Hosting
                 ShutDownContainer(deadline);
                 if (container != null)
                 {
+                    mediator = null;
                     AppDomain.Unload(container);
+                    Behaviour.OnAfterStop();
                     container = null;
                 }
             }
@@ -124,7 +127,10 @@ namespace Bluewire.Common.Console.Hosting
             Debug.Assert(container == null);
             Debug.Assert(mediator == null);
 
-            var containerInstance = AppDomain.CreateDomain(containerName, null, setupInfo);
+            Behaviour.OnBeforeStart();
+
+            var appDomainSetup = Behaviour.CreateAppDomainSetup();
+            var containerInstance = AppDomain.CreateDomain(containerName, null, appDomainSetup);
             try
             {
                 var mediatorType = typeof(DaemonContainerMediator);
@@ -138,6 +144,7 @@ namespace Bluewire.Common.Console.Hosting
             catch
             {
                 AppDomain.Unload(containerInstance);
+                Behaviour.OnAfterStop();
                 container = null;
                 throw;
             }

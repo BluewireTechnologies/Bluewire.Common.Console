@@ -29,8 +29,7 @@ namespace Bluewire.Common.Console.Daemons
             var serviceEnvironment = environment as ServiceEnvironment;
             if (serviceEnvironment != null)
             {
-                runAsService.Run(serviceEnvironment, daemon, args);
-                return 0;
+                return runAsService.Run(serviceEnvironment, daemon, args);
             }
 
             var applicationEnvironment = environment as ApplicationEnvironment;
@@ -44,13 +43,12 @@ namespace Bluewire.Common.Console.Daemons
             {
                 var session = daemon.Configure();
                 session.Parse(args);
-                runAsHostedService.Run(hostedEnvironment, daemon, session.Arguments);
-                return 0;
+                return runAsHostedService.Run(hostedEnvironment, daemon, session.Arguments);
             }
 
             // Exit code 10 is a Windows standard exit code meaning 'The environment is incorrect'.
             // Try 'net helpmsg 10' at the shell.
-            throw new ErrorWithReturnCodeException(10, "The detected environment is not valid for execution: {0}", environment.GetType().Name);
+            return 10;
         }
 
 

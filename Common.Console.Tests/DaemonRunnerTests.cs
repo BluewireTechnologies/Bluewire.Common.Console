@@ -72,9 +72,9 @@ namespace Bluewire.Common.Console.Tests
         }
 
         [Test]
-        public void IfInvokedInAnUninitialisedHostedEnvironment_ThrowsException()
+        public void IfInvokedInAnUninitialisedHostedEnvironment_ReturnsErrorCode()
         {
-            Assert.Throws<ErrorWithReturnCodeException>(() => runner.Run(new HostedEnvironment(), daemon, "arg"));
+            Assert.AreNotEqual(0, runner.Run(new HostedEnvironment(), daemon, "arg"));
         }
 
 

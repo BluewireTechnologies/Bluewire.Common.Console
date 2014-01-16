@@ -48,15 +48,35 @@ namespace Bluewire.Common.Console.Hosting
 
                 var invoker = (EntryPointInvoker)appdomain.CreateInstanceAndUnwrap(typeof(EntryPointInvoker).Assembly.FullName, typeof(EntryPointInvoker).FullName, false, BindingFlags.Instance | BindingFlags.Public, null, new object[] { daemonAssemblyName }, null, null);
 
-                entryAssemblyTask = InvokeAsync(invoker, args);
-                entryAssemblyTask.ContinueWith(_ =>
+                var task = InvokeAsync(invoker, args);
+                entryAssemblyTask = task;
+                task.ContinueWith(_ =>
                 {
                     lock (Lock)
                     {
                         entryAssemblyTask = null;
                     }
                 });
-                return entryAssemblyTask;
+                task.ContinueWith(RecordEntryAssemblyTermination);
+                return task;
+            }
+        }
+
+        private void RecordEntryAssemblyTermination(Task<int> task)
+        {
+            if (task.IsFaulted)
+            {
+                Log.Error("The assembly invocation failed.", task.Exception);
+                return;
+            }
+            var exitCode = task.Result;
+            if (exitCode == 0)
+            {
+                Log.Debug("The running assembly terminated successfully.");
+            }
+            else
+            {
+                Log.ErrorFormat("The running assembly terminated with exit code {0}", exitCode);
             }
         }
 
@@ -84,19 +104,6 @@ namespace Bluewire.Common.Console.Hosting
             if (!entryAssemblyTask.Wait(Until(deadline)))
             {
                 Log.Warn("Timed out while waiting for the running assembly to terminate.");
-                return;
-            }
-            if(entryAssemblyTask.IsCompleted) // Should always be true by now!
-            {
-                var exitCode = entryAssemblyTask.Result;
-                if (exitCode == 0)
-                {
-                    Log.Debug("The running assembly terminated successfully.");
-                }
-                else
-                {
-                    Log.ErrorFormat("The running assembly terminated with exit code {0}", exitCode);
-                }
             }
         }
 

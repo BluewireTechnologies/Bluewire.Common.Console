@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
 using Bluewire.Common.Console.Hosting;
@@ -6,11 +9,10 @@ using NUnit.Framework;
 
 namespace Bluewire.Common.Console.Tests.Hosting
 {
-    [TestFixture]
+    [TestFixture, Timeout(10000)]
     public class DaemonExeContainerTests
     {
         [Test]
-        [Timeout(10000)]
         public void CanStartDaemonExeInHostedEnvironment()
         {
             var assemblyName = typeof(TestDaemon.TestDaemon).Assembly.GetName();
@@ -20,7 +22,7 @@ namespace Bluewire.Common.Console.Tests.Hosting
             using (var container = new DaemonExeContainer(daemon))
             {
                 var task = container.Run();
-                Assert.True(WaitUntilDaemonStarts(container, task));
+                Assume.That(WaitUntilDaemonStarts(container, task), Is.True);
 
                 Assert.AreEqual(1, container.GetDaemonNames().Length);
             }
@@ -28,7 +30,6 @@ namespace Bluewire.Common.Console.Tests.Hosting
 
 
         [Test, Ignore("Not sure how to implement this currently. We need to disable Unmanaged Code permissions in the child appdomain.")]
-        [Timeout(10000)]
         public void DaemonCannotKillHostingProcess()
         {
             var assemblyName = typeof(TestDaemon.TestDaemon).Assembly.GetName();
@@ -47,7 +48,7 @@ namespace Bluewire.Common.Console.Tests.Hosting
             {
                 var task = container.Run("--environment-exit", "5");
 
-                Assume.That(!WaitUntilDaemonStarts(container, task)); // Not expecting a successful start.
+                Assume.That(WaitUntilDaemonStarts(container, task), Is.False); // Not expecting a successful start.
 
                 // TestDaemon throws an unhandled exception when --value doesn't match the configured value.
                 Assert.AreNotEqual(0, task.Result);
@@ -57,7 +58,6 @@ namespace Bluewire.Common.Console.Tests.Hosting
 
         [TestCase("PassingValue", 0)]
         [TestCase("FailingValue", 255)]
-        [Timeout(10000)]
         public void CanStartDaemonExeWithAlternateConfiguration(string sentinelValue, int expectedReturnCode)
         {
             var assemblyName = typeof(TestDaemon.TestDaemon).Assembly.GetName();
@@ -84,6 +84,41 @@ namespace Bluewire.Common.Console.Tests.Hosting
 
             
         }
+        
+        [Test]
+        public void CanStartDaemonExeSpecifiedByFilePathInHostedEnvironment()
+        {
+            var assembly = typeof(TestDaemon.TestDaemon).Assembly;
+            
+            var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(path);
+            try
+            {
+                var daemonFile = CopyAssembly(assembly, path);
+                CopyAssembly(typeof(DaemonRunner).Assembly, path);
+
+                var daemon = HostedDaemonExe.FromAssemblyFile(daemonFile);
+
+                using (var container = new DaemonExeContainer(daemon))
+                {
+                    var task = container.Run();
+                    Assume.That(WaitUntilDaemonStarts(container, task), Is.True);
+
+                    Assert.AreEqual(1, container.GetDaemonNames().Length);
+                }
+            }
+            finally
+            {
+                Directory.Delete(path, true);
+            }
+        }
+
+        private static string CopyAssembly(Assembly assembly, string directory)
+        {
+            var targetPath = Path.Combine(directory, Path.GetFileName(assembly.Location));
+            File.Copy(assembly.Location, targetPath);
+            return targetPath;
+        }
 
         /// <summary>
         /// Invoking Main() means that we have no control over how the daemon runs. We can't even be sure
@@ -102,5 +137,6 @@ namespace Bluewire.Common.Console.Tests.Hosting
             // Task completed, so the app must've terminated.
             return false;
         }
+
     }
 }

@@ -8,31 +8,47 @@ namespace Bluewire.Common.Console.Hosting
 {
     public class HostedDaemonExe : IHostingBehaviour
     {
-        private readonly AppDomainSetup appDomainSetup;
         private string configurationFilePath;
         private XmlDocument configurationXml;
 
-        public HostedDaemonExe(AssemblyName daemonAssemblyName, AppDomainSetup setup = null)
+
+        public HostedDaemonExe(AssemblyName daemonAssemblyName, AppDomainSetup appDomainSetup = null)
         {
             if (daemonAssemblyName == null) throw new ArgumentNullException("daemonAssemblyName");
             AssemblyName = daemonAssemblyName;
-            appDomainSetup = setup ?? AppDomain.CurrentDomain.SetupInformation;
+            AppDomainSetup = appDomainSetup ?? AppDomain.CurrentDomain.SetupInformation;
         }
 
         public AssemblyName AssemblyName { get; private set; }
-        
+        public AppDomainSetup AppDomainSetup { get; private set; }
+
         public HostedDaemonExe UseConfiguration(XmlDocument configuration)
         {
             configurationFilePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             
             configurationXml = (XmlDocument)configuration.Clone();
-            appDomainSetup.ConfigurationFile = configurationFilePath;
+            AppDomainSetup.ConfigurationFile = configurationFilePath;
             return this;
+        }
+        
+        public static HostedDaemonExe FromAssemblyFile(string file)
+        {
+            if(!Path.IsPathRooted(file)) throw new ArgumentException("Specified path is not absolute.");
+            var assemblyName = AssemblyName.GetAssemblyName(file);
+            
+            return new HostedDaemonExe(assemblyName, new AppDomainSetup())
+            {
+                AppDomainSetup = {
+                    ApplicationName = assemblyName.Name,
+                    ApplicationBase = Path.GetDirectoryName(file),
+                    ApplicationTrust = AppDomain.CurrentDomain.ApplicationTrust
+                }
+            };
         }
 
         AppDomainSetup IHostingBehaviour.CreateAppDomainSetup()
         {
-            return appDomainSetup;
+            return AppDomainSetup;
         }
 
         void IHostingBehaviour.OnBeforeStart()

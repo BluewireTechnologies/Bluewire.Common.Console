@@ -22,8 +22,10 @@ namespace Bluewire.Common.Console.Hosting
             : base(daemon.AssemblyName.Name, daemon)
         {
             this.daemonAssemblyName = daemon.AssemblyName;
-            this.definition = definition;
+
             if (String.IsNullOrEmpty(definition.ApplicationName)) definition.ApplicationName = daemonAssemblyName.Name;
+
+            this.definition = definition;
         }
 
         /// <summary>

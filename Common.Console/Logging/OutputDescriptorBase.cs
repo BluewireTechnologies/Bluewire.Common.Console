@@ -10,6 +10,7 @@ namespace Bluewire.Common.Console.Logging
     {
         protected OutputDescriptorBase(string applicationName)
         {
+            if (applicationName == null) throw new ArgumentNullException("applicationName");
             ApplicationName = applicationName;
         }
 

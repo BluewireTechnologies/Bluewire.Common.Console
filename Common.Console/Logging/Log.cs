@@ -13,17 +13,28 @@ namespace Bluewire.Common.Console.Logging
     {
         private static LoggingConfigurer configurer;
 
-        private static OutputDescriptorBase CreateDescriptor(IExecutionEnvironment environment)
-        {
-            return environment.CreateOutputDescriptor();
-        }
-
         /// <summary>
         /// Configure Log4Net from application's config file if possible.
         /// </summary>
-        /// <param name="defaultLogFileRoot">Root directory used for logfiles written by the default logging behaviour. Does not affect configured logging. Defaults to the application directory.</param>
-        public static void Configure(string defaultLogFileRoot = null)
+        public static void Configure()
         {
+            ConfigureWith(c =>
+            {
+                // ignore absent configuration:
+                if (HasLog4NetConfiguration(GetApplicationConfiguration()))
+                {
+                    XmlConfigurator.Configure();
+                }
+            });
+        }
+
+        /// <summary>
+        /// Configure Log4Net from application's config file if possible, and specify an alternate directory for the default logs.
+        /// </summary>
+        /// <param name="defaultLogFileRoot">Root directory used for logfiles written by the default logging behaviour. Does not affect configured logging. Defaults to the application directory.</param>
+        public static void Configure(string defaultLogFileRoot)
+        {
+            if (String.IsNullOrEmpty(defaultLogFileRoot)) throw new ArgumentNullException("defaultLogFileRoot");
             ConfigureWith(c =>
             {
                 c.SetLogRootDirectory(defaultLogFileRoot);

@@ -34,5 +34,11 @@ namespace Bluewire.Common.Console.Hosting
         {
             return Environment.GetDaemonInfo().Select(d => d.Name).ToArray();
         }
+
+        public override object InitializeLifetimeService()
+        {
+            // Infinite lease time. Prevents this object from being GC'd.
+            return null;
+        }
     }
 }

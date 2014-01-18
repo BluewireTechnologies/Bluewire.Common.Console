@@ -81,8 +81,22 @@ namespace Bluewire.Common.Console.Tests.Hosting
                 // TestDaemon throws an unhandled exception when --value doesn't match the configured value.
                 Assert.AreEqual(expectedReturnCode, task.Result);
             }
+        }
 
-            
+        [Test]
+        public void CannotReuseDaemonExeContainer()
+        {
+            var assemblyName = typeof(TestDaemon.TestDaemon).Assembly.GetName();
+
+            var daemon = new HostedDaemonExe(assemblyName);
+
+            using (var container = new DaemonExeContainer(daemon))
+            {
+                var task = container.Run("--key", "Key", "--value", "FailingValue");
+                task.Wait();
+
+                Assert.Catch<Exception>(() => container.Run());
+            }
         }
         
         [Test]

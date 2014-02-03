@@ -49,19 +49,18 @@ namespace Bluewire.Common.Console.Hosting
 
                 var invoker = (EntryPointInvoker)appdomain.CreateInstanceAndUnwrap(typeof(EntryPointInvoker).Assembly.FullName, typeof(EntryPointInvoker).FullName, false, BindingFlags.Instance | BindingFlags.Public, null, new object[] { daemonAssemblyName }, null, null);
 
-                var task = InvokeAsync(invoker, args);
+                var task = InvokeAsync(invoker, args).ContinueWith(t => RecordEntryAssemblyTermination(t), TaskContinuationOptions.ExecuteSynchronously);
                 entryAssemblyTask = task;
-                task.ContinueWith(RecordEntryAssemblyTermination);
                 return task;
             }
         }
 
-        private void RecordEntryAssemblyTermination(Task<int> task)
+        private int RecordEntryAssemblyTermination(Task<int> task)
         {
             if (task.IsFaulted)
             {
                 Log.Error("The assembly invocation failed.", task.Exception);
-                return;
+                return 255;
             }
             var exitCode = task.Result;
             if (exitCode == 0)
@@ -72,6 +71,7 @@ namespace Bluewire.Common.Console.Hosting
             {
                 Log.ErrorFormat("The running assembly terminated with exit code {0}", exitCode);
             }
+            return exitCode;
         }
 
         private static Task<int> InvokeAsync(EntryPointInvoker invoker, string[] args)

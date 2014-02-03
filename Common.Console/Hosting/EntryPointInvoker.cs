@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using log4net;
 
 namespace Bluewire.Common.Console.Hosting
 {
@@ -13,8 +10,6 @@ namespace Bluewire.Common.Console.Hosting
     /// </summary>
     public class EntryPointInvoker : MarshalByRefObject
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(EntryPointInvoker));
-
         private static EntryPointInvoker singleton;
         private readonly Assembly assembly;
 
@@ -46,12 +41,9 @@ namespace Bluewire.Common.Console.Hosting
             }
             catch (TargetInvocationException ex)
             {
-                log.Error(ex);
+                if (ex.InnerException == null) throw new HostedEntryPointException(ex); // Failed to invoke entry point?
 
-                if (ex.InnerException == null) throw; // Failed to invoke entry point?
-
-                // Unhandled exceptions thrown by the entry point generate an exit code of 255 for console apps.
-                return 255;
+                throw new HostedEntryPointException(ex.InnerException);
             }
         }
 
@@ -73,6 +65,35 @@ namespace Bluewire.Common.Console.Hosting
                     receiver.ExitCode(t.Result);
                 }
             });
+        }
+    }
+
+    [Serializable]
+    public class HostedEntryPointException : Exception
+    {
+        public int ExitCode { get; private set; }
+
+        public HostedEntryPointException(Exception exception)
+            : base("The application's entry point terminated with an unhandled exception.", exception)
+        {
+            // Unhandled exceptions thrown by the entry point generate an exit code of 255 for console apps.
+            ExitCode = 255;
+        }
+
+        public HostedEntryPointException(TargetInvocationException exception)
+            : base("Failed to invoke the application's entry point.", exception)
+        {
+            // Unhandled exceptions thrown by the entry point generate an exit code of 255 for console apps.
+            ExitCode = 255;
+        }
+        public HostedEntryPointException(int errorCode) : base(String.Format("The application's entry point terminated with code {0}", errorCode))
+        {
+            ExitCode = errorCode;
+        }
+
+        public HostedEntryPointException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
         }
     }
 }

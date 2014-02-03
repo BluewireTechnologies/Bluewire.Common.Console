@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using log4net;
 
 namespace Bluewire.Common.Console.Hosting
 {
@@ -12,6 +13,8 @@ namespace Bluewire.Common.Console.Hosting
     /// </summary>
     public class EntryPointInvoker : MarshalByRefObject
     {
+        private static readonly ILog log = LogManager.GetLogger(typeof(EntryPointInvoker));
+
         private static EntryPointInvoker singleton;
         private readonly Assembly assembly;
 
@@ -43,6 +46,8 @@ namespace Bluewire.Common.Console.Hosting
             }
             catch (TargetInvocationException ex)
             {
+                log.Error(ex);
+
                 if (ex.InnerException == null) throw; // Failed to invoke entry point?
 
                 // Unhandled exceptions thrown by the entry point generate an exit code of 255 for console apps.

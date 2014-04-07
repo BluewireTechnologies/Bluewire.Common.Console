@@ -74,6 +74,7 @@
     <Compile Include="Daemons\HostedDaemonMonitor.cs" />
     <Compile Include="Daemons\IHostedDaemonInstance.cs" />
     <Compile Include="Daemons\IRunAsHostedService.cs" />
+    <Compile Include="Daemons\ITestAsConsoleApplication.cs" />
     <Compile Include="Daemons\ServiceAccountCredentials.cs" />
     <Compile Include="Daemons\ServiceAccountCredentialsFactory.cs" />
     <Compile Include="Environment\ApplicationEnvironment.cs" />

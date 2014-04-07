@@ -12,6 +12,7 @@ namespace Bluewire.Common.Console.Tests
     public class DaemonRunnerTests
     {
         private Mock<IRunAsConsoleApplication> runAsConsoleApplication;
+        private Mock<ITestAsConsoleApplication> testAsConsoleApplication;
         private Mock<IRunAsService> runAsService;
         private Mock<IRunAsServiceInstaller> runAsServiceInstaller;
         private Mock<IRunAsHostedService> runAsHostedService;
@@ -27,11 +28,12 @@ namespace Bluewire.Common.Console.Tests
         public void SetUp()
         {
             runAsConsoleApplication = new Mock<IRunAsConsoleApplication>();
+            testAsConsoleApplication = new Mock<ITestAsConsoleApplication>();
             runAsService = new Mock<IRunAsService>();
             runAsServiceInstaller = new Mock<IRunAsServiceInstaller>();
             runAsHostedService = new Mock<IRunAsHostedService>();
             
-            runner = new DaemonRunner<NoArguments>(runAsConsoleApplication.Object, runAsService.Object, runAsServiceInstaller.Object, runAsHostedService.Object);
+            runner = new DaemonRunner<NoArguments>(runAsConsoleApplication.Object, runAsService.Object, runAsServiceInstaller.Object, runAsHostedService.Object, testAsConsoleApplication.Object);
 
             var daemon = new Mock<IDaemonisable<NoArguments>>();
             daemon.Setup(d => d.Configure()).Returns(() => new SessionArguments<NoArguments>(new NoArguments(), new OptionSet()));
@@ -160,6 +162,14 @@ namespace Bluewire.Common.Console.Tests
             runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "--", "--install", "arg");
 
             runAsConsoleApplication.Verify(s => s.Run(It.IsAny<ApplicationEnvironment>(), daemon, It.IsAny<NoArguments>()));
+        }
+
+        [Test]
+        public void IfInvokedWithTestSwitch_RunsDaemonInTestMode()
+        {
+            runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "--test");
+
+            testAsConsoleApplication.Verify(s => s.Test(It.IsAny<ApplicationEnvironment>(), daemon, It.IsAny<NoArguments>()));
         }
     }
 }

@@ -12,15 +12,17 @@ namespace Bluewire.Common.Console.Daemons
             this.Daemon = daemon;
         }
 
-        public bool ServiceInstallationRequested { get; private set; }
-        
+        public bool ServiceInstallationRequested { get { return RunInstall || RunUninstall; } }
+
+        public bool ModeSwitchSpecified { get; private set; }
 
         private void AssertOnlyOneRequest()
         {
-            if (ServiceInstallationRequested) throw new InvalidArgumentsException("Specify only one of --install, --reinstall or --uninstall.");
-            ServiceInstallationRequested = true;
+            if (ModeSwitchSpecified) throw new InvalidArgumentsException("Specify only one of --install, --reinstall, --uninstall or --test.");
+            ModeSwitchSpecified = true;
         }
 
+        public bool RunTest { get; private set; }
         public bool RunInstall { get; private set; }
         public bool RunUninstall { get; private set; }
 
@@ -43,6 +45,12 @@ namespace Bluewire.Common.Console.Daemons
         public ServiceAccountCredentials GetAccount()
         {
             return new ServiceAccountCredentialsFactory().Create(ServiceUser, ServicePassword) ?? new ServiceAccountCredentials();
+        }
+
+        public void Test()
+        {
+            AssertOnlyOneRequest();
+            RunTest = true;
         }
 
         public void Install()

@@ -11,17 +11,20 @@ namespace Bluewire.Common.Console.Daemons
         private readonly IRunAsService runAsService;
         private readonly IRunAsServiceInstaller runAsServiceInstaller;
         private readonly IRunAsHostedService runAsHostedService;
+        private readonly ITestAsConsoleApplication testAsConsoleApplication;
 
         public DaemonRunner(
             IRunAsConsoleApplication runAsConsoleApplication,
             IRunAsService runAsService,
             IRunAsServiceInstaller runAsServiceInstaller,
-            IRunAsHostedService runAsHostedService)
+            IRunAsHostedService runAsHostedService,
+            ITestAsConsoleApplication testAsConsoleApplication)
         {
             this.runAsConsoleApplication = runAsConsoleApplication;
             this.runAsService = runAsService;
             this.runAsServiceInstaller = runAsServiceInstaller;
             this.runAsHostedService = runAsHostedService;
+            this.testAsConsoleApplication = testAsConsoleApplication;
         }
 
         public int Run(IExecutionEnvironment environment, IDaemonisable<T> daemon, params string[] args)
@@ -68,12 +71,17 @@ namespace Bluewire.Common.Console.Daemons
                             .Strip(args);
                     return runAsServiceInstaller.Run(applicationEnvironment, serviceInstallerArguments, consoleArguments);
                 }
+                if (serviceInstallerArguments.RunTest)
+                {
+                    return testAsConsoleApplication.Test(applicationEnvironment, daemon, a);
+                }
                 return runAsConsoleApplication.Run(applicationEnvironment, daemon, a);
             });
         }
 
         private static TArgs AddInstallerOptions<TArgs>(TArgs sessionArguments, ServiceInstallerArguments<T> serviceInstallerArguments) where TArgs : SessionArguments
         {
+            sessionArguments.Options.Add("test", "Start and stop the application to verify its configuration. This will run it under the current user account.", i => serviceInstallerArguments.Test());
             sessionArguments.Options.Add("install", "Install this application as a service.", i => serviceInstallerArguments.Install());
             sessionArguments.Options.Add("uninstall", "Uninstall this service.", i => serviceInstallerArguments.Uninstall());
             sessionArguments.Options.Add("reinstall", "Reinstall this service.", i => serviceInstallerArguments.Reinstall());

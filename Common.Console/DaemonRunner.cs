@@ -38,7 +38,8 @@ namespace Bluewire.Common.Console
                 new RunAsConsoleApplication(),
                 new RunAsService(),
                 new RunAsServiceInstaller(),
-                new RunAsHostedService()).Run(environment, daemon, args);
+                new RunAsHostedService(),
+                new TestAsConsoleApplication()).Run(environment, daemon, args);
         }
 
 
@@ -69,6 +70,17 @@ namespace Bluewire.Common.Console
             public int Run<T>(ApplicationEnvironment environment, IDaemonisable<T> daemon, T arguments)
             {
                 return new ConsoleDaemonMonitor(daemon.Start(arguments)).WaitForTermination();
+            }
+        }
+
+        public class TestAsConsoleApplication : ITestAsConsoleApplication
+        {
+            public int Test<T>(ApplicationEnvironment environment, IDaemonisable<T> daemon, T arguments)
+            {
+                using (daemon.Start(arguments))
+                {
+                }
+                return 0;
             }
         }
 

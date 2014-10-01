@@ -8,6 +8,7 @@ namespace Bluewire.Common.Console.Hosting
     {
         private readonly TaskCompletionSource<object> completion = new TaskCompletionSource<object>();
         private readonly CountdownEvent countdown = new CountdownEvent(1); // '1' prevents it completing immediately.
+        private int isWaiting;
 
         public void Track(Task shutdownTask)
         {
@@ -31,7 +32,7 @@ namespace Bluewire.Common.Console.Hosting
 
         public Task GetWaitTask()
         {
-            Decrement(); // Counteract the initial '1'.
+            if(Interlocked.Increment(ref isWaiting) == 1) Decrement(); // Counteract the initial '1', but only once.
             return completion.Task;
         }
     }

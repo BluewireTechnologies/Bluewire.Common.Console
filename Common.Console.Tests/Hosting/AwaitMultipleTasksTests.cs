@@ -101,5 +101,27 @@ namespace Bluewire.Common.Console.Tests.Hosting
 
             Assert.True(task.IsCompleted);
         }
+
+        [Test]
+        public void CallingGetWaitTaskMultipleTimesDoesNotCorruptState()
+        {
+            var sourceA = new TaskCompletionSource<object>();
+            var sourceB = new TaskCompletionSource<object>();
+            var sourceC = new TaskCompletionSource<object>();
+
+            sourceA.SetResult(new object());
+            sourceC.SetResult(new object());
+
+            var awaiter = new AwaitMultipleTasks();
+            awaiter.Track(sourceA.Task);
+            awaiter.Track(sourceB.Task);
+            awaiter.Track(sourceC.Task);
+
+            Assert.False(awaiter.GetWaitTask().IsCompleted);
+            Assert.False(awaiter.GetWaitTask().IsCompleted);
+
+            sourceB.SetResult(new object());
+            Assert.True(awaiter.GetWaitTask().IsCompleted);
+        }
     }
 }

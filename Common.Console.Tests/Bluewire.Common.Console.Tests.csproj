@@ -58,6 +58,7 @@
     <Compile Include="Progress\FormattingHelpersTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceAccountCredentialsFactoryTests.cs" />
+    <Compile Include="VerbosityListTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common.Console\Bluewire.Common.Console.csproj">

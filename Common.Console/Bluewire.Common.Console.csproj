@@ -138,6 +138,7 @@
     <Compile Include="Daemons\ServiceInstallerArguments.cs" />
     <Compile Include="SessionArguments.cs" />
     <Compile Include="ThirdParty\Options.cs" />
+    <Compile Include="VerbosityList.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

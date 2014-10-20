@@ -16,7 +16,6 @@ namespace Bluewire.Common.Console.Logging
 
         protected readonly string ApplicationName;
 
-        public abstract IAppender CreateStdOut();
         public abstract IAppender CreateStdErr();
 
         protected static T Init<T>(T obj)

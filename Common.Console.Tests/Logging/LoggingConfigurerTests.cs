@@ -44,7 +44,6 @@ namespace Bluewire.Common.Console.Tests.Logging
         }
 
         private TextWriter NULL_DEVICE;
-        private TextWriter STDOUT;
         private TextWriter STDERR;
 
 
@@ -52,7 +51,6 @@ namespace Bluewire.Common.Console.Tests.Logging
         public void SetUp()
         {
             NULL_DEVICE = new StringWriter();
-            STDOUT = new StringWriter();
             STDERR = new StringWriter();
             LogManager.ResetConfiguration();
         }
@@ -62,7 +60,6 @@ namespace Bluewire.Common.Console.Tests.Logging
         {
             LogManager.ResetConfiguration();
             NULL_DEVICE.Dispose();
-            STDOUT.Dispose();
             STDERR.Dispose();
         }
 
@@ -73,7 +70,7 @@ namespace Bluewire.Common.Console.Tests.Logging
             {
                 XmlConfigurator.Configure(config);
             }
-            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", NULL_DEVICE, NULL_DEVICE)))
+            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", NULL_DEVICE)))
             {
                 var appenders = LogManager.GetRepository().GetAppenders();
 
@@ -90,7 +87,7 @@ namespace Bluewire.Common.Console.Tests.Logging
             {
                 XmlConfigurator.Configure(config);
             }
-            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", NULL_DEVICE, NULL_DEVICE)))
+            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", NULL_DEVICE)))
             {
                 var appenders = LogManager.GetRepository().GetAppenders();
 
@@ -102,7 +99,7 @@ namespace Bluewire.Common.Console.Tests.Logging
         [Test]
         public void ConfiguresDefaultLogging_If_Log4NetIsNotConfigured()
         {
-            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", NULL_DEVICE, NULL_DEVICE)))
+            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", NULL_DEVICE)))
             {
                 var appenders = LogManager.GetRepository().GetAppenders();
 
@@ -115,7 +112,6 @@ namespace Bluewire.Common.Console.Tests.Logging
         private void AssertDefaultAppenders(IAppender[] appenders)
         {
             CollectionAssert.AreEquivalent(new[]{
-                "Console.STDOUT",
                 "Console.STDERR",
                 "DefaultLogAppender"
             }, appenders.Select(a => a.Name));
@@ -128,12 +124,11 @@ namespace Bluewire.Common.Console.Tests.Logging
             {
                 XmlConfigurator.Configure(config);
             }
-            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", NULL_DEVICE, NULL_DEVICE)))
+            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", NULL_DEVICE)))
             {
                 var appenders = LogManager.GetRepository().GetAppenders();
 
                 CollectionAssert.AreEquivalent(new[]{
-                    "Console.STDOUT",
                     "Console.STDERR",
                     "ConfiguredRootAppender"
                 }, appenders.Select(a => a.Name));
@@ -150,28 +145,26 @@ namespace Bluewire.Common.Console.Tests.Logging
                 XmlConfigurator.Configure(config);
             }
             const string error = "Error Message";
-            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDOUT, STDERR)))
+            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDERR)))
             {
                 configurer.Console.Error(error);
             }
             Assert.That(STDERR.ToString(), Is.StringContaining(error));
-            Assert.That(STDOUT.ToString(), Is.Not.StringContaining(error));
         }
 
         [Test]
-        public void ConsoleMessagesGoTo_STDOUT()
+        public void ConsoleMessagesGoTo_STDERR()
         {
             using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
             {
                 XmlConfigurator.Configure(config);
             }
             const string message = "Info Message";
-            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDOUT, STDERR)))
+            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDERR)))
             {
                 configurer.Console.Warn(message);
             }
-            Assert.That(STDOUT.ToString(), Is.StringContaining(message));
-            Assert.That(STDERR.ToString(), Is.Not.StringContaining(message));
+            Assert.That(STDERR.ToString(), Is.StringContaining(message));
         }
 
         [Test]
@@ -185,7 +178,7 @@ namespace Bluewire.Common.Console.Tests.Logging
             const string message = "Info Message";
             using(var defaultLog = new StringWriter())
             {
-                var descriptor = new Mock<ConsoleOutputDescriptor>("Test", STDOUT, STDERR) {CallBase = true};
+                var descriptor = new Mock<ConsoleOutputDescriptor>("Test", STDERR) {CallBase = true};
                 descriptor.Setup(d => d.CreateDefaultLog()).Returns(new TextWriterAppender { Writer = defaultLog });
                 using (var configurer = new LoggingConfigurer(descriptor.Object))
                 {
@@ -196,18 +189,17 @@ namespace Bluewire.Common.Console.Tests.Logging
         }
 
         [Test]
-        public void RootMessagesDoNotGoTo_STDERR_Or_STDOUT()
+        public void RootMessagesDoNotGoTo_STDERR()
         {
             using (var config = GetConfigurationStream("EmptyConfiguration.xml"))
             {
                 XmlConfigurator.Configure(config);
             }
             const string message = "Info Message";
-            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDOUT, STDERR)))
+            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDERR)))
             {
                 LogManager.GetLogger("none").Info(message);
             }
-            Assert.That(STDOUT.ToString(), Is.Not.StringContaining(message));
             Assert.That(STDERR.ToString(), Is.Not.StringContaining(message));
         }
 
@@ -221,16 +213,13 @@ namespace Bluewire.Common.Console.Tests.Logging
 
             const string info = "Info Message";
             const string warning = "Warning Message";
-            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDOUT, STDERR)))
+            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDERR)))
             {
                 configurer.Console.Info(info);
                 configurer.Console.Warn(warning);
             }
-            Assert.That(STDOUT.ToString(), Is.Not.StringContaining(info));
-            Assert.That(STDOUT.ToString(), Is.StringContaining(warning));
-
             Assert.That(STDERR.ToString(), Is.Not.StringContaining(info));
-            Assert.That(STDERR.ToString(), Is.Not.StringContaining(warning));
+            Assert.That(STDERR.ToString(), Is.StringContaining(warning));
         }
 
         [Test]
@@ -241,14 +230,13 @@ namespace Bluewire.Common.Console.Tests.Logging
                 XmlConfigurator.Configure(config);
             }
             const string info = "Info Message";
-            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDOUT, STDERR)))
+            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDERR)))
             {
                 configurer.ConsoleVerbosity = Level.Info;
 
                 configurer.Console.Info(info);
             }
-            Assert.That(STDOUT.ToString(), Is.StringContaining(info));
-            Assert.That(STDERR.ToString(), Is.Not.StringContaining(info));
+            Assert.That(STDERR.ToString(), Is.StringContaining(info));
         }
 
         [Test]
@@ -260,14 +248,13 @@ namespace Bluewire.Common.Console.Tests.Logging
             }
 
             const string info = "Info Message";
-            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDOUT, STDERR)))
+            using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDERR)))
             {
                 configurer.ConsoleVerbosity = Level.Info;   
 
                 configurer.Console.Info(info);
             }
-            Assert.That(STDOUT.ToString(), Is.StringContaining(info));
-            Assert.That(STDERR.ToString(), Is.Not.StringContaining(info));
+            Assert.That(STDERR.ToString(), Is.StringContaining(info));
         }
 
         [Test]

@@ -17,12 +17,7 @@ namespace Bluewire.Common.Console.Logging
             appender.File = GetLogFilePath("{0}.console", ApplicationName);
             return appender;
         }
-
-        public override IAppender CreateStdOut()
-        {
-            return CreateAppender();
-        }
-
+        
         public override IAppender CreateStdErr()
         {
             return CreateAppender();

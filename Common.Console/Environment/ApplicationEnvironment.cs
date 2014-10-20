@@ -23,7 +23,7 @@ namespace Bluewire.Common.Console.Environment
 
         public OutputDescriptorBase CreateOutputDescriptor()
         {
-            return new ConsoleOutputDescriptor(applicationName, System.Console.Out, System.Console.Error);
+            return new ConsoleOutputDescriptor(applicationName, System.Console.Error);
         }
     }
 }

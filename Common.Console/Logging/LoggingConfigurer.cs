@@ -91,24 +91,16 @@ namespace Bluewire.Common.Console.Logging
         {
             consoleLogger.Additivity = false;
             SetLoggerLevel(consoleLogger, consoleLogLevel);
-            AddAppenderIfMissing(consoleLogger, ConfigureStdOut(repository));
             AddAppenderIfMissing(consoleLogger, ConfigureStdErr(repository));
         }
 
         private IAppender ConfigureStdErr(ILoggerRepository repository)
         {
             return GetOrCreateConsoleAppender(repository, "Console.STDERR",
-                new LevelRangeFilter { AcceptOnMatch = false, LevelMin = Level.Error },
+                new LevelRangeFilter { AcceptOnMatch = false },
                 outputDescriptor.CreateStdErr);
         }
-
-        private IAppender ConfigureStdOut(ILoggerRepository repository)
-        {
-            return GetOrCreateConsoleAppender(repository, "Console.STDOUT",
-                new LevelRangeFilter {AcceptOnMatch = false, LevelMax = Level.Warn},
-                outputDescriptor.CreateStdOut);
-        }
-
+        
         private IAppender CreateDefaultLogAppender()
         {
             var appender = outputDescriptor.CreateDefaultLog();

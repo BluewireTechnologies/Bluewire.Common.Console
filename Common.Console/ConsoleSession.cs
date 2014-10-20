@@ -58,14 +58,25 @@ namespace Bluewire.Common.Console
         }
 
         private string customUsageString;
+        /// <summary>
+        /// Displayed first, above the options descriptions.
+        /// </summary>
         public string Usage
         {
             get { return this.customUsageString ?? GetUsageString(); }
             set { this.customUsageString = value; }
         }
 
+        /// <summary>
+        /// If the application accepts an arbitrary parameter list, this will be appended to the
+        /// default usage string.
+        /// </summary>
         public string ListParameterUsage { get; set; }
 
+        /// <summary>
+        /// This is displayed below the option descriptions.
+        /// </summary>
+        public string ExtendedUsageDetails { get; set; }
 
         private void AddConsoleOptions()
         {
@@ -95,7 +106,7 @@ namespace Bluewire.Common.Console
         private void OnHandledException(ErrorWithReturnCodeException ex)
         {
             System.Console.Error.WriteLine(ex.Message);
-            if (ex.ShowUsage) ShowUsage();
+            if (ex.ShowUsage) ShowUsageSummary();
         }
 
         private void OnUnhandledException(Exception ex)
@@ -111,10 +122,20 @@ namespace Bluewire.Common.Console
             System.Console.Error.WriteLine(ex.StackTrace);
         }
 
+        private void ShowUsageSummary()
+        {
+            System.Console.Error.WriteLine("Usage: {0}", Usage);
+            System.Console.Error.WriteLine("For more information, try specifying -?");
+        }
+
         private void ShowUsage()
         {
             System.Console.Error.WriteLine("Usage: {0}", Usage);
             this.session.Options.WriteOptionDescriptions(System.Console.Error);
+            if (!String.IsNullOrWhiteSpace(ExtendedUsageDetails))
+            {
+                System.Console.Error.WriteLine(ExtendedUsageDetails);
+            }
         }
 
         public class ConsoleArguments

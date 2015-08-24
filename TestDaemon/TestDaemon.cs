@@ -2,6 +2,7 @@
 using System.Configuration;
 using Bluewire.Common.Console;
 using Bluewire.Common.Console.ThirdParty;
+using System.Diagnostics;
 
 namespace TestDaemon
 {

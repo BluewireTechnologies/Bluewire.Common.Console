@@ -35,13 +35,29 @@ namespace Bluewire.Common.Console.Environment
                 // run from the command line or as a service.
                 return new HostedEnvironment();
             }
-
-            if (NativeMethods.IsRunningAsService())
+            
+            if (!HasSTDERR())
             {
+                // If we can't open STDERR, probably running inside a noninteractive service.
+                // We cannot and should not detect if we're 'running as a service' because there are so many
+                // ways which 'almost' work and none that entirely work. All we really care about is 'can we
+                // sensibly log to STDERR?'
                 return new ServiceEnvironment(entryAssembly);
             }
 
             return new ApplicationEnvironment(entryAssembly);
+        }
+
+
+        private static bool HasSTDERR()
+        {
+            using (var stderr = System.Console.OpenStandardError())
+            {
+                if (stderr == null) return false;
+                if (!stderr.CanWrite) return false;
+                if (stderr.GetType().FullName == "System.IO.Stream+NullStream") return false;
+            }
+            return true;
         }
 
         public InitialisedHostedEnvironment DefineHostedEnvironment(HostedEnvironmentDefinition definition)

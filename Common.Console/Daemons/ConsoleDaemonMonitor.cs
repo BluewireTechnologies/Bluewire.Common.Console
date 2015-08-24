@@ -10,10 +10,10 @@
         {
             this.daemon = daemon;
             cancelMonitor = new CancelMonitor();
-            cancelMonitor.CancelRequested += (s, e) => System.Console.WriteLine("Shutting down.");
+            cancelMonitor.CancelRequested += (s, e) => System.Console.Error.WriteLine("Shutting down.");
             cancelMonitor.KillRequested += (s, e) => e.Cancel = true; // Ignore kill requests.
 
-            System.Console.Out.WriteLine("Press CTRL-C to terminate.");
+            System.Console.Error.WriteLine("Press CTRL-C to terminate.");
         }
 
         public int WaitForTermination()

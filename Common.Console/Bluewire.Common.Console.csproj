@@ -129,7 +129,6 @@
     <Compile Include="Logging\LoggingConfigurer.cs" />
     <Compile Include="Logging\OutputDescriptorBase.cs" />
     <Compile Include="Logging\ServiceLogOutputDescriptor.cs" />
-    <Compile Include="NativeMethods.cs" />
     <Compile Include="NoArguments.cs" />
     <Compile Include="Progress\FormattingHelpers.cs" />
     <Compile Include="Progress\IProgressReceiver.cs" />

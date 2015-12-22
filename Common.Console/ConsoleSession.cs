@@ -50,7 +50,13 @@ namespace Bluewire.Common.Console
             }
         }
 
-        public async Task<int> Run(string[] args, Func<T, Task<int>> application)
+        public int Run(string[] args, Func<T, Task<int>> application)
+        {
+            var task = RunAsync(args, application);
+            return task.GetAwaiter().GetResult();
+        }
+
+        public async Task<int> RunAsync(string[] args, Func<T, Task<int>> application)
         {
             try
             {

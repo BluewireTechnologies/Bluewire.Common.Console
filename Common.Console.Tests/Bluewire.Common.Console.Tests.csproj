@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CancelMonitorTests.cs" />
+    <Compile Include="ConsoleSessionTests.cs" />
     <Compile Include="DaemonRunnerTests.cs" />
     <Compile Include="Daemons\HostedDaemonMonitorTests.cs" />
     <Compile Include="Hosting\AwaitMultipleTasksTests.cs" />

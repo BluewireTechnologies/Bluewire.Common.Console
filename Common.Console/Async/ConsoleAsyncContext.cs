@@ -37,13 +37,18 @@ namespace Bluewire.Common.Console.Async
         {
             using (var context = new ConsoleAsyncContext())
             {
-                // This is tricky. Unwrap() returns a task proxy, which must also be executed within the context.
-                context.TaskAdded();
-                var task = context.factory.StartNew(app, TaskCreationOptions.DenyChildAttach).Unwrap();
-                context.ObserveTaskCompletion(task);
-                context.RunToCompletion();
-                return task.GetAwaiter().GetResult();
+                return context.RunInternal(app);
             }
+        }
+
+        private T RunInternal<T>(Func<Task<T>> app)
+        {
+            // This is tricky. Unwrap() returns a task proxy, which must also be executed within the context.
+            TaskAdded();
+            var task = factory.StartNew(app, TaskCreationOptions.DenyChildAttach).Unwrap();
+            ObserveTaskCompletion(task);
+            RunToCompletion();
+            return task.GetAwaiter().GetResult();
         }
 
         private void Enqueue(Task task, bool rethrowOnContext)
@@ -59,7 +64,7 @@ namespace Bluewire.Common.Console.Async
         {
             Interlocked.Increment(ref numberOfOperations);
         }
-
+        
         private void ObserveTaskCompletion(Task task)
         {
             // If we finished the last task, don't expect any more. Return control to Main(...).
@@ -132,6 +137,8 @@ namespace Bluewire.Common.Console.Async
             {
                 this.consoleAsyncContext = consoleAsyncContext;
             }
+
+            public override int MaximumConcurrencyLevel => 1;
 
             protected override void QueueTask(Task task)
             {

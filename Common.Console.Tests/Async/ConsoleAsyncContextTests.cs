@@ -25,6 +25,18 @@ namespace Bluewire.Common.Console.Tests.Async
         }
 
         [Test]
+        public void DoesNotHangWhenAwaitingATaskCompletionSource()
+        {
+            var tcs = new TaskCompletionSource<int>();
+
+            Task.Delay(100).ContinueWith(_ => tcs.TrySetResult(42));
+
+            var result = ConsoleAsyncContext.Run(async () => await tcs.Task);
+
+            Assert.That(result, Is.EqualTo(42));
+        }
+
+        [Test]
         public void UnwrapsExceptions()
         {
             Assert.Throws<OutOfMemoryException>(() =>

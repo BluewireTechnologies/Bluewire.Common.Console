@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Bluewire.Common.Console.ThirdParty;
 
 namespace Bluewire.Common.Console
@@ -30,6 +31,33 @@ namespace Bluewire.Common.Console
                 if (OnBeforeRun())
                 {
                     return application(this.session.Arguments);
+                }
+                return 0;
+            }
+            catch (ErrorWithReturnCodeException ex)
+            {
+                OnHandledException(ex);
+                return ex.ExitCode;
+            }
+            catch (Exception ex)
+            {
+                OnUnhandledException(ex);
+                return 255;
+            }
+            finally
+            {
+                OnAfterRun();
+            }
+        }
+
+        public async Task<int> Run(string[] args, Func<T, Task<int>> application)
+        {
+            try
+            {
+                session.Parse(args);
+                if (OnBeforeRun())
+                {
+                    return await application(this.session.Arguments);
                 }
                 return 0;
             }

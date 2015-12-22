@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentClassExtensions.cs" />
+    <Compile Include="Async\ConsoleAsyncContext.cs" />
     <Compile Include="CancelMonitor.cs" />
     <Compile Include="Daemons\ConsoleDaemonMonitor.cs" />
     <Compile Include="ConsoleSession.cs" />

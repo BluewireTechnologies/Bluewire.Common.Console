@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Bluewire.Common.Console.Async;
 using Bluewire.Common.Console.ThirdParty;
 
 namespace Bluewire.Common.Console
@@ -52,8 +53,7 @@ namespace Bluewire.Common.Console
 
         public int Run(string[] args, Func<T, Task<int>> application)
         {
-            var task = Task.Run(async () => await RunAsync(args, application));
-            return task.GetAwaiter().GetResult();
+            return ConsoleAsyncContext.Run(() => RunAsync(args, application));
         }
 
         public async Task<int> RunAsync(string[] args, Func<T, Task<int>> application)

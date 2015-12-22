@@ -52,6 +52,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Async\ConsoleAsyncContextTests.cs" />
     <Compile Include="CancelMonitorTests.cs" />
     <Compile Include="ConsoleSessionTests.cs" />
     <Compile Include="DaemonRunnerTests.cs" />

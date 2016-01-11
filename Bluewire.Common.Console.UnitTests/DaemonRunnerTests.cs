@@ -3,10 +3,10 @@ using System.Reflection;
 using Bluewire.Common.Console.Daemons;
 using Bluewire.Common.Console.Environment;
 using Bluewire.Common.Console.ThirdParty;
-using NUnit.Framework;
 using Moq;
+using NUnit.Framework;
 
-namespace Bluewire.Common.Console.Tests
+namespace Bluewire.Common.Console.UnitTests
 {
     [TestFixture]
     public class DaemonRunnerTests

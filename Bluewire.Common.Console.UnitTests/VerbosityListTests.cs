@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using log4net.Core;
+﻿using log4net.Core;
 using NUnit.Framework;
 
-namespace Bluewire.Common.Console.Tests
+namespace Bluewire.Common.Console.UnitTests
 {
     [TestFixture]
     public class VerbosityListTests

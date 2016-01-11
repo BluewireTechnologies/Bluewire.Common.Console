@@ -8,10 +8,10 @@ using log4net;
 using log4net.Appender;
 using log4net.Config;
 using log4net.Core;
-using NUnit.Framework;
 using Moq;
+using NUnit.Framework;
 
-namespace Bluewire.Common.Console.Tests.Logging
+namespace Bluewire.Common.Console.UnitTests.Logging
 {
     [TestFixture]
     public class LoggingConfigurerTests

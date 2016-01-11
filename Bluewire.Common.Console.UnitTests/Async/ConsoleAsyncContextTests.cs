@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Bluewire.Common.Console.Async;
 using NUnit.Framework;
 
-namespace Bluewire.Common.Console.Tests.Async
+namespace Bluewire.Common.Console.UnitTests.Async
 {
     [TestFixture]
     public class ConsoleAsyncContextTests

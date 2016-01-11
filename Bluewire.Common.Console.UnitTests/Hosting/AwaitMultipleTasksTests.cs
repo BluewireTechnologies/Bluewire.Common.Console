@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Bluewire.Common.Console.Hosting;
 using NUnit.Framework;
 
-namespace Bluewire.Common.Console.Tests.Hosting
+namespace Bluewire.Common.Console.UnitTests.Hosting
 {
     [TestFixture]
     public class AwaitMultipleTasksTests

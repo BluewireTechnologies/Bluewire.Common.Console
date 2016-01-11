@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bluewire.Common.Console", "Common.Console\Bluewire.Common.Console.csproj", "{63C2CCD8-973D-4611-B5D4-D5A5CEF7E53C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bluewire.Common.Console", "Bluewire.Common.Console\Bluewire.Common.Console.csproj", "{63C2CCD8-973D-4611-B5D4-D5A5CEF7E53C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bluewire.Common.Console.Tests", "Common.Console.Tests\Bluewire.Common.Console.Tests.csproj", "{4A399738-3937-4F38-841D-DF85FDE83422}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bluewire.Common.Console.Tests", "Bluewire.Common.Console.UnitTests\Bluewire.Common.Console.UnitTests.csproj", "{4A399738-3937-4F38-841D-DF85FDE83422}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDaemon", "TestDaemon\TestDaemon.csproj", "{B267916A-AC3B-4C34-8E71-72C0098B69F4}"
 EndProject

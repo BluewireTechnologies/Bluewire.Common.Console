@@ -2,7 +2,7 @@
 using Bluewire.Common.Console.Daemons;
 using NUnit.Framework;
 
-namespace Bluewire.Common.Console.Tests
+namespace Bluewire.Common.Console.UnitTests
 {
     [TestFixture]
     public class ServiceAccountCredentialsFactoryTests

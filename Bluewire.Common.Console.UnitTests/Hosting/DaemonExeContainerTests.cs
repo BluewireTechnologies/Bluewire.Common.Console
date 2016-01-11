@@ -7,7 +7,7 @@ using System.Xml;
 using Bluewire.Common.Console.Hosting;
 using NUnit.Framework;
 
-namespace Bluewire.Common.Console.Tests.Hosting
+namespace Bluewire.Common.Console.UnitTests.Hosting
 {
     [TestFixture, Timeout(10000)]
     public class DaemonExeContainerTests

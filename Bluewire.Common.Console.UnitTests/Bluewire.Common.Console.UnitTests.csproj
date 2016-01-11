@@ -8,8 +8,8 @@
     <ProjectGuid>{4A399738-3937-4F38-841D-DF85FDE83422}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bluewire.Common.Console.Tests</RootNamespace>
-    <AssemblyName>Bluewire.Common.Console.Tests</AssemblyName>
+    <RootNamespace>Bluewire.Common.Console.UnitTests</RootNamespace>
+    <AssemblyName>Bluewire.Common.Console.UnitTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -67,7 +67,7 @@
     <Compile Include="VerbosityListTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common.Console\Bluewire.Common.Console.csproj">
+    <ProjectReference Include="..\Bluewire.Common.Console\Bluewire.Common.Console.csproj">
       <Project>{63C2CCD8-973D-4611-B5D4-D5A5CEF7E53C}</Project>
       <Name>Bluewire.Common.Console</Name>
     </ProjectReference>

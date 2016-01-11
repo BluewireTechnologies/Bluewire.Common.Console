@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using Bluewire.Common.Console.Daemons;
 using Bluewire.Common.Console.Hosting;
 using Moq;
 using NUnit.Framework;
 
-namespace Bluewire.Common.Console.Tests.Hosting
+namespace Bluewire.Common.Console.UnitTests.Hosting
 {
     [TestFixture]
     public class HostedDaemonTrackerTests

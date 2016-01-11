@@ -2,7 +2,7 @@
 using Bluewire.Common.Console.Progress;
 using NUnit.Framework;
 
-namespace Bluewire.Common.Console.Tests.Progress
+namespace Bluewire.Common.Console.UnitTests.Progress
 {
     [TestFixture]
     public class FormattingHelpersTests

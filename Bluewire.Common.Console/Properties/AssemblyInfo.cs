@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("63004be3-89e0-4ac2-82e0-801a94fa76e0")]
 
-[assembly: InternalsVisibleTo("Bluewire.Common.Console.Tests")]
+[assembly: InternalsVisibleTo("Bluewire.Common.Console.UnitTests")]
 
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]

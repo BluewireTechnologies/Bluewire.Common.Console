@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Bluewire.Common.Console.ThirdParty;
 using NUnit.Framework;
 
-namespace Bluewire.Common.Console.Tests
+namespace Bluewire.Common.Console.UnitTests
 {
     [TestFixture]
     public class ConsoleSessionTests

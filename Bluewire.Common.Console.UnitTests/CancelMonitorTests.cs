@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 
-namespace Bluewire.Common.Console.Tests
+namespace Bluewire.Common.Console.UnitTests
 {
     [TestFixture]
     public class CancelMonitorTests

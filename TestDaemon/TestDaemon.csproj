@@ -50,7 +50,7 @@
     <Compile Include="TestDaemon.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Common.Console\Bluewire.Common.Console.csproj">
+    <ProjectReference Include="..\Bluewire.Common.Console\Bluewire.Common.Console.csproj">
       <Project>{63C2CCD8-973D-4611-B5D4-D5A5CEF7E53C}</Project>
       <Name>Bluewire.Common.Console</Name>
     </ProjectReference>

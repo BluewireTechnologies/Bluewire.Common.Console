@@ -149,7 +149,7 @@ namespace Bluewire.Common.Console.UnitTests.Logging
             {
                 configurer.Console.Error(error);
             }
-            Assert.That(STDERR.ToString(), Is.StringContaining(error));
+            Assert.That(STDERR.ToString(), Does.Contain(error));
         }
 
         [Test]
@@ -164,7 +164,7 @@ namespace Bluewire.Common.Console.UnitTests.Logging
             {
                 configurer.Console.Warn(message);
             }
-            Assert.That(STDERR.ToString(), Is.StringContaining(message));
+            Assert.That(STDERR.ToString(), Does.Contain(message));
         }
 
         [Test]
@@ -184,7 +184,7 @@ namespace Bluewire.Common.Console.UnitTests.Logging
                 {
                     configurer.Console.Warn(message);
                 }
-                Assert.That(defaultLog.ToString(),  Is.Not.StringContaining(message));
+                Assert.That(defaultLog.ToString(), Does.Not.Contain(message));
             }
         }
 
@@ -200,7 +200,7 @@ namespace Bluewire.Common.Console.UnitTests.Logging
             {
                 LogManager.GetLogger("none").Info(message);
             }
-            Assert.That(STDERR.ToString(), Is.Not.StringContaining(message));
+            Assert.That(STDERR.ToString(), Does.Not.Contain(message));
         }
 
         [Test]
@@ -218,8 +218,8 @@ namespace Bluewire.Common.Console.UnitTests.Logging
                 configurer.Console.Info(info);
                 configurer.Console.Warn(warning);
             }
-            Assert.That(STDERR.ToString(), Is.Not.StringContaining(info));
-            Assert.That(STDERR.ToString(), Is.StringContaining(warning));
+            Assert.That(STDERR.ToString(), Does.Not.Contain(info));
+            Assert.That(STDERR.ToString(), Does.Contain(warning));
         }
 
         [Test]
@@ -236,7 +236,7 @@ namespace Bluewire.Common.Console.UnitTests.Logging
 
                 configurer.Console.Info(info);
             }
-            Assert.That(STDERR.ToString(), Is.StringContaining(info));
+            Assert.That(STDERR.ToString(), Does.Contain(info));
         }
 
         [Test]
@@ -254,7 +254,7 @@ namespace Bluewire.Common.Console.UnitTests.Logging
 
                 configurer.Console.Info(info);
             }
-            Assert.That(STDERR.ToString(), Is.StringContaining(info));
+            Assert.That(STDERR.ToString(), Does.Contain(info));
         }
 
         [Test]

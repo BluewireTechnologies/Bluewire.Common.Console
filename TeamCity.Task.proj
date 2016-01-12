@@ -29,10 +29,12 @@
     
     <ItemGroup>
 		<NugetProjects Include="Bluewire.Common.Console\Bluewire.Common.Console.csproj" />
+        <NugetProjects Include="Bluewire.Common.Console.Client\Bluewire.Common.Console.Client.csproj" />
     </ItemGroup>
     
     <ItemGroup>
         <NUnitProject Include="Bluewire.Common.Console.UnitTests\Bluewire.Common.Console.UnitTests.csproj" />
+        <NUnitProject Include="Bluewire.Common.Console.Client.UnitTests\Bluewire.Common.Console.Client.UnitTests.csproj" />
     </ItemGroup>
     
 	<Target DependsOnTargets="ValidateParameters;PrepareOutputDirectory" Name="Build">

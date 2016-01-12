@@ -68,13 +68,13 @@
     <Compile Include="Util\ControllableReplaySubjectTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Bluewire.Common.Console.Client\Bluewire.Common.Console.Client.csproj">
       <Project>{c66a3f12-79e2-46bd-8aab-d75414e14b6c}</Project>
       <Name>Bluewire.Common.Console.Client</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

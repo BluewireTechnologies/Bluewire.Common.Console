@@ -67,7 +67,7 @@ namespace Bluewire.Common.Console.Client.Shell
             private static OutputPipe ObservePipe(Action<DataReceivedEventHandler> attach, Action<DataReceivedEventHandler> detach)
             {
                 var raw = Observable.FromEvent<DataReceivedEventHandler, string>(h => (s, e) => h(e.Data), attach, detach);
-                return new OutputPipe(raw.Where(d => d != null));
+                return new OutputPipe(raw.TakeUntil(raw.Where(d => d == null)));
             }
 
             private void OnTerminated()
@@ -77,8 +77,6 @@ namespace Bluewire.Common.Console.Client.Shell
                     if (completeAndFlushed) return;
                     // Flush the output buffers before reporting completion.
                     process.WaitForExit();
-                    stdOutPipe.Complete();
-                    stdErrPipe.Complete();
                 }
                 tcs.TrySetResult(process.ExitCode);
                 completeAndFlushed = true;

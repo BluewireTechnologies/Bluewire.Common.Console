@@ -17,7 +17,7 @@ namespace Bluewire.Common.Console.Client.Shell
     /// For small outputs it may be appropriate to consume the buffer via ToEnumerable()
     /// after the stream has ended.
     /// </remarks>
-    public class OutputPipe : IOutputPipe, IDisposable
+    public class OutputPipe : IOutputPipe
     {
         private readonly ControllableReplaySubject<string> pipe;
         private IDisposable subscription;
@@ -48,11 +48,6 @@ namespace Bluewire.Common.Console.Client.Shell
                 subscription = null;
                 pipe.OnCompleted();
             }
-        }
-
-        public void Dispose()
-        {
-            Complete();
         }
     }
 }

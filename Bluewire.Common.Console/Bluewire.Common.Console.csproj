@@ -83,6 +83,7 @@
     <Compile Include="Hosting\AwaitMultipleTasks.cs" />
     <Compile Include="Environment\EnvironmentAnalyser.cs" />
     <Compile Include="Environment\ExecutionEnvironmentHelpers.cs" />
+    <Compile Include="Hosting\BindingRedirects.cs" />
     <Compile Include="Hosting\DefaultHostingBehaviour.cs" />
     <Compile Include="Hosting\EntryPointInvoker.cs" />
     <Compile Include="Hosting\HostedDaemonExe.cs" />

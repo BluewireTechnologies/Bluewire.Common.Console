@@ -84,6 +84,43 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
         }
 
         [Test]
+        public void AlternateConfigurationInheritsBindingRedirectsFromExistingConfiguration()
+        {
+            var assemblyName = typeof(TestDaemon.TestDaemon).Assembly.GetName();
+            using (WriteConfigurationFile(assemblyName, @"<?xml version='1.0' encoding='utf-8' ?>
+<configuration>
+  <runtime>
+    <assemblyBinding xmlns='urn:schemas-microsoft-com:asm.v1'>
+      <dependentAssembly>
+        <assemblyIdentity name='SomeReference' publicKeyToken='21ef50ce11b5d80f' culture='neutral' />
+        <bindingRedirect oldVersion='0.0.0.0-1.2.3.4' newVersion='1.2.3.4' />
+      </dependentAssembly>
+    </assemblyBinding>
+  </runtime>
+</configuration>"))
+            {
+                var xmlDocument = new XmlDocument();
+                xmlDocument.LoadXml(@"<configuration></configuration>");
+
+                var daemon = new HostedDaemonExe(assemblyName).UseConfiguration(xmlDocument);
+
+                using (var container = new DaemonExeContainer(daemon))
+                {
+                    var task = container.Run();
+
+                    WaitUntilDaemonStarts(container, task);
+                
+                    var configuration = new XmlDocument();
+                    configuration.Load(daemon.AppDomainSetup.ConfigurationFile);
+
+                    var redirects = BindingRedirects.ReadFrom(configuration);
+                    Assert.That(redirects.Count, Is.EqualTo(1));
+                }
+            }
+        }
+
+
+        [Test]
         public void CannotReuseDaemonExeContainer()
         {
             var assemblyName = typeof(TestDaemon.TestDaemon).Assembly.GetName();
@@ -151,6 +188,27 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
             // Task completed, so the app must've terminated.
             return false;
         }
+        
+        private static IDisposable WriteConfigurationFile(AssemblyName assemblyName, string content)
+        {
+            var filePath = $"{new Uri(assemblyName.CodeBase).LocalPath}.config";
+            File.WriteAllText(filePath, content);
+            return new TemporaryConfigurationFile(filePath);
+        }
 
+        class TemporaryConfigurationFile : IDisposable
+        {
+            private readonly string path;
+
+            public TemporaryConfigurationFile(string path)
+            {
+                this.path = path;
+            }
+
+            public void Dispose()
+            {
+                if(File.Exists(path)) File.Delete(path);
+            }
+        }
     }
 }

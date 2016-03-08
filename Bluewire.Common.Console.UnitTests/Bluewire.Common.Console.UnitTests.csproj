@@ -58,6 +58,7 @@
     <Compile Include="DaemonRunnerTests.cs" />
     <Compile Include="Daemons\HostedDaemonMonitorTests.cs" />
     <Compile Include="Hosting\AwaitMultipleTasksTests.cs" />
+    <Compile Include="Hosting\BindingRedirectsTests.cs" />
     <Compile Include="Hosting\DaemonExeContainerTests.cs" />
     <Compile Include="Hosting\HostedDaemonTrackerTests.cs" />
     <Compile Include="Logging\LoggingConfigurerTests.cs" />

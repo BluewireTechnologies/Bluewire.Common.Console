@@ -27,7 +27,7 @@
 	
     <dependencies>
       <!-- Ignore, all referenced NuGet packages will be added here at compile time -->
-      <dependency id="Bluewire.Common" version="9.1.0" />
+      <dependency id="Bluewire.Common.Console.Client" version="9.1.0" />
     </dependencies>
 
     <frameworkAssemblies>

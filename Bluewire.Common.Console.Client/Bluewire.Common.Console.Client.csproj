@@ -79,6 +79,7 @@
   <ItemGroup>
     <None Include="Bluewire.Common.Console.Client.nuspec">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
     <None Include="README.md" />

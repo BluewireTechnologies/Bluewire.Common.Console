@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
@@ -17,19 +18,33 @@ namespace Bluewire.Common.Console.NUnit3.Filesystem
         
         private static string GetTemporaryDirectoryPathForAssembly(Assembly assembly)
         {
-            var assemblyName = assembly.GetName().Name;
             var pid = Process.GetCurrentProcess().Id;
+            var shortenedName = GetShortenedAssemblyName(assembly);
 
-            var assemblyDirectory = $"{PathSegmentSanitiser.Instance.Sanitise(assemblyName)}-{pid}";
+            var assemblyDirectory = $"{PathSegmentSanitiser.Instance.Sanitise(shortenedName)}-{pid}";
 
             return Path.Combine(Path.GetTempPath(), "NUnit3", assemblyDirectory);
+        }
+
+        private static string GetSubdirectoryNameForTest(Assembly assembly, string testFullName)
+        {
+            var shortenedName = GetShortenedTestName(assembly, testFullName);
+            return PathSegmentSanitiser.Instance.Sanitise(shortenedName);
+        }
+
+        private static string GetShortenedAssemblyName(Assembly assembly)
+        {
+            var assemblyName = assembly.GetName().Name;
+            return new PathSegmentShortener().AggressivelyShortenDottedSegment(assemblyName, 20);
         }
 
         private static string GetShortenedTestName(Assembly assembly, string testFullName)
         {
             var assemblyName = assembly.GetName().Name;
             Debug.Assert(testFullName != assemblyName); // Should be impossible.
-            return testFullName.StartsWith(assemblyName) ? testFullName.Substring(assemblyName.Length + 1) : testFullName;
+            var testNameWithoutAssemblyPrefix = testFullName.StartsWith(assemblyName) ? testFullName.Substring(assemblyName.Length + 1) : testFullName;
+
+            return new PathSegmentShortener().AggressivelyShortenDottedSegment(testNameWithoutAssemblyPrefix, 25);
         }
 
         private static string LookupTemporaryDirectoryForAssembly(Assembly assembly)
@@ -86,25 +101,7 @@ namespace Bluewire.Common.Console.NUnit3.Filesystem
             var containingType = testDetails.TypeInfo.Type;
             return Path.Combine(
                 LookupTemporaryDirectoryForAssembly(containingType.Assembly),
-                PathSegmentSanitiser.Instance.Sanitise(GetShortenedTestName(containingType.Assembly, test.FullName)));
-        }
-
-        class PathSegmentSanitiser
-        {
-            private readonly Regex rxInvalidChars;
-
-            public PathSegmentSanitiser()
-            {
-                var invalidChars = new String(Path.GetInvalidFileNameChars());
-                rxInvalidChars = new Regex($"[{Regex.Escape(invalidChars)}]", RegexOptions.Compiled);
-            }
-
-            public static readonly PathSegmentSanitiser Instance = new PathSegmentSanitiser();
-
-            public string Sanitise(string segment)
-            {
-                return rxInvalidChars.Replace(segment, "_");
-            }
+                GetSubdirectoryNameForTest(containingType.Assembly, test.FullName));
         }
     }
 }

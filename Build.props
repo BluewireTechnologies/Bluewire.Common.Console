@@ -9,5 +9,6 @@
         <!-- Full list of NUnit test projects -->
         <NUnitProjects Include="Bluewire.Common.Console.UnitTests\Bluewire.Common.Console.UnitTests.csproj" />
         <NUnitProjects Include="Bluewire.Common.Console.Client.UnitTests\Bluewire.Common.Console.Client.UnitTests.csproj" />
+        <NUnitProjects Include="Bluewire.Common.Console.NUnit3.UnitTests\Bluewire.Common.Console.NUnit3.UnitTests.csproj" />
     </ItemGroup>
 </Project>

@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Filesystem\PathSegmentSanitiser.cs" />
+    <Compile Include="Filesystem\PathSegmentShortener.cs" />
     <Compile Include="Filesystem\TemporaryDirectory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Filesystem\CleanTemporaryDirectoryWhenCompleteAttribute.cs" />
@@ -55,6 +57,7 @@
   <ItemGroup>
     <None Include="Bluewire.Common.Console.NUnit3.nuspec">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
     <None Include="README.md" />

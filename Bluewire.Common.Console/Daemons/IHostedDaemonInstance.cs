@@ -7,7 +7,6 @@ namespace Bluewire.Common.Console.Daemons
     public interface IHostedDaemonInfo
     {
         string Name { get; }
-        Type Type { get; }
     }
 
     public interface IHostedDaemonInstance : IHostedDaemonInfo

@@ -48,7 +48,8 @@ namespace Bluewire.Common.Console
         {
             public int Run<T>(InitialisedHostedEnvironment environment, IDaemonisable<T> daemon, T arguments)
             {
-                var instance = new HostedDaemonMonitor(daemon.Start(arguments), daemon.Name);
+                var instance = new HostedDaemonMonitor<T>(daemon);
+                instance.Start(arguments);
                 environment.RegisterForShutdownNotification(instance);
                 instance.WaitForTermination();
                 return 0;

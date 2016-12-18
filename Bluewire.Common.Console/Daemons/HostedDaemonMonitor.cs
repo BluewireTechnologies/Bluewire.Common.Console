@@ -7,29 +7,29 @@ using System.Threading.Tasks;
 
 namespace Bluewire.Common.Console.Daemons
 {
-    sealed class HostedDaemonMonitor : IHostedDaemonInstance
+    sealed class HostedDaemonMonitor<TArguments> : IHostedDaemonInstance
     {
-        private readonly IDaemon daemon;
-        private readonly string name;
+        private readonly IDaemonisable<TArguments> daemon;
         private readonly EventWaitHandle shutdownRequest = new ManualResetEvent(false);
         private bool isShuttingDown;
         private readonly TaskCompletionSource<object> shutdownTask = new TaskCompletionSource<object>();
+        private IDaemon instance;
 
-        // EDGE CASE: What happens if the daemon is being constructed when a shutdown request comes in?
-        // This monitor will not have been constructed yet, and therefore cannot be registered to receive it.
+        public string Name => daemon.Name;
 
-        public string Name { get { return name; } }
-        public Type Type { get { return daemon.GetType(); } }
-
-
-        public HostedDaemonMonitor(IDaemon daemon) : this(daemon, daemon.GetType().FullName)
-        {
-        }
-
-        public HostedDaemonMonitor(IDaemon daemon, string name)
+        public HostedDaemonMonitor(IDaemonisable<TArguments> daemon)
         {
             this.daemon = daemon;
-            this.name = name;
+        }
+
+        public void Start(TArguments arguments)
+        {
+            if (instance != null) throw new InvalidOperationException("Instance already started.");
+            lock (daemon)
+            {
+                if (instance != null) throw new InvalidOperationException("Instance already started.");
+                instance = daemon.Start(arguments);
+            }
         }
 
         private void DoAsyncShutdown()
@@ -47,7 +47,7 @@ namespace Bluewire.Common.Console.Daemons
 
         private void Terminate()
         {
-            daemon.Dispose();
+            instance.Dispose();
             shutdownTask.SetResult(null);
         }
 

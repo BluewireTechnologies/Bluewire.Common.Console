@@ -3,6 +3,8 @@ using System.Configuration;
 using Bluewire.Common.Console;
 using Bluewire.Common.Console.ThirdParty;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace TestDaemon
 {
@@ -29,7 +31,7 @@ namespace TestDaemon
             });
         }
 
-        public IDaemon Start(TestDaemonArguments args)
+        public Task<IDaemon> Start(TestDaemonArguments args, CancellationToken token)
         {
             if(args.ExpectedConfigKey != null)
             {
@@ -40,7 +42,7 @@ namespace TestDaemon
             {
                 Environment.Exit(args.EnvironmentExitCode.Value);
             }
-            return new Implementation();
+            return Task.FromResult<IDaemon>(new Implementation());
         }
 
         public string[] GetDependencies()

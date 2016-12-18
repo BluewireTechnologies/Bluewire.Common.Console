@@ -1,5 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.ServiceProcess;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Bluewire.Common.Console.Daemons
 {
@@ -14,19 +17,22 @@ namespace Bluewire.Common.Console.Daemons
             this.staticArgs = staticArgs;
         }
 
-        private IDaemon instance;
+        private HostedDaemonMonitor<TArguments> instance;
         protected override void OnStart(string[] args)
         {
+            OnStop();
             var session = daemon.Configure();
             session.Parse(staticArgs.Concat(args).ToArray());
-            instance = daemon.Start(session.Arguments);
+
+            instance = new HostedDaemonMonitor<TArguments>(daemon);
+            instance.Start(session.Arguments);
         }
 
         protected override void OnStop()
         {
             try
             {
-                instance.Dispose();
+                instance?.RequestShutdown()?.Wait();
             }
             finally
             {

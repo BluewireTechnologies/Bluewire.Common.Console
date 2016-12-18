@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,67 +6,84 @@ namespace Bluewire.Common.Console.Daemons
 {
     sealed class HostedDaemonMonitor<TArguments> : IHostedDaemonInstance
     {
+        private readonly CancellationTokenSource shutdownToken = new CancellationTokenSource();
         private readonly IDaemonisable<TArguments> daemon;
-        private readonly EventWaitHandle shutdownRequest = new ManualResetEvent(false);
-        private bool isShuttingDown;
-        private readonly TaskCompletionSource<object> shutdownTask = new TaskCompletionSource<object>();
-        private IDaemon instance;
 
-        // EDGE CASE: What happens if the daemon is being constructed when a shutdown request comes in?
-        // This monitor will not have been constructed yet, and therefore cannot be registered to receive it.
+        /// <summary>
+        /// Represents initialisation of the daemon instance.
+        /// </summary>
+        private Task<IDaemon> createDaemonTask;
+        /// <summary>
+        /// Represents entire lifetime of the daemon instance.
+        /// </summary>
+        private Task lifetimeTask;
 
         public string Name => daemon.Name;
+        public bool ShutdownRequested => shutdownToken.IsCancellationRequested;
 
         public HostedDaemonMonitor(IDaemonisable<TArguments> daemon)
         {
             this.daemon = daemon;
         }
 
-        public void Start(TArguments arguments)
+        public Task Start(TArguments arguments)
         {
-            if (instance != null) throw new InvalidOperationException("Instance already started.");
-            lock (daemon)
+            if (createDaemonTask != null) throw new InvalidOperationException("Instance already started.");
+            lock (shutdownToken)
             {
-                if (instance != null) throw new InvalidOperationException("Instance already started.");
-                instance = daemon.Start(arguments);
+                if (this.createDaemonTask != null) throw new InvalidOperationException("Instance already started.");
+                createDaemonTask = Task.Run(() => daemon.Start(arguments, shutdownToken.Token));
+                lifetimeTask = Task.Run(async () => { using (await createDaemonTask) await shutdownToken.Token.WaitHandle.AsTask(); });
+                return lifetimeTask;
             }
         }
 
-        private void DoAsyncShutdown()
+        private async Task GetShutdownCompletionTask()
         {
-            if (isShuttingDown) return; // Already shutting down.
-            lock (shutdownRequest)
+            lock (shutdownToken)
             {
-                if (isShuttingDown) return; // Already shutting down.
-                isShuttingDown = true;
-                shutdownRequest.Set();
-
-                Terminate();
+                if (lifetimeTask == null) return;
             }
+            await createDaemonTask;
+            await lifetimeTask.GetCompletionOnlyTask();
         }
 
-        private void Terminate()
-        {
-            instance.Dispose();
-            shutdownTask.SetResult(null);
-        }
-
+        /// <summary>
+        /// Triggers shutdown of the daemon, or cancels initialisation.
+        /// </summary>
+        /// <returns></returns>
         public Task RequestShutdown()
         {
-            Task.Factory.StartNew(DoAsyncShutdown);
-            shutdownRequest.WaitOne();
-            return shutdownTask.Task;
+            shutdownToken.Cancel();
+            return GetShutdownCompletionTask();
         }
 
+        /// <summary>
+        /// Wait on total shutdown of the daemon for a limited period of time.
+        /// Propagates startup failures but not shutdown failures.
+        /// </summary>
+        /// <param name="timeout"></param>
         public void WaitForShutdown(TimeSpan timeout)
         {
-            if (!isShuttingDown) throw new InvalidOperationException("Shutdown has not been requested.");
-            if(!shutdownTask.Task.Wait(timeout)) throw new TimeoutException();
+            if (!ShutdownRequested) throw new InvalidOperationException("Shutdown has not been requested."); 
+            if (!GetShutdownCompletionTask().WaitWithUnwrapExceptions(timeout)) throw new TimeoutException();
         }
 
+        /// <summary>
+        /// Wait on total shutdown of the daemon.
+        /// Propagates startup failures but not shutdown failures.
+        /// </summary>
         public void WaitForTermination()
         {
-            shutdownTask.Task.Wait();
+            GetShutdownCompletionTask().WaitWithUnwrapExceptions();
+        }
+
+        /// <summary>
+        /// Wait on completion, propagating all errors.
+        /// </summary>
+        public void Wait()
+        {
+            lifetimeTask.WaitWithUnwrapExceptions();
         }
     }
 }

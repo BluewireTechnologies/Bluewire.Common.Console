@@ -9,7 +9,7 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
     [TestFixture]
     public class HostedDaemonTrackerTests
     {
-        private IHostedDaemonInstance CreateDaemon(string name)
+        private static IHostedDaemonInstance CreateDaemon(string name)
         {
             var daemonisable = new MockDaemonisable(name);
             var monitor = new HostedDaemonMonitor<object>(daemonisable);

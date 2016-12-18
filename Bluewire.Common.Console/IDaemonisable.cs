@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Bluewire.Common.Console
 {
@@ -8,28 +10,17 @@ namespace Bluewire.Common.Console
 
         SessionArguments<TArguments> Configure();
 
-        IDaemon Start(TArguments arguments);
+        /// <summary>
+        /// Create a new instance of the daemon and return it.
+        /// Shutdown will be performed by disposing the instance.
+        /// </summary>
+        /// <remarks>
+        /// If shutdown is requested before the daemon is fully started, the token will be cancelled.
+        /// * If the returned task completes then its result will be disposed of immediately, so returning
+        ///   the constructed instance is an acceptable response to cancellation.
+        /// * If the task cancels, it must perform all clean-up itself beforehand.
+        /// </remarks>
+        Task<IDaemon> Start(TArguments arguments, CancellationToken token);
         string[] GetDependencies();
-    }
-
-    public abstract class DaemonisableBase : IDaemonisable<object>
-    {
-        public string Name { get; private set; }
-        protected DaemonisableBase(string name)
-        {
-            Name = name;
-        }
-
-        public SessionArguments<object> Configure()
-        {
-            return new NoArguments();
-        }
-
-        public abstract IDaemon Start(object args);
-
-        public virtual string[] GetDependencies()
-        {
-            return new string[0];
-        }
     }
 }

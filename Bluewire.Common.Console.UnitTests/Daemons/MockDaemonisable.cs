@@ -1,4 +1,6 @@
-﻿using Moq;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Moq;
 
 namespace Bluewire.Common.Console.UnitTests.Daemons
 {
@@ -10,9 +12,9 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
         {
         }
 
-        public override IDaemon Start(object arguments)
+        public override Task<IDaemon> Start(object arguments, CancellationToken token)
         {
-            return Daemon.Object;
+            return Task.FromResult(Daemon.Object);
         }
     }
 }

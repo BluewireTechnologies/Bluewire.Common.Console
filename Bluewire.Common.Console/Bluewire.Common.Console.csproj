@@ -65,6 +65,7 @@
     <Compile Include="ArgumentClassExtensions.cs" />
     <Compile Include="Async\ConsoleAsyncContext.cs" />
     <Compile Include="CancelMonitor.cs" />
+    <Compile Include="DaemonisableBase.cs" />
     <Compile Include="Daemons\ConsoleDaemonMonitor.cs" />
     <Compile Include="ConsoleSession.cs" />
     <Compile Include="DaemonRunner.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Daemons\ITestAsConsoleApplication.cs" />
     <Compile Include="Daemons\ServiceAccountCredentials.cs" />
     <Compile Include="Daemons\ServiceAccountCredentialsFactory.cs" />
+    <Compile Include="Daemons\TaskHelpers.cs" />
     <Compile Include="Environment\ApplicationEnvironment.cs" />
     <Compile Include="Hosting\AsyncExitCodeReceiver.cs" />
     <Compile Include="Hosting\AwaitMultipleTasks.cs" />

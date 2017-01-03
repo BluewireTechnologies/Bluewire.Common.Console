@@ -5,6 +5,7 @@ using System.Configuration.Install;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
+using System.Threading;
 using Bluewire.Common.Console.Daemons;
 using Bluewire.Common.Console.Environment;
 using Bluewire.Common.Console.Logging;
@@ -48,7 +49,8 @@ namespace Bluewire.Common.Console
         {
             public int Run<T>(InitialisedHostedEnvironment environment, IDaemonisable<T> daemon, T arguments)
             {
-                var instance = new HostedDaemonMonitor(daemon.Start(arguments), daemon.Name);
+                var instance = new HostedDaemonMonitor<T>(daemon);
+                instance.Start(arguments);
                 environment.RegisterForShutdownNotification(instance);
                 instance.WaitForTermination();
                 return 0;
@@ -69,7 +71,10 @@ namespace Bluewire.Common.Console
         {
             public int Run<T>(ApplicationEnvironment environment, IDaemonisable<T> daemon, T arguments)
             {
-                return new ConsoleDaemonMonitor(daemon.Start(arguments)).WaitForTermination();
+                var monitor = new ConsoleDaemonMonitor<T>(daemon);
+                monitor.Start(arguments);
+                monitor.WaitForTermination();
+                return 0;
             }
         }
 
@@ -77,9 +82,10 @@ namespace Bluewire.Common.Console
         {
             public int Test<T>(ApplicationEnvironment environment, IDaemonisable<T> daemon, T arguments)
             {
-                using (daemon.Start(arguments))
-                {
-                }
+                var instance = new HostedDaemonMonitor<T>(daemon);
+                instance.Start(arguments);
+                instance.RequestShutdown();
+                instance.Wait();
                 return 0;
             }
         }

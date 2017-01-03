@@ -1,25 +1,29 @@
 ﻿namespace Bluewire.Common.Console.Daemons
 {
-    class ConsoleDaemonMonitor
+    class ConsoleDaemonMonitor<TArguments>
     {
-        private readonly IDaemon daemon;
-        
-        private CancelMonitor cancelMonitor;
+        private readonly CancelMonitor cancelMonitor;
+        private readonly HostedDaemonMonitor<TArguments> monitor;
 
-        public ConsoleDaemonMonitor(IDaemon daemon)
+        public ConsoleDaemonMonitor(IDaemonisable<TArguments> daemon)
         {
-            this.daemon = daemon;
+            monitor = new HostedDaemonMonitor<TArguments>(daemon);
             cancelMonitor = new CancelMonitor();
             cancelMonitor.CancelRequested += (s, e) => System.Console.Error.WriteLine("Shutting down.");
             cancelMonitor.KillRequested += (s, e) => e.Cancel = true; // Ignore kill requests.
+        }
 
-            System.Console.Error.WriteLine("Press CTRL-C to terminate.");
+        public void Start(TArguments arguments)
+        {
+            monitor.Start(arguments);
         }
 
         public int WaitForTermination()
         {
+            System.Console.Error.WriteLine("Press CTRL-C to terminate.");
             cancelMonitor.WaitForCancel();
-            daemon.Dispose();
+            monitor.RequestShutdown();
+            monitor.Wait();
             return 0;
         }
     }

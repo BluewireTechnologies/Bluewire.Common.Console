@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using Bluewire.Common.Console.Daemons;
 using Bluewire.Common.Console.Hosting;
-using Moq;
+using Bluewire.Common.Console.UnitTests.Daemons;
 using NUnit.Framework;
 
 namespace Bluewire.Common.Console.UnitTests.Hosting
@@ -9,9 +9,12 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
     [TestFixture]
     public class HostedDaemonTrackerTests
     {
-        private IHostedDaemonInstance CreateDaemon(string name)
+        private static IHostedDaemonInstance CreateDaemon(string name)
         {
-            return new HostedDaemonMonitor(new Mock<IDaemon>().Object, name);
+            var daemonisable = new MockDaemonisable(name);
+            var monitor = new HostedDaemonMonitor<object>(daemonisable);
+            monitor.Start(new object());
+            return monitor;
         }
 
         [Test]

@@ -2,7 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <ItemGroup>
         <!-- Full list of NuGet package projects -->
-		<NugetProjects Include="Bluewire.Common.Console\Bluewire.Common.Console.csproj" />
+        <NugetProjects Include="Bluewire.Common.Console\Bluewire.Common.Console.csproj" />
         <NugetProjects Include="Bluewire.Common.Console.Client\Bluewire.Common.Console.Client.csproj" />
         <NugetProjects Include="Bluewire.Common.Console.NUnit3\Bluewire.Common.Console.NUnit3.csproj" />
     
@@ -10,5 +10,11 @@
         <NUnitProjects Include="Bluewire.Common.Console.UnitTests\Bluewire.Common.Console.UnitTests.csproj" />
         <NUnitProjects Include="Bluewire.Common.Console.Client.UnitTests\Bluewire.Common.Console.Client.UnitTests.csproj" />
         <NUnitProjects Include="Bluewire.Common.Console.NUnit3.UnitTests\Bluewire.Common.Console.NUnit3.UnitTests.csproj" />
+
+        <!-- Library repository: all packages use SemVer -->
+        <SemVerProjects Include="@(NugetProjects)" />
     </ItemGroup>
+    <PropertyGroup>
+        <DotCoverConfigurationFile>DotCover.coverage.xml</DotCoverConfigurationFile>
+    </PropertyGroup>
 </Project>

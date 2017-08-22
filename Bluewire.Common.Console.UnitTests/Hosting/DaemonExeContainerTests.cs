@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Bluewire.Common.Console.Hosting;
@@ -116,6 +117,43 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
                     var redirects = BindingRedirects.ReadFrom(configuration);
                     Assert.That(redirects.Count, Is.EqualTo(1));
                 }
+            }
+        }
+
+        [Test]
+        public void WritesAdditionalConfigurationsRelativeToRootPath()
+        {
+            const string content = "Test";
+            const string relativePath = "relative/path/file.txt";
+
+            var assemblyName = typeof(TestDaemon.TestDaemon).Assembly.GetName();
+
+            var additionalStream = new MemoryStream();
+            using (var writer = new StreamWriter(additionalStream, Encoding.UTF8, 4096, true)) writer.Write(content);
+            additionalStream.Position = 0;
+
+            var xmlDocument = new XmlDocument();
+            xmlDocument.LoadXml(@"
+<configuration>
+  <appSettings>
+    <add key='Key' value='Value' />
+  </appSettings>
+</configuration>");
+
+            var daemon = new HostedDaemonExe(assemblyName)
+                .UseConfiguration(xmlDocument)
+                .UseAdditionalConfiguration(additionalStream, relativePath);
+
+            using (var container = new DaemonExeContainer(daemon))
+            {
+                var task = container.Run("--key", "Key", "--value", "Value");
+
+                var configurationRoot = Path.GetDirectoryName(daemon.AppDomainSetup.ConfigurationFile);
+                var expectedFilePath = Path.Combine(configurationRoot, relativePath);
+                Assert.That(expectedFilePath, Does.Exist);
+                Assert.That(File.ReadAllText(expectedFilePath), Is.EqualTo(content));
+
+                WaitUntilDaemonStarts(container, task);
             }
         }
 

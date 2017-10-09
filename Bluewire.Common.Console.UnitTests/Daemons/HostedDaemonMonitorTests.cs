@@ -151,6 +151,17 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
             Assert.True(task.IsCompleted);
         }
 
+        [Test]
+        public void WaitForStartPropagatesFailures()
+        {
+            var daemonisable = Mock.Of<IDaemonisable<object>>(d => d.Name == "MockDaemon");
+            Mock.Get(daemonisable).Setup(d => d.Start(It.IsAny<object>(), It.IsAny<CancellationToken>())).Throws(new OutOfMemoryException());
+            var monitor = new HostedDaemonMonitor<object>(daemonisable);
+            monitor.Start(new object());
+
+            Assert.Throws<OutOfMemoryException>(() => monitor.WaitForStart());
+        }
+
         private EventWaitHandle BlockShutdown(Mock<IDaemon> daemon)
         {
             var handle = new ManualResetEvent(false);

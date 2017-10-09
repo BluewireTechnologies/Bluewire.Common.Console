@@ -59,6 +59,14 @@ namespace Bluewire.Common.Console.Daemons
         }
 
         /// <summary>
+        /// Wait for startup, propagating errors.
+        /// </summary>
+        public void WaitForStart(CancellationToken token = default(CancellationToken))
+        {
+            createDaemonTask.WaitWithUnwrapExceptions(token);
+        }
+
+        /// <summary>
         /// Wait on total shutdown of the daemon for a limited period of time.
         /// Propagates startup failures but not shutdown failures.
         /// </summary>
@@ -76,6 +84,14 @@ namespace Bluewire.Common.Console.Daemons
         public void WaitForTermination()
         {
             GetShutdownCompletionTask().WaitWithUnwrapExceptions();
+        }
+
+        /// <summary>
+        /// Wait on completion, propagating all errors.
+        /// </summary>
+        public void Wait(CancellationToken token)
+        {
+            lifetimeTask.WaitWithUnwrapExceptions(token);
         }
 
         /// <summary>

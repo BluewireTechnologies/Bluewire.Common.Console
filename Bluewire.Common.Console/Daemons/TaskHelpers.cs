@@ -56,5 +56,24 @@ namespace Bluewire.Common.Console.Daemons
                 return true;
             }
         }
+
+        public static bool WaitWithUnwrapExceptions(this Task task, CancellationToken token)
+        {
+            try
+            {
+                task.Wait(token);
+                return true;
+            }
+            catch (OperationCanceledException)
+            {
+                return false;
+            }
+            catch
+            {
+                // This should rethrow the exception, unwrapped:
+                task.GetAwaiter().GetResult();
+                return true;
+            }
+        }
     }
 }

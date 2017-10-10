@@ -1,4 +1,6 @@
-﻿namespace Bluewire.Common.Console.Daemons
+﻿using System;
+
+namespace Bluewire.Common.Console.Daemons
 {
     class ConsoleDaemonMonitor<TArguments>
     {
@@ -20,8 +22,13 @@
 
         public int WaitForTermination()
         {
+            monitor.WaitForStart(cancelMonitor.GetToken());
             System.Console.Error.WriteLine("Press CTRL-C to terminate.");
-            cancelMonitor.WaitForCancel();
+
+            // This will terminate if the daemon shuts down voluntarily or if Ctrl-C is observed:
+            monitor.Wait(cancelMonitor.GetToken());
+
+            // Request shutdown and wait again, in case it was Ctrl-C.
             monitor.RequestShutdown();
             monitor.Wait();
             return 0;

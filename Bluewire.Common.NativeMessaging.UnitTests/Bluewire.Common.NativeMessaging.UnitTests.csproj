@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="NativeHostArgumentParserTests.cs" />
     <Compile Include="NativeMessageReaderWriterTests.cs" />
     <Compile Include="NativeMessageReceiverTests.cs" />
     <Compile Include="NativeMessageWriterTests.cs" />

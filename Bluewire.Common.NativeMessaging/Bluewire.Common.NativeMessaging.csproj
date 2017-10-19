@@ -45,7 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Installation\ManifestDescription.cs" />
     <Compile Include="NativeHostArgumentParser.cs" />
+    <Compile Include="Installation\NativeHostInstaller.cs" />
     <Compile Include="NativeMessageSender.cs" />
     <Compile Include="ConsoleNativeStreams.cs" />
     <Compile Include="IMessageHandler.cs" />

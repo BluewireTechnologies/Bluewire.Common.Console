@@ -4,11 +4,9 @@ using System.Threading.Tasks;
 
 namespace Bluewire.Common.Console
 {
-    public interface IDaemonisable<TArguments>
+    public interface IDaemonisable
     {
         string Name { get; }
-
-        SessionArguments<TArguments> Configure();
 
         /// <summary>
         /// Create a new instance of the daemon and return it.
@@ -20,7 +18,7 @@ namespace Bluewire.Common.Console
         ///   the constructed instance is an acceptable response to cancellation.
         /// * If the task cancels, it must perform all clean-up itself beforehand.
         /// </remarks>
-        Task<IDaemon> Start(TArguments arguments, CancellationToken token);
+        Task<IDaemon> Start(CancellationToken token);
         string[] GetDependencies();
     }
 }

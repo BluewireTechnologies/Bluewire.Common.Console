@@ -56,10 +56,11 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Arguments\ArgumentListTests.cs" />
     <Compile Include="Async\ConsoleAsyncContextTests.cs" />
     <Compile Include="CancelMonitorTests.cs" />
     <Compile Include="ConsoleSessionTests.cs" />
-    <Compile Include="DaemonRunnerTests.cs" />
+    <Compile Include="DaemonSessionTests.cs" />
     <Compile Include="Daemons\HostedDaemonMonitorTests.cs" />
     <Compile Include="Daemons\MockDaemonisable.cs" />
     <Compile Include="Hosting\AwaitMultipleTasksTests.cs" />

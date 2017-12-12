@@ -1,37 +1,29 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Bluewire.Common.Console.Arguments;
 using Bluewire.Common.Console.Async;
 using Bluewire.Common.Console.ThirdParty;
 
 namespace Bluewire.Common.Console
 {
-
-    public class ConsoleSession<T>
+    public class ConsoleSession : SessionArguments
     {
-        private ConsoleArguments consoleArguments;
-        private SessionArguments<T> session;
+        private readonly ConsoleArguments consoleArguments;
 
-        public ConsoleSession(T arguments, OptionSet options) : this(new SessionArguments<T>(arguments, options))
+        public ConsoleSession()
         {
+            consoleArguments = Options.AddCollector(new ConsoleArguments());
         }
 
-        public ConsoleSession(SessionArguments<T> session)
-        {
-            ListParameterUsage = "<file names ...>";
-            this.session = session;
-            consoleArguments = new ConsoleArguments();
-            AddConsoleOptions();
-        }
-
-        public int Run(string[] args, Func<T, int> application)
+        public int Run(string[] args, Func<int> application)
         {
             try
             {
-                session.Parse(args);
+                Parse(args);
                 if (OnBeforeRun())
                 {
-                    return application(this.session.Arguments);
+                    return application();
                 }
                 return 0;
             }
@@ -51,19 +43,19 @@ namespace Bluewire.Common.Console
             }
         }
 
-        public int Run(string[] args, Func<T, Task<int>> application)
+        public int Run(string[] args, Func<Task<int>> application)
         {
             return ConsoleAsyncContext.Run(() => RunAsync(args, application));
         }
 
-        public async Task<int> RunAsync(string[] args, Func<T, Task<int>> application)
+        public async Task<int> RunAsync(string[] args, Func<Task<int>> application)
         {
             try
             {
-                session.Parse(args);
+                Parse(args);
                 if (OnBeforeRun())
                 {
-                    return await application(this.session.Arguments);
+                    return await application();
                 }
                 return 0;
             }
@@ -83,12 +75,9 @@ namespace Bluewire.Common.Console
             }
         }
 
-
         private string GetUsageString()
         {
-            var usage = String.Format("{0} <options>", Path.GetFileName(session.Application));
-            session.ForArgumentsInterface<IArgumentList>(a => usage += " " + ListParameterUsage);
-            return usage;
+            return $"{Path.GetFileName(Application)} <options> {ListParameterUsage ?? ArgumentList.GetArgumentDescriptions()}".Trim();
         }
 
         private string customUsageString;
@@ -111,12 +100,6 @@ namespace Bluewire.Common.Console
         /// This is displayed below the option descriptions.
         /// </summary>
         public string ExtendedUsageDetails { get; set; }
-
-        private void AddConsoleOptions()
-        {
-            session.Options.Add("pause", "When finished, wait for the user to press <Enter> before terminating.", v => consoleArguments.PauseWhenDone = true);
-            session.Options.Add("h|?|help", "Show usage.", v => consoleArguments.ShowUsage = true);
-        }
 
         private bool OnBeforeRun()
         {
@@ -165,17 +148,23 @@ namespace Bluewire.Common.Console
         private void ShowUsage()
         {
             System.Console.Error.WriteLine("Usage: {0}", Usage);
-            this.session.Options.WriteOptionDescriptions(System.Console.Error);
+            Options.WriteOptionDescriptions(System.Console.Error);
             if (!String.IsNullOrWhiteSpace(ExtendedUsageDetails))
             {
                 System.Console.Error.WriteLine(ExtendedUsageDetails);
             }
         }
 
-        public class ConsoleArguments
+        public class ConsoleArguments : IReceiveOptions
         {
             public bool ShowUsage { get; set; }
             public bool PauseWhenDone { get; set; }
+
+            void IReceiveOptions.ReceiveFrom(OptionSet options)
+            {
+                options.Add("pause", "When finished, wait for the user to press <Enter> before terminating.", v => PauseWhenDone = true);
+                options.Add("h|?|help", "Show usage.", v => ShowUsage = true);
+            }
         }
     }
 }

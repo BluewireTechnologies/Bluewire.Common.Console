@@ -12,8 +12,8 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
         private static IHostedDaemonInstance CreateDaemon(string name)
         {
             var daemonisable = new MockDaemonisable(name);
-            var monitor = new HostedDaemonMonitor<object>(daemonisable);
-            monitor.Start(new object());
+            var monitor = new HostedDaemonMonitor(daemonisable);
+            monitor.Start();
             return monitor;
         }
 

@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 
 namespace Bluewire.Common.Console.Daemons
 {
-    sealed class HostedDaemonMonitor<TArguments> : IHostedDaemonInstance
+    sealed class HostedDaemonMonitor : IHostedDaemonInstance
     {
         private readonly CancellationTokenSource shutdownToken = new CancellationTokenSource();
-        private readonly IDaemonisable<TArguments> daemon;
+        private readonly IDaemonisable daemon;
         private Task CompletedTask
         {
             get
@@ -35,18 +35,18 @@ namespace Bluewire.Common.Console.Daemons
         public string Name => daemon.Name;
         public bool ShutdownRequested => shutdownToken.IsCancellationRequested;
 
-        public HostedDaemonMonitor(IDaemonisable<TArguments> daemon)
+        public HostedDaemonMonitor(IDaemonisable daemon)
         {
             this.daemon = daemon;
         }
 
-        public Task Start(TArguments arguments)
+        public Task Start()
         {
             if (createDaemonTask != null) throw new InvalidOperationException("Instance already started.");
             lock (shutdownToken)
             {
                 if (this.createDaemonTask != null) throw new InvalidOperationException("Instance already started.");
-                createDaemonTask = Task.Run(() => daemon.Start(arguments, shutdownToken.Token));
+                createDaemonTask = Task.Run(() => daemon.Start(shutdownToken.Token));
                 lifetimeTask = Task.Run(async () => { using (await createDaemonTask) await shutdownToken.Token.WaitHandle.AsTask(); });
                 return lifetimeTask;
             }

@@ -4,6 +4,6 @@ namespace Bluewire.Common.Console.Daemons
 {
     public interface ITestAsConsoleApplication
     {
-        int Test<T>(ApplicationEnvironment environment, IDaemonisable<T> daemon, T arguments);
+        int Test(ApplicationEnvironment environment, IDaemonisable daemon);
     }
 }

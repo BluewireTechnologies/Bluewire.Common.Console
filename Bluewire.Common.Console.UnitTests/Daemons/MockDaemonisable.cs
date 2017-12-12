@@ -4,17 +4,17 @@ using Moq;
 
 namespace Bluewire.Common.Console.UnitTests.Daemons
 {
-    class MockDaemonisable : DaemonisableBase
+    class MockDaemonisable : IDaemonisable
     {
         public Mock<IDaemon> Daemon { get; } = new Mock<IDaemon>();
+        public string Name { get; }
 
-        public MockDaemonisable(string name) : base(name)
+        public MockDaemonisable(string name)
         {
+            Name = name;
         }
 
-        public override Task<IDaemon> Start(object arguments, CancellationToken token)
-        {
-            return Task.FromResult(Daemon.Object);
-        }
+        public Task<IDaemon> Start(CancellationToken token) => Task.FromResult(Daemon.Object);
+        public virtual string[] GetDependencies() => new string[0];
     }
 }

@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Configuration.Install;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
-using System.Threading;
 using Bluewire.Common.Console.Daemons;
 using Bluewire.Common.Console.Environment;
-using Bluewire.Common.Console.Logging;
 using Microsoft.Win32;
-using Console = System.Console;
 
 namespace Bluewire.Common.Console
 {
     public static class DaemonRunner
     {
-        public static int Run<T>(string[] args, IDaemonisable<T> daemon)
+        public static int Run(string[] args, IDaemonisable daemon)
         {
             return Run(args, daemon, new EnvironmentAnalyser().GetEnvironment());
         }
@@ -28,14 +24,13 @@ namespace Bluewire.Common.Console
         /// Refrain from using this. In real applications it will cause incorrect behaviour whenever the daemon
         /// is not actually running in the specified execution environment.
         /// </remarks>
-        /// <typeparam name="T"></typeparam>
         /// <param name="args"></param>
         /// <param name="daemon"></param>
         /// <param name="environment"></param>
         /// <returns></returns>
-        public static int Run<T>(string[] args, IDaemonisable<T> daemon, IExecutionEnvironment environment)
+        public static int Run(string[] args, IDaemonisable daemon, IExecutionEnvironment environment)
         {
-            return new DaemonRunner<T>(
+            return new DaemonSession(
                 new RunAsConsoleApplication(),
                 new RunAsService(),
                 new RunAsServiceInstaller(),
@@ -47,10 +42,10 @@ namespace Bluewire.Common.Console
 
         public class RunAsHostedService : IRunAsHostedService
         {
-            public int Run<T>(InitialisedHostedEnvironment environment, IDaemonisable<T> daemon, T arguments)
+            public int Run(InitialisedHostedEnvironment environment, IDaemonisable daemon)
             {
-                var instance = new HostedDaemonMonitor<T>(daemon);
-                instance.Start(arguments);
+                var instance = new HostedDaemonMonitor(daemon);
+                instance.Start();
                 environment.RegisterForShutdownNotification(instance);
                 instance.WaitForTermination();
                 return 0;
@@ -59,9 +54,9 @@ namespace Bluewire.Common.Console
 
         public class RunAsService : IRunAsService
         {
-            public int Run<T>(ServiceEnvironment environment, IDaemonisable<T> daemon, string[] staticArgs)
+            public int Run(ServiceEnvironment environment, IDaemonisable daemon, string[] staticArgs)
             {
-                var servicesToRun = new ServiceBase[] { new DaemonService<T>(daemon, staticArgs) };
+                var servicesToRun = new ServiceBase[] { new DaemonService(daemon, staticArgs) };
                 ServiceBase.Run(servicesToRun);
                 return 0;
             }
@@ -69,10 +64,10 @@ namespace Bluewire.Common.Console
 
         public class RunAsConsoleApplication : IRunAsConsoleApplication
         {
-            public int Run<T>(ApplicationEnvironment environment, IDaemonisable<T> daemon, T arguments)
+            public int Run(ApplicationEnvironment environment, IDaemonisable daemon)
             {
-                var monitor = new ConsoleDaemonMonitor<T>(daemon);
-                monitor.Start(arguments);
+                var monitor = new ConsoleDaemonMonitor(daemon);
+                monitor.Start();
                 monitor.WaitForTermination();
                 return 0;
             }
@@ -80,10 +75,10 @@ namespace Bluewire.Common.Console
 
         public class TestAsConsoleApplication : ITestAsConsoleApplication
         {
-            public int Test<T>(ApplicationEnvironment environment, IDaemonisable<T> daemon, T arguments)
+            public int Test(ApplicationEnvironment environment, IDaemonisable daemon)
             {
-                var instance = new HostedDaemonMonitor<T>(daemon);
-                instance.Start(arguments);
+                var instance = new HostedDaemonMonitor(daemon);
+                instance.Start();
                 instance.RequestShutdown();
                 instance.Wait();
                 return 0;
@@ -92,7 +87,7 @@ namespace Bluewire.Common.Console
 
         public class RunAsServiceInstaller : IRunAsServiceInstaller
         {
-            public int Run<T>(ApplicationEnvironment environment, ServiceInstallerArguments<T> arguments, string[] serviceArguments)
+            public int Run(ApplicationEnvironment environment, ServiceInstallerArguments arguments, string[] serviceArguments)
             {
                 var serviceInstaller = CreateServiceInstaller(arguments);
                 var installer = CreateInstaller(serviceInstaller, arguments);
@@ -115,7 +110,7 @@ namespace Bluewire.Common.Console
                 return 0;
             }
 
-            private static TransactedInstaller CreateInstaller<T>(ServiceInstaller serviceInstaller, ServiceInstallerArguments<T> arguments)
+            private static TransactedInstaller CreateInstaller(ServiceInstaller serviceInstaller, ServiceInstallerArguments arguments)
             {
                 var serviceProcessInstaller = new ServiceProcessInstaller();
                 arguments.GetAccount().Apply(serviceProcessInstaller);
@@ -133,7 +128,7 @@ namespace Bluewire.Common.Console
                 };
             }
 
-            private static ServiceInstaller CreateServiceInstaller<T>(ServiceInstallerArguments<T> arguments)
+            private static ServiceInstaller CreateServiceInstaller(ServiceInstallerArguments arguments)
             {
                 var serviceInstaller = new ServiceInstaller();
                 serviceInstaller.ServiceName = arguments.ServiceName;
@@ -164,7 +159,5 @@ namespace Bluewire.Common.Console
                 return arg;
             }
         }
-
     }
-
 }

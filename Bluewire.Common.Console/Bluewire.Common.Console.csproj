@@ -63,13 +63,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentClassExtensions.cs" />
+    <Compile Include="Arguments\ArgumentList.cs" />
+    <Compile Include="ArgumentListExtensions.cs" />
+    <Compile Include="Arguments\ExcessPositionalArgumentsPolicy.cs" />
     <Compile Include="Async\ConsoleAsyncContext.cs" />
     <Compile Include="CancelMonitor.cs" />
-    <Compile Include="DaemonisableBase.cs" />
     <Compile Include="Daemons\ConsoleDaemonMonitor.cs" />
     <Compile Include="ConsoleSession.cs" />
     <Compile Include="DaemonRunner.cs" />
-    <Compile Include="Daemons\DaemonRunner.cs" />
+    <Compile Include="Daemons\DaemonSession.cs" />
     <Compile Include="Daemons\DaemonService.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -81,6 +83,7 @@
     <Compile Include="Daemons\ServiceAccountCredentialsFactory.cs" />
     <Compile Include="Daemons\TaskHelpers.cs" />
     <Compile Include="Environment\ApplicationEnvironment.cs" />
+    <Compile Include="ExcessArgumentsException.cs" />
     <Compile Include="Hosting\AsyncExitCodeReceiver.cs" />
     <Compile Include="Hosting\AwaitMultipleTasks.cs" />
     <Compile Include="Environment\EnvironmentAnalyser.cs" />
@@ -125,7 +128,8 @@
     <Compile Include="Daemons\IRunAsConsoleApplication.cs" />
     <Compile Include="Daemons\IRunAsService.cs" />
     <Compile Include="Daemons\IRunAsServiceInstaller.cs" />
-    <Compile Include="IVerbosityArgument.cs" />
+    <Compile Include="IReceiveArgumentList.cs" />
+    <Compile Include="IReceiveOptions.cs" />
     <Compile Include="Logging\ConsoleOutputDescriptor.cs" />
     <Compile Include="Logging\IOutputDescriptor.cs" />
     <Compile Include="Logging\IOutputDescriptorConfiguration.cs" />
@@ -133,13 +137,14 @@
     <Compile Include="Logging\LoggingConfigurer.cs" />
     <Compile Include="Logging\OutputDescriptorBase.cs" />
     <Compile Include="Logging\ServiceLogOutputDescriptor.cs" />
-    <Compile Include="NoArguments.cs" />
+    <Compile Include="OptionsExtensions.cs" />
+    <Compile Include="Arguments\OptionsParser.cs" />
     <Compile Include="Progress\FormattingHelpers.cs" />
     <Compile Include="Progress\IProgressReceiver.cs" />
     <Compile Include="Progress\PowerOfTenMilestoneCounter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Daemons\ServiceInstallerArguments.cs" />
-    <Compile Include="SessionArguments.cs" />
+    <Compile Include="Arguments\SessionArguments.cs" />
     <Compile Include="ThirdParty\Options.cs" />
     <Compile Include="VerbosityList.cs" />
   </ItemGroup>

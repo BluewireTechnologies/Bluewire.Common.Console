@@ -3,6 +3,7 @@
     <ItemGroup>
         <!-- Full list of NuGet package projects -->
         <NugetProjects Include="Bluewire.Common.Console\Bluewire.Common.Console.csproj" />
+        <NugetProjects Include="Bluewire.Common.Console.Formatting\Bluewire.Common.Console.Formatting.csproj" />
         <NugetProjects Include="Bluewire.Common.Console.Client\Bluewire.Common.Console.Client.csproj" />
         <NugetProjects Include="Bluewire.Common.Console.NUnit3\Bluewire.Common.Console.NUnit3.csproj" />
     

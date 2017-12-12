@@ -50,6 +50,5 @@ namespace Bluewire.Common.Console.Formatting
         {
             return String.Join("", cells.ToArray());
         }
-
     }
 }

@@ -25,7 +25,7 @@ namespace Bluewire.Common.Console.Daemons
             session.Parse(staticArgs.Concat(args).ToArray());
 
             instance = new HostedDaemonMonitor<TArguments>(daemon);
-            instance.Start(session.Arguments);
+            instance.Start(session.Arguments).WaitWithUnwrapExceptions();
         }
 
         protected override void OnStop()

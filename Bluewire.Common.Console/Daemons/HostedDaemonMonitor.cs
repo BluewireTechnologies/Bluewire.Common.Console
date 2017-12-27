@@ -8,6 +8,15 @@ namespace Bluewire.Common.Console.Daemons
     {
         private readonly CancellationTokenSource shutdownToken = new CancellationTokenSource();
         private readonly IDaemonisable<TArguments> daemon;
+        private Task CompletedTask
+        {
+            get
+            {
+                var tcs = new TaskCompletionSource<object>();
+                tcs.SetResult(null);
+                return tcs.Task;
+            }
+        }
 
         /// <summary>
         /// Represents initialisation of the daemon instance.
@@ -17,6 +26,11 @@ namespace Bluewire.Common.Console.Daemons
         /// Represents entire lifetime of the daemon instance.
         /// </summary>
         private Task lifetimeTask;
+        /// <summary>
+        /// Represents shutdown of the daemon instance. Initialised on first
+        /// request after shutdown has begun.
+        /// </summary>
+        private Task shutdownTask;
 
         public string Name => daemon.Name;
         public bool ShutdownRequested => shutdownToken.IsCancellationRequested;
@@ -38,12 +52,18 @@ namespace Bluewire.Common.Console.Daemons
             }
         }
 
-        private async Task GetShutdownCompletionTask()
+        private Task GetShutdownCompletionTask()
         {
             lock (shutdownToken)
             {
-                if (lifetimeTask == null) return;
+                if (lifetimeTask == null) return CompletedTask;
+                if (shutdownTask == null) shutdownTask = AwaitShutdownCompletion();
+                return shutdownTask;
             }
+        }
+
+        private async Task AwaitShutdownCompletion()
+        {
             await createDaemonTask.ConfigureAwait(false);
             await lifetimeTask.GetCompletionOnlyTask().ConfigureAwait(false);
         }

@@ -48,7 +48,7 @@ namespace Bluewire.Common.Console.Daemons
                 if (this.createDaemonTask != null) throw new InvalidOperationException("Instance already started.");
                 createDaemonTask = Task.Run(() => daemon.Start(shutdownToken.Token));
                 lifetimeTask = Task.Run(async () => { using (await createDaemonTask) await shutdownToken.Token.WaitHandle.AsTask(); });
-                return lifetimeTask;
+                return createDaemonTask;
             }
         }
 

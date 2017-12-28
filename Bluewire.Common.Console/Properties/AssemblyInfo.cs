@@ -24,5 +24,5 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("Bluewire.Common.Console.UnitTests")]
 
-[assembly: AssemblyVersion("10.2.2")]
-[assembly: AssemblyFileVersion("10.2.2")]
+[assembly: AssemblyVersion("10.2.3")]
+[assembly: AssemblyFileVersion("10.2.3")]

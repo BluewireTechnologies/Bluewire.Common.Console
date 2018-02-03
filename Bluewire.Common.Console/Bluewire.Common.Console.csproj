@@ -68,6 +68,7 @@
     <Compile Include="Arguments\ExcessPositionalArgumentsPolicy.cs" />
     <Compile Include="Async\ConsoleAsyncContext.cs" />
     <Compile Include="CancelMonitor.cs" />
+    <Compile Include="DaemonBase.cs" />
     <Compile Include="Daemons\ConsoleDaemonMonitor.cs" />
     <Compile Include="ConsoleSession.cs" />
     <Compile Include="DaemonRunner.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="Daemons\ServiceInstallerArguments.cs" />
     <Compile Include="Arguments\SessionArguments.cs" />
     <Compile Include="ThirdParty\Options.cs" />
+    <Compile Include="Util\EmptyDisposable.cs" />
     <Compile Include="VerbosityList.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -32,21 +32,30 @@ namespace Bluewire.Common.Console.Daemons
         {
             if (environment is ServiceEnvironment serviceEnvironment)
             {
-                return runAsService.Run(serviceEnvironment, daemon, args);
+                using (environment.BeginExecution())
+                {
+                    return runAsService.Run(serviceEnvironment, daemon, args);
+                }
             }
 
             if (environment is ApplicationEnvironment applicationEnvironment)
             {
-                return RunInApplicationEnvironment(applicationEnvironment, daemon, args);
+                using (environment.BeginExecution())
+                {
+                    return RunInApplicationEnvironment(applicationEnvironment, daemon, args);
+                }
             }
 
             if (environment is InitialisedHostedEnvironment hostedEnvironment)
             {
-                var session = new SessionArguments();
-                session.Options.AddCollector(daemon as IReceiveOptions);
-                session.ArgumentList.AddCollector(daemon as IReceiveArgumentList);
-                session.Parse(args);
-                return runAsHostedService.Run(hostedEnvironment, daemon);
+                using (environment.BeginExecution())
+                {
+                    var session = new SessionArguments();
+                    session.Options.AddCollector(daemon as IReceiveOptions);
+                    session.ArgumentList.AddCollector(daemon as IReceiveArgumentList);
+                    session.Parse(args);
+                    return runAsHostedService.Run(hostedEnvironment, daemon);
+                }
             }
 
             // Exit code 10 is a Windows standard exit code meaning 'The environment is incorrect'.

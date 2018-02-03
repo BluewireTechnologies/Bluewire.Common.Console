@@ -64,7 +64,7 @@ namespace Bluewire.Common.Console.UnitTests
         [Test]
         public void IfInvokedInAnInitialisedHostedEnvironment_RunsDaemonAsAHostedService()
         {
-            runner.Run(new InitialisedHostedEnvironment(new HostedEnvironmentDefinition(), new HostedEnvironment()), daemon, "arg");
+            runner.Run(new InitialisedHostedEnvironment(new HostedEnvironmentDefinition(Assembly.GetExecutingAssembly().GetName()), new HostedEnvironment()), daemon, "arg");
 
             runAsHostedService.Verify(s => s.Run(It.IsAny<InitialisedHostedEnvironment>(), daemon));
         }

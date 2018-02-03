@@ -35,6 +35,13 @@ namespace Bluewire.Common.Console.Environment
             return instanceTracker.Shutdown();
         }
 
+        public string ApplicationName => definition.ApplicationName;
+
+        public IDisposable BeginExecution()
+        {
+            return new RedirectConsoleToFiles().RedirectTo(definition.ConsoleLogDirectory ?? DaemonRunnerSettings.ConsoleLogDirectory, definition.ApplicationName);
+        }
+
         public OutputDescriptorBase CreateOutputDescriptor()
         {
             var descriptor = new ServiceLogOutputDescriptor(definition.ApplicationName);

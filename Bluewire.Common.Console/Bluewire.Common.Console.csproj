@@ -69,9 +69,11 @@
     <Compile Include="Async\ConsoleAsyncContext.cs" />
     <Compile Include="CancelMonitor.cs" />
     <Compile Include="DaemonBase.cs" />
+    <Compile Include="Environment\RedirectConsoleScope.cs" />
     <Compile Include="Daemons\ConsoleDaemonMonitor.cs" />
     <Compile Include="ConsoleSession.cs" />
     <Compile Include="DaemonRunner.cs" />
+    <Compile Include="Daemons\DaemonRunnerSettings.cs" />
     <Compile Include="Daemons\DaemonSession.cs" />
     <Compile Include="Daemons\DaemonService.cs">
       <SubType>Component</SubType>
@@ -84,6 +86,8 @@
     <Compile Include="Daemons\ServiceAccountCredentialsFactory.cs" />
     <Compile Include="Daemons\TaskHelpers.cs" />
     <Compile Include="Environment\ApplicationEnvironment.cs" />
+    <Compile Include="Util\ConfigurationReader.cs" />
+    <Compile Include="Environment\RedirectConsoleToFiles.cs" />
     <Compile Include="ExcessArgumentsException.cs" />
     <Compile Include="Hosting\AsyncExitCodeReceiver.cs" />
     <Compile Include="Hosting\AwaitMultipleTasks.cs" />
@@ -96,7 +100,7 @@
     <Compile Include="Hosting\HostedDaemonTracker.cs" />
     <Compile Include="Environment\HostedEnvironment.cs" />
     <Compile Include="Environment\InitialisedHostedEnvironment.cs" />
-    <Compile Include="Environment\IRunningEnvironment.cs" />
+    <Compile Include="Environment\HostedEnvironmentDefinition.cs" />
     <Compile Include="Environment\ServiceEnvironment.cs" />
     <Compile Include="ErrorWithReturnCodeException.cs" />
     <Compile Include="Hosting\DaemonExeContainer.cs" />
@@ -132,6 +136,8 @@
     <Compile Include="Arguments\SessionArguments.cs" />
     <Compile Include="ThirdParty\Options.cs" />
     <Compile Include="Util\EmptyDisposable.cs" />
+    <Compile Include="Util\Extensions.cs" />
+    <Compile Include="Util\PathValidator.cs" />
     <Compile Include="VerbosityList.cs" />
   </ItemGroup>
   <ItemGroup>

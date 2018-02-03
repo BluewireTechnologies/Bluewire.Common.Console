@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Bluewire.Common.Console.Logging;
 
 namespace Bluewire.Common.Console.Environment
@@ -11,6 +8,16 @@ namespace Bluewire.Common.Console.Environment
         private static Exception NotInitialised()
         {
             return new InvalidOperationException("Hosted execution environment has not been initialised yet.");
+        }
+
+        public string ApplicationName
+        {
+            get { throw NotInitialised(); }
+        }
+
+        public IDisposable BeginExecution()
+        {
+            throw NotInitialised();
         }
 
         public OutputDescriptorBase CreateOutputDescriptor()

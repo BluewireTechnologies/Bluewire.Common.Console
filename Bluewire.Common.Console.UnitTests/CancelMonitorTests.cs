@@ -38,7 +38,7 @@ namespace Bluewire.Common.Console.UnitTests
         public void SecondCancelRequestTriggersKill()
         {
             var monitor = new CancelMonitor();
-            
+
             monitor.RequestCancel(new object(), CreateEventArgs());
 
             var eventArgs = CreateEventArgs();

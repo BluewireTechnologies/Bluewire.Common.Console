@@ -6,7 +6,7 @@ namespace Bluewire.Common.Console.Formatting
     {
         private readonly string format;
         public string Heading { get; private set; }
-        
+
         public Column(string heading) : this(heading, "{0}")
         {
         }
@@ -32,7 +32,7 @@ namespace Bluewire.Common.Console.Formatting
 
         public int LeftPadding { get; set; }
         public int RightPadding { get; set; }
-        
+
         public virtual string FormatValue(object value)
         {
             return String.Format(format, value);

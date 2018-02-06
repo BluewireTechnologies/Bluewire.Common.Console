@@ -14,7 +14,7 @@ namespace Bluewire.Common.Console.Client.UnitTests.Shell
         {
             Assume.That(Cmd.Exists);
         }
-        
+
         [Test]
         public async Task AwaitsExitAndYieldsExitCode()
         {
@@ -31,10 +31,10 @@ namespace Bluewire.Common.Console.Client.UnitTests.Shell
         public async Task CollectsStdOut()
         {
             var invoker = new CommandLineInvoker();
-            
+
             var process = invoker.Start(new CommandLine(Cmd.GetExecutableFilePath(), "/C", "cd"));
             await process.Completed;
-            
+
 
             Assert.That(await process.StdOut.ToStringAsync(), Is.EqualTo($"{invoker.WorkingDirectory}{Environment.NewLine}"));
         }
@@ -44,7 +44,7 @@ namespace Bluewire.Common.Console.Client.UnitTests.Shell
         {
             var invoker = new CommandLineInvoker();
             Assume.That(!Directory.Exists(Path.Combine(invoker.WorkingDirectory, "doesnotexist")));
-            
+
             var process = invoker.Start(new CommandLine(Cmd.GetExecutableFilePath(), "/C", "cd", "doesnotexist"));
             await process.Completed;
 

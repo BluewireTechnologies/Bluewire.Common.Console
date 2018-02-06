@@ -24,7 +24,7 @@ namespace Bluewire.Common.Console.Hosting
             // DefineHostedEnvironment only succeeds on one thread, so this is safe:
             new EnvironmentAnalyser().DefineHostedEnvironment(definition);
         }
-        
+
         public bool RequestShutdown(TimeSpan timeout)
         {
             return Environment.RequestShutdown().Wait(timeout);

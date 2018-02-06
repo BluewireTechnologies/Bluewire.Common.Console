@@ -35,7 +35,7 @@ namespace Bluewire.Common.Console.Environment
                 // run from the command line or as a service.
                 return new HostedEnvironment();
             }
-            
+
             if (!HasSTDERR())
             {
                 // If we can't open STDERR, probably running inside a noninteractive service.

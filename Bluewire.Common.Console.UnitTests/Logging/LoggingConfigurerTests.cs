@@ -176,7 +176,7 @@ namespace Bluewire.Common.Console.UnitTests.Logging
             }
 
             const string message = "Info Message";
-            using(var defaultLog = new StringWriter())
+            using (var defaultLog = new StringWriter())
             {
                 var descriptor = new Mock<ConsoleOutputDescriptor>("Test", STDERR) {CallBase = true};
                 descriptor.Setup(d => d.CreateDefaultLog()).Returns(new TextWriterAppender { Writer = defaultLog });
@@ -250,7 +250,7 @@ namespace Bluewire.Common.Console.UnitTests.Logging
             const string info = "Info Message";
             using (var configurer = new LoggingConfigurer(new ConsoleOutputDescriptor("Test", STDERR)))
             {
-                configurer.ConsoleVerbosity = Level.Info;   
+                configurer.ConsoleVerbosity = Level.Info;
 
                 configurer.Console.Info(info);
             }

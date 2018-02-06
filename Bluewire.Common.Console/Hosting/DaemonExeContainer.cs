@@ -44,7 +44,7 @@ namespace Bluewire.Common.Console.Hosting
             {
                 AssertNotDisposing();
                 if (entryAssemblyTask != null) throw new InvalidOperationException("The container has already run an assembly.");
-                
+
                 var appdomain = GetContainer();
 
                 var invoker = (EntryPointInvoker)appdomain.CreateInstanceAndUnwrap(typeof(EntryPointInvoker).Assembly.FullName, typeof(EntryPointInvoker).FullName, false, BindingFlags.Instance | BindingFlags.Public, null, new object[] { daemonAssemblyName }, null, null);

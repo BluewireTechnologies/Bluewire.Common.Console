@@ -32,7 +32,7 @@ namespace Bluewire.Common.Console.UnitTests
             runAsService = new Mock<IRunAsService>();
             runAsServiceInstaller = new Mock<IRunAsServiceInstaller>();
             runAsHostedService = new Mock<IRunAsHostedService>();
-            
+
             runner = new DaemonRunner<NoArguments>(runAsConsoleApplication.Object, runAsService.Object, runAsServiceInstaller.Object, runAsHostedService.Object, testAsConsoleApplication.Object);
 
             var daemon = new Mock<IDaemonisable<NoArguments>>();
@@ -117,7 +117,7 @@ namespace Bluewire.Common.Console.UnitTests
 
             VerifyServiceArguments((sa, ca) => Assert.AreEqual("Test Name", sa.ServiceName));
         }
-        
+
         [Test]
         public void CanSpecifyServiceAccount()
         {

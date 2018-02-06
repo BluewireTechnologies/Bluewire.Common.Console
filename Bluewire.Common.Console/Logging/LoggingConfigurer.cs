@@ -100,7 +100,7 @@ namespace Bluewire.Common.Console.Logging
                 new LevelRangeFilter { AcceptOnMatch = false },
                 outputDescriptor.CreateStdErr);
         }
-        
+
         private IAppender CreateDefaultLogAppender()
         {
             var appender = outputDescriptor.CreateDefaultLog();
@@ -113,7 +113,7 @@ namespace Bluewire.Common.Console.Logging
             Func<IAppender> defaultAppender)
         {
             var appender = repository.GetAppenders().FirstOrDefault(a => a.Name == name);
-            
+
             if (appender == null)
             {
                 appender = defaultAppender();
@@ -156,7 +156,7 @@ namespace Bluewire.Common.Console.Logging
 
         private static T Init<T>(T obj)
         {
-            if(obj is IOptionHandler) ((IOptionHandler)obj).ActivateOptions();
+            if (obj is IOptionHandler) ((IOptionHandler)obj).ActivateOptions();
             return obj;
         }
 

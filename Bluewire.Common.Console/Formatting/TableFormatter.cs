@@ -36,11 +36,11 @@ namespace Bluewire.Common.Console.Formatting
                 previousColumnPadding = column.RightPadding;
             }
         }
-        
+
         public string[] Format(IEnumerable<IRow> rows)
         {
             var formattedCellsColumnMajor = columns.Select(c => c.Format(rows)).ToArray();
-            
+
             var renderedCells = rows.Select((r, ri) => formattedCellsColumnMajor.Select(c => c.RenderCell(r, ri)));
 
             return renderedCells.Select(CoalesceRow).ToArray();

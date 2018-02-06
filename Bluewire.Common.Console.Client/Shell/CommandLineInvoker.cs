@@ -34,7 +34,7 @@ namespace Bluewire.Common.Console.Client.Shell
             var process = Process.Start(info);
             return new ConsoleProcess(sealedCmd, process);
         }
-        
+
         class ConsoleProcess : IConsoleProcess
         {
             private readonly Process process;
@@ -47,16 +47,16 @@ namespace Bluewire.Common.Console.Client.Shell
             {
                 CommandLine = commandLine;
                 this.process = process;
-                
+
                 stdOutPipe = ObservePipe(h => process.OutputDataReceived += h, h => process.OutputDataReceived -= h);
                 stdErrPipe = ObservePipe(h => process.ErrorDataReceived += h, h => process.ErrorDataReceived -= h);
 
                 process.Exited += (s, e) => { OnTerminated(); };
                 process.EnableRaisingEvents = true;
-                
+
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
-                
+
                 // Handle possible race condition if process has already terminated.
                 if (process.HasExited)
                 {
@@ -72,7 +72,7 @@ namespace Bluewire.Common.Console.Client.Shell
 
             private void OnTerminated()
             {
-                lock(this)
+                lock (this)
                 {
                     if (completeAndFlushed) return;
                     // Flush the output buffers before reporting completion.
@@ -81,7 +81,7 @@ namespace Bluewire.Common.Console.Client.Shell
                 tcs.TrySetResult(process.ExitCode);
                 completeAndFlushed = true;
             }
-            
+
             public IOutputPipe StdOut => stdOutPipe;
             public IOutputPipe StdErr => stdErrPipe;
 

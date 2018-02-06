@@ -12,7 +12,7 @@ namespace Bluewire.Common.Console.Hosting
         private const string DependentAssemblyElementNamespace = "urn:schemas-microsoft-com:asm.v1";
 
         private readonly ICollection<XmlElement> elements;
-        
+
         public BindingRedirects(ICollection<XmlElement> elements)
         {
             if (GetUnexpectedNamespaces(elements).Any()) throw new ArgumentException($"One or more elements lie in a namespace other than {DependentAssemblyElementNamespace}.");
@@ -24,34 +24,34 @@ namespace Bluewire.Common.Console.Hosting
         public void ApplyTo(XmlDocument configuration)
         {
             var runtimeContainer = configuration.SelectSingleNode("/configuration/runtime");
-            if(runtimeContainer == null)
+            if (runtimeContainer == null)
             {
                 runtimeContainer = configuration.CreateElement("runtime");
                 configuration.DocumentElement.AppendChild(runtimeContainer);
             }
-            
+
             var namespaces = CreateNamespaceManager(configuration.NameTable);
             var assemblyBindingContainer = runtimeContainer.SelectNodes("./asmv1:assemblyBinding", namespaces)?.Cast<XmlElement>().LastOrDefault();
-            if(assemblyBindingContainer == null)
+            if (assemblyBindingContainer == null)
             {
                 assemblyBindingContainer = configuration.CreateElement("assemblyBinding", DependentAssemblyElementNamespace);
                 runtimeContainer.AppendChild(assemblyBindingContainer);
             }
 
-            foreach(var element in elements)
+            foreach (var element in elements)
             {
                 assemblyBindingContainer.AppendChild(configuration.ImportNode(element, true));
             }
         }
-        
+
         public static BindingRedirects ReadFrom(XmlDocument configuration)
         {
             var namespaces = CreateNamespaceManager(configuration.NameTable);
 
             var nodes = configuration.SelectNodes("/configuration/runtime/asmv1:assemblyBinding/asmv1:dependentAssembly", namespaces)?.Cast<XmlNode>().ToArray();
             // I have no idea if this can even happen, but throwing a useful exception will help if it ever does.
-            if(nodes == null || !nodes.All(n => n is XmlElement)) throw new XmlException("Could not read binding redirects from configuration. 'dependentAssembly' nodes were not of the expected type.");
-            
+            if (nodes == null || !nodes.All(n => n is XmlElement)) throw new XmlException("Could not read binding redirects from configuration. 'dependentAssembly' nodes were not of the expected type.");
+
             return new BindingRedirects(nodes.Cast<XmlElement>().ToList());
         }
 
@@ -71,7 +71,7 @@ namespace Bluewire.Common.Console.Hosting
         {
             return GetEnumerator();
         }
-        
+
         public static bool IsDependentAssemblyElement(XmlElement element)
         {
             return element.Name == "dependentAssembly" && element.NamespaceURI == DependentAssemblyElementNamespace;
@@ -85,7 +85,7 @@ namespace Bluewire.Common.Console.Hosting
                 .Distinct()
                 .ToArray();
         }
-        
+
         private static XmlNamespaceManager CreateNamespaceManager(XmlNameTable nameTable)
         {
             var namespaces = new XmlNamespaceManager(nameTable);

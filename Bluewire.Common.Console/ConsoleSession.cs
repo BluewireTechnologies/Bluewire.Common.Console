@@ -6,7 +6,7 @@ using Bluewire.Common.Console.ThirdParty;
 
 namespace Bluewire.Common.Console
 {
-    
+
     public class ConsoleSession<T>
     {
         private ConsoleArguments consoleArguments;
@@ -151,7 +151,7 @@ namespace Bluewire.Common.Console
 
         private void WriteExceptionStack(Exception ex)
         {
-            if(ex.InnerException != null) WriteExceptionStack(ex.InnerException);
+            if (ex.InnerException != null) WriteExceptionStack(ex.InnerException);
             System.Console.Error.WriteLine(ex.Message);
             System.Console.Error.WriteLine(ex.StackTrace);
         }

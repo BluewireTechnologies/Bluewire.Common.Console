@@ -32,7 +32,7 @@ namespace Bluewire.Common.Console.Hosting
 
         public Task GetWaitTask()
         {
-            if(Interlocked.Increment(ref isWaiting) == 1) Decrement(); // Counteract the initial '1', but only once.
+            if (Interlocked.Increment(ref isWaiting) == 1) Decrement(); // Counteract the initial '1', but only once.
             return completion.Task;
         }
     }

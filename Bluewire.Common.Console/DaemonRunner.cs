@@ -114,7 +114,7 @@ namespace Bluewire.Common.Console
 
                 return 0;
             }
-            
+
             private static TransactedInstaller CreateInstaller<T>(ServiceInstaller serviceInstaller, ServiceInstallerArguments<T> arguments)
             {
                 var serviceProcessInstaller = new ServiceProcessInstaller();
@@ -148,7 +148,7 @@ namespace Bluewire.Common.Console
                 var argumentString = String.Join(" ", serviceArguments.Select(FormatArgument).ToArray());
                 System.Console.Out.WriteLine("Setting service arguments for {0}: {1}", serviceName, argumentString);
 
-                using (var configKey = Registry.LocalMachine.OpenSubKey(String.Format(@"SYSTEM\CurrentControlSet\services\{0}", serviceName), true)) 
+                using (var configKey = Registry.LocalMachine.OpenSubKey(String.Format(@"SYSTEM\CurrentControlSet\services\{0}", serviceName), true))
                 {
                     var existingImagePath = configKey.GetValue("ImagePath");
                     configKey.SetValue("ImagePath", existingImagePath + " " + argumentString);

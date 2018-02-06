@@ -91,4 +91,12 @@ namespace Bluewire.Common.Console.Daemons
             });
         }
     }
+
+    public static class DaemonSessionExtensions
+    {
+        public static int Run(this DaemonSession session, IDaemonisable daemon, params string[] args)
+        {
+            return session.Run(new EnvironmentAnalyser().GetEnvironment(), daemon, args);
+        }
+    }
 }

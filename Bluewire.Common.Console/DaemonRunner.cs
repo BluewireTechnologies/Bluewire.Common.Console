@@ -14,30 +14,16 @@ namespace Bluewire.Common.Console
     {
         public static int Run(string[] args, IDaemonisable daemon)
         {
-            return Run(args, daemon, new EnvironmentAnalyser().GetEnvironment());
+            return CreateSession().Run(daemon, args);
         }
 
-        /// <summary>
-        /// Intended for testing. This override permits the execution environment to be specified explicitly.
-        /// </summary>
-        /// <remarks>
-        /// Refrain from using this. In real applications it will cause incorrect behaviour whenever the daemon
-        /// is not actually running in the specified execution environment.
-        /// </remarks>
-        /// <param name="args"></param>
-        /// <param name="daemon"></param>
-        /// <param name="environment"></param>
-        /// <returns></returns>
-        public static int Run(string[] args, IDaemonisable daemon, IExecutionEnvironment environment)
-        {
-            return new DaemonSession(
+        public static DaemonSession CreateSession() =>
+            new DaemonSession(
                 new RunAsConsoleApplication(),
                 new RunAsService(),
                 new RunAsServiceInstaller(),
                 new RunAsHostedService(),
-                new TestAsConsoleApplication()).Run(environment, daemon, args);
-        }
-
+                new TestAsConsoleApplication());
 
 
         public class RunAsHostedService : IRunAsHostedService

@@ -1,5 +1,4 @@
 ﻿using System;
-using Bluewire.Common.Console.Logging;
 
 namespace Bluewire.Common.Console.Environment
 {
@@ -16,11 +15,6 @@ namespace Bluewire.Common.Console.Environment
         }
 
         public IDisposable BeginExecution()
-        {
-            throw NotInitialised();
-        }
-
-        public OutputDescriptorBase CreateOutputDescriptor()
         {
             throw NotInitialised();
         }

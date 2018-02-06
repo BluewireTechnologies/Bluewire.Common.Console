@@ -10,10 +10,17 @@ namespace Bluewire.Common.Console.Daemons
     public static class DaemonRunnerSettings
     {
         /// <summary>
-        /// Default location: [app-path]
+        /// Default location: [app-path]/logs/
+        /// </summary>
+        public static string LogDirectory =>
+            ConfigurationReader.Default.GetAbsolutePath(ConfigurationManager.AppSettings["Bluewire.Common.Console:LogDirectory"], "logs")
+                .EnsureSingleTrailing(Path.DirectorySeparatorChar);
+
+        /// <summary>
+        /// Default location: [LogDirectory]
         /// </summary>
         public static string ConsoleLogDirectory =>
-            ConfigurationReader.Default.GetAbsolutePath(ConfigurationManager.AppSettings["Bluewire.Common.Console:ConsoleLogDirectory"], "")
+            ConfigurationReader.Default.GetAbsolutePath(LogDirectory, ConfigurationManager.AppSettings["Bluewire.Common.Console:ConsoleLogDirectory"], "")
                 .EnsureSingleTrailing(Path.DirectorySeparatorChar);
     }
 }

@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using Bluewire.Common.Console.Logging;
 using Bluewire.Common.Console.Util;
 
 namespace Bluewire.Common.Console.Environment
@@ -20,16 +16,16 @@ namespace Bluewire.Common.Console.Environment
             ApplicationName = entryAssembly.GetName().Name;
         }
 
+        public ApplicationEnvironment(string name)
+        {
+            ApplicationName = name ?? throw new ArgumentNullException(nameof(name));
+        }
+
         public string ApplicationName { get; }
 
         public IDisposable BeginExecution()
         {
             return Disposable.Empty;
-        }
-
-        public OutputDescriptorBase CreateOutputDescriptor()
-        {
-            return new ConsoleOutputDescriptor(ApplicationName, System.Console.Error);
         }
     }
 }

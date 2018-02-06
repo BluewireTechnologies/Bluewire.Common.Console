@@ -60,6 +60,7 @@
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArgumentClassExtensions.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="CancelMonitor.cs" />
     <Compile Include="DaemonBase.cs" />
     <Compile Include="Environment\RedirectConsoleScope.cs" />
+    <Compile Include="Logging\CommonLogAppenders.cs" />
     <Compile Include="Daemons\ConsoleDaemonMonitor.cs" />
     <Compile Include="ConsoleSession.cs" />
     <Compile Include="DaemonRunner.cs" />
@@ -78,10 +80,15 @@
     <Compile Include="Daemons\DaemonService.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Logging\SimpleConsoleLoggingPolicy.cs" />
+    <Compile Include="Logging\DefaultDaemonLoggingPolicy.cs" />
     <Compile Include="Daemons\HostedDaemonMonitor.cs" />
     <Compile Include="Daemons\IHostedDaemonInstance.cs" />
     <Compile Include="Daemons\IRunAsHostedService.cs" />
     <Compile Include="Daemons\ITestAsConsoleApplication.cs" />
+    <Compile Include="Logging\Log4NetHelper.cs" />
+    <Compile Include="Logging\Log4NetLoggingPolicy.cs" />
+    <Compile Include="Logging\LoggingPolicy.cs" />
     <Compile Include="Daemons\ServiceAccountCredentials.cs" />
     <Compile Include="Daemons\ServiceAccountCredentialsFactory.cs" />
     <Compile Include="Daemons\TaskHelpers.cs" />
@@ -119,13 +126,7 @@
     <Compile Include="Daemons\IRunAsServiceInstaller.cs" />
     <Compile Include="IReceiveArgumentList.cs" />
     <Compile Include="IReceiveOptions.cs" />
-    <Compile Include="Logging\ConsoleOutputDescriptor.cs" />
-    <Compile Include="Logging\IOutputDescriptor.cs" />
-    <Compile Include="Logging\IOutputDescriptorConfiguration.cs" />
     <Compile Include="Logging\Log.cs" />
-    <Compile Include="Logging\LoggingConfigurer.cs" />
-    <Compile Include="Logging\OutputDescriptorBase.cs" />
-    <Compile Include="Logging\ServiceLogOutputDescriptor.cs" />
     <Compile Include="OptionsExtensions.cs" />
     <Compile Include="Arguments\OptionsParser.cs" />
     <Compile Include="Progress\FormattingHelpers.cs" />

@@ -1,5 +1,4 @@
 ﻿using System;
-using Bluewire.Common.Console.Logging;
 
 namespace Bluewire.Common.Console.Environment
 {
@@ -7,6 +6,5 @@ namespace Bluewire.Common.Console.Environment
     {
         string ApplicationName { get; }
         IDisposable BeginExecution();
-        OutputDescriptorBase CreateOutputDescriptor();
     }
 }

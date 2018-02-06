@@ -2,6 +2,7 @@
 using System.Linq;
 using Bluewire.Common.Console.Arguments;
 using Bluewire.Common.Console.Environment;
+using Bluewire.Common.Console.Logging;
 using Bluewire.Common.Console.ThirdParty;
 
 namespace Bluewire.Common.Console.Daemons
@@ -13,6 +14,8 @@ namespace Bluewire.Common.Console.Daemons
         private readonly IRunAsServiceInstaller runAsServiceInstaller;
         private readonly IRunAsHostedService runAsHostedService;
         private readonly ITestAsConsoleApplication testAsConsoleApplication;
+
+        public LoggingPolicy Logging { get; set; } = new DefaultDaemonLoggingPolicy();
 
         public DaemonSession(
             IRunAsConsoleApplication runAsConsoleApplication,
@@ -33,6 +36,7 @@ namespace Bluewire.Common.Console.Daemons
             if (environment is ServiceEnvironment serviceEnvironment)
             {
                 using (environment.BeginExecution())
+                using (LoggingPolicy.Register(environment, Logging))
                 {
                     return runAsService.Run(serviceEnvironment, daemon, args);
                 }
@@ -41,6 +45,7 @@ namespace Bluewire.Common.Console.Daemons
             if (environment is ApplicationEnvironment applicationEnvironment)
             {
                 using (environment.BeginExecution())
+                using (LoggingPolicy.Register(environment, Logging))
                 {
                     return RunInApplicationEnvironment(applicationEnvironment, daemon, args);
                 }
@@ -49,6 +54,7 @@ namespace Bluewire.Common.Console.Daemons
             if (environment is InitialisedHostedEnvironment hostedEnvironment)
             {
                 using (environment.BeginExecution())
+                using (LoggingPolicy.Register(environment, Logging))
                 {
                     var session = new SessionArguments();
                     session.Options.AddCollector(daemon as IReceiveOptions);

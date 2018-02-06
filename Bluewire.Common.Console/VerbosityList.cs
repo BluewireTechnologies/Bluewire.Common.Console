@@ -10,7 +10,7 @@ namespace Bluewire.Common.Console
     {
         public VerbosityList() : base(Level.Fatal, Level.Error, Level.Warn, Level.Info, Level.Debug)
         {
-            Default(Level.Warn);
+            Default = Level.Warn;
         }
     }
 
@@ -66,15 +66,16 @@ namespace Bluewire.Common.Console
         /// If a level appears more than once in the list, this method will pick the first
         /// occurrence.
         /// </remarks>
-        /// <param name="defaultLevel"></param>
-        /// <returns></returns>
-        public VerbosityList<T> Default(T defaultLevel)
+        public T Default
         {
-            if (!levels.Contains(defaultLevel)) throw new ArgumentException(String.Format("Default level {0} is not in the list of available verbosity levels.", defaultLevel));
-            // If a level appears multiple times, err on the quiet side.
-            // Should not really have duplicates, though.
-            defaultLogLevel = logLevel = levels.IndexOf(defaultLevel);
-            return this;
+            get => GetLevelByIndex(defaultLogLevel);
+            set
+            {
+                if (!levels.Contains(value)) throw new ArgumentException($"Default level {value} is not in the list of available verbosity levels.");
+                // If a level appears multiple times, err on the quiet side.
+                // Should not really have duplicates, though.
+                defaultLogLevel = logLevel = levels.IndexOf(value);
+            }
         }
 
         /// <summary>
@@ -85,10 +86,15 @@ namespace Bluewire.Common.Console
             get
             {
                 var currentLogLevel = logLevel;
-                if (currentLogLevel < 0) currentLogLevel = 0;
-                if (currentLogLevel >= levels.Count) currentLogLevel = levels.Count - 1;
-                return levels[currentLogLevel];
+                return GetLevelByIndex(currentLogLevel);
             }
+        }
+
+        private T GetLevelByIndex(int currentLogLevel)
+        {
+            if (currentLogLevel < 0) currentLogLevel = 0;
+            if (currentLogLevel >= levels.Count) currentLogLevel = levels.Count - 1;
+            return levels[currentLogLevel];
         }
 
         public IEnumerator<T> GetEnumerator()

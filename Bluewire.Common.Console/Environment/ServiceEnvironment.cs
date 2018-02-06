@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using Bluewire.Common.Console.Daemons;
-using Bluewire.Common.Console.Logging;
 
 namespace Bluewire.Common.Console.Environment
 {
@@ -22,11 +21,6 @@ namespace Bluewire.Common.Console.Environment
         public IDisposable BeginExecution()
         {
             return new RedirectConsoleToFiles().RedirectTo(DaemonRunnerSettings.ConsoleLogDirectory, ApplicationName);
-        }
-
-        public OutputDescriptorBase CreateOutputDescriptor()
-        {
-            return new ServiceLogOutputDescriptor(ApplicationName);
         }
     }
 }

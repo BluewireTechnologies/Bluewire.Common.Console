@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bluewire.Common.Console.Daemons;
 using Bluewire.Common.Console.Hosting;
-using Bluewire.Common.Console.Logging;
 
 namespace Bluewire.Common.Console.Environment
 {
@@ -40,16 +39,6 @@ namespace Bluewire.Common.Console.Environment
         public IDisposable BeginExecution()
         {
             return new RedirectConsoleToFiles().RedirectTo(definition.ConsoleLogDirectory ?? DaemonRunnerSettings.ConsoleLogDirectory, definition.ApplicationName);
-        }
-
-        public OutputDescriptorBase CreateOutputDescriptor()
-        {
-            var descriptor = new ServiceLogOutputDescriptor(definition.ApplicationName);
-            if (!String.IsNullOrEmpty(definition.ConsoleLogDirectory))
-            {
-                ((IOutputDescriptorConfiguration)descriptor).SetLogRootDirectory(definition.ConsoleLogDirectory);
-            }
-            return descriptor;
         }
 
         public IHostedDaemonInfo[] GetDaemonInfo()

@@ -68,6 +68,7 @@
     <Compile Include="Hosting\DaemonExeContainerTests.cs" />
     <Compile Include="Hosting\HostedDaemonTrackerTests.cs" />
     <Compile Include="Logging\LoggingConfigurerTests.cs" />
+    <Compile Include="TestHelpers\TemporaryAssemblyBundle.cs" />
     <Compile Include="Progress\FormattingHelpersTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceAccountCredentialsFactoryTests.cs" />

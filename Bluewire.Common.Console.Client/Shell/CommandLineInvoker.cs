@@ -16,8 +16,7 @@ namespace Bluewire.Common.Console.Client.Shell
 
         public CommandLineInvoker(string workingDirectory)
         {
-            if (workingDirectory == null) throw new ArgumentNullException(nameof(workingDirectory));
-            this.WorkingDirectory = workingDirectory;
+            this.WorkingDirectory = workingDirectory ?? throw new ArgumentNullException(nameof(workingDirectory));
         }
 
         public IConsoleProcess Start(ICommandLine cmd)

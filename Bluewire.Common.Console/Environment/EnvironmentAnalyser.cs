@@ -21,9 +21,8 @@ namespace Bluewire.Common.Console.Environment
 
         public InitialisedHostedEnvironment GetHostedEnvironment()
         {
-            var environment = GetEnvironment() as InitialisedHostedEnvironment;
-            if (environment == null) throw new InvalidOperationException("Not a hosted environment, or the environment has not yet been defined.");
-            return environment;
+            if (GetEnvironment() is InitialisedHostedEnvironment environment) return environment;
+            throw new InvalidOperationException("Not a hosted environment, or the environment has not yet been defined.");
         }
 
         private static IExecutionEnvironment DetermineEnvironment()

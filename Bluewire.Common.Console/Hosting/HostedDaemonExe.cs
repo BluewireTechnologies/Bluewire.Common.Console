@@ -29,8 +29,7 @@ namespace Bluewire.Common.Console.Hosting
             var clonedConfiguration = (XmlDocument)configuration.Clone();
             if (keepExistingBindingRedirects != false)
             {
-                BindingRedirects bindingRedirects;
-                if (TryReadBindingRedirects(keepExistingBindingRedirects == true, out bindingRedirects))
+                if (TryReadBindingRedirects(keepExistingBindingRedirects == true, out var bindingRedirects))
                 {
                     bindingRedirects.ApplyTo(clonedConfiguration);
                 }

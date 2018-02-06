@@ -33,10 +33,7 @@ namespace Bluewire.Common.Console.Hosting
             try
             {
                 var result = assembly.EntryPoint.Invoke(null, new object[] { arguments });
-                if (result is int)
-                {
-                    return (int)result;
-                }
+                if (result is int i) return i;
                 return 0;
             }
             catch (TargetInvocationException ex)

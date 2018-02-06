@@ -126,9 +126,8 @@ namespace Bluewire.Common.Console.Logging
 
         private static void AddFilterIfPossible<T>(IAppender appender, T filter) where T : IFilter
         {
-            if (appender is AppenderSkeleton)
+            if (appender is AppenderSkeleton filterable)
             {
-                var filterable = (AppenderSkeleton)appender;
                 if (!EnumerateFilters(filterable.FilterHead).OfType<T>().Any())
                 {
                     filterable.AddFilter(Init(filter));
@@ -156,7 +155,7 @@ namespace Bluewire.Common.Console.Logging
 
         private static T Init<T>(T obj)
         {
-            if (obj is IOptionHandler) ((IOptionHandler)obj).ActivateOptions();
+            if (obj is IOptionHandler handler) handler.ActivateOptions();
             return obj;
         }
 

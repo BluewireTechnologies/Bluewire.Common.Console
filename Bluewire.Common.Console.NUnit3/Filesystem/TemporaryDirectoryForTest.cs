@@ -12,7 +12,7 @@ namespace Bluewire.Common.Console.NUnit3.Filesystem
     {
         // I think we should not see more than one assembly per appdomain, but would not like to rely upon it.
         private static readonly ConcurrentDictionary<Assembly, string> temporaryDirectoriesForAssemblies = new ConcurrentDictionary<Assembly, string>();
-        
+
         private static string GetTemporaryDirectoryPathForAssembly(Assembly assembly)
         {
             var pid = Process.GetCurrentProcess().Id;
@@ -61,7 +61,7 @@ namespace Bluewire.Common.Console.NUnit3.Filesystem
         }
 
         private const string Bluewire_TemporaryDirectoryKey = "bluewire.temporary_directory";
-        
+
         private static Test GetActualTestFromContext(TestContext context)
         {
             var type = context.Test.GetType();

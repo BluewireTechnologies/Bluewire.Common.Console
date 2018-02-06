@@ -64,7 +64,7 @@ namespace Bluewire.Common.Console.Async
         {
             Interlocked.Increment(ref numberOfOperations);
         }
-        
+
         private void ObserveTaskCompletion(Task task)
         {
             // If we finished the last task, don't expect any more. Return control to Main(...).

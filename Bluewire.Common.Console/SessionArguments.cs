@@ -14,7 +14,7 @@ namespace Bluewire.Common.Console
         }
 
         public OptionSet Options { get; private set; }
-        
+
         protected string[] Parse(string[] args)
         {
             try
@@ -67,7 +67,7 @@ namespace Bluewire.Common.Console
 
             var entryAssembly = Assembly.GetEntryAssembly();
             Application = entryAssembly == null ? "(unknown)" : Assembly.GetEntryAssembly().Location;
-            
+
             AddStandardOptions();
         }
 

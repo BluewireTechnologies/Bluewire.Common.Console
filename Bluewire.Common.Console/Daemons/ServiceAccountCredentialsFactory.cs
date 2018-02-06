@@ -34,7 +34,7 @@ namespace Bluewire.Common.Console.Daemons
                 // if we have multiple backslashes, the remainder will show up in the user name.
                 if (user.Contains("\\")) throw new ArgumentException(String.Format("Specified user name '{0}' was not valid: too many '\\'", userName));
             }
-            
+
             return new ServiceAccountCredentials(user, password, domain);
         }
     }

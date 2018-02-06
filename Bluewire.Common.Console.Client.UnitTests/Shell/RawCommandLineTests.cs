@@ -13,7 +13,7 @@ namespace Bluewire.Common.Console.Client.UnitTests.Shell
 
             Assert.That(cmd.GetQuotedArguments(), Is.EqualTo("raw argument string with --options and orphaned \" quotes"));
         }
-        
+
         [Test]
         public void StringRepresentationOfObjectQuotesProgramPathsWithWhitespace()
         {

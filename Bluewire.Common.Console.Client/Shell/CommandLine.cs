@@ -28,7 +28,7 @@ namespace Bluewire.Common.Console.Client.Shell
             }
             return this;
         }
-        
+
         public CommandLine AddList(IEnumerable<string> list)
         {
             foreach (var arg in list) Add(arg);
@@ -49,7 +49,7 @@ namespace Bluewire.Common.Console.Client.Shell
 
         public static string Quote(string arg)
         {
-            if (rxSimpleArgument.IsMatch(arg)) return arg;   
+            if (rxSimpleArgument.IsMatch(arg)) return arg;
             return $"\"{arg.Replace("\"", "\"\"")}\"";
         }
 

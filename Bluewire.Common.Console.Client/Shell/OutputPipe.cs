@@ -11,7 +11,7 @@ namespace Bluewire.Common.Console.Client.Shell
     /// Initially, behaves like a Replay() IObservable in that all lines seen so far are
     /// replayed against new subscribers. After StopBuffering() is called, new subscribers
     /// will not receive any replay and the buffer is thrown away.
-    /// 
+    ///
     /// When the output stream is potentially large, it may be consumed efficiently and
     /// asynchronously with appropriate subscriptions followed by StopBuffering().
     /// For small outputs it may be appropriate to consume the buffer via ToEnumerable()
@@ -32,7 +32,7 @@ namespace Bluewire.Common.Console.Client.Shell
         {
             pipe.Unbuffer();
         }
-        
+
         public IDisposable Subscribe(IObserver<string> observer)
         {
             return pipe.Subscribe(observer);

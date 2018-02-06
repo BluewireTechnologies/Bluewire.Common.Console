@@ -18,7 +18,7 @@ namespace Bluewire.Common.Console.Environment
         private readonly HostedEnvironmentDefinition definition;
         private readonly IExecutionEnvironment detected;
         private readonly HostedDaemonTracker instanceTracker = new HostedDaemonTracker();
-        
+
         public InitialisedHostedEnvironment(HostedEnvironmentDefinition definition, IExecutionEnvironment detected)
         {
             this.definition = definition;

@@ -10,8 +10,7 @@ namespace Bluewire.Common.Console.Logging
     {
         protected OutputDescriptorBase(string applicationName)
         {
-            if (applicationName == null) throw new ArgumentNullException("applicationName");
-            ApplicationName = applicationName;
+            ApplicationName = applicationName ?? throw new ArgumentNullException("applicationName");
         }
 
         protected readonly string ApplicationName;
@@ -20,7 +19,7 @@ namespace Bluewire.Common.Console.Logging
 
         protected static T Init<T>(T obj)
         {
-            if (obj is IOptionHandler) ((IOptionHandler)obj).ActivateOptions();
+            if (obj is IOptionHandler handler) handler.ActivateOptions();
             return obj;
         }
 

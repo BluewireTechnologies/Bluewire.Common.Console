@@ -29,20 +29,17 @@ namespace Bluewire.Common.Console.Daemons
 
         public int Run(IExecutionEnvironment environment, IDaemonisable<T> daemon, params string[] args)
         {
-            var serviceEnvironment = environment as ServiceEnvironment;
-            if (serviceEnvironment != null)
+            if (environment is ServiceEnvironment serviceEnvironment)
             {
                 return runAsService.Run(serviceEnvironment, daemon, args);
             }
 
-            var applicationEnvironment = environment as ApplicationEnvironment;
-            if (applicationEnvironment != null)
+            if (environment is ApplicationEnvironment applicationEnvironment)
             {
                 return RunInApplicationEnvironment(applicationEnvironment, daemon, args);
             }
 
-            var hostedEnvironment = environment as InitialisedHostedEnvironment;
-            if (hostedEnvironment != null)
+            if (environment is InitialisedHostedEnvironment hostedEnvironment)
             {
                 var session = daemon.Configure();
                 session.Parse(args);

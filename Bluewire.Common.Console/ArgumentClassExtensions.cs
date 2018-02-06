@@ -14,7 +14,7 @@ namespace Bluewire.Common.Console
 
         public static IEnumerable<string> ResolveAsFileNameWildcards(this IEnumerable<string> arguments, string relativeTo)
         {
-            if(!Path.IsPathRooted(relativeTo)) throw new InvalidOperationException(String.Format("Not an absolute path: {0}", relativeTo));
+            if (!Path.IsPathRooted(relativeTo)) throw new InvalidOperationException(String.Format("Not an absolute path: {0}", relativeTo));
             return arguments.SelectMany(f => GetFilesInDirectory(relativeTo, f));
         }
 
@@ -35,7 +35,7 @@ namespace Bluewire.Common.Console
 
         private static string GetDirectoryOfArg(string arg)
         {
-            if(String.IsNullOrEmpty(arg)) return ".";
+            if (String.IsNullOrEmpty(arg)) return ".";
             return Path.GetDirectoryName(arg);
         }
     }

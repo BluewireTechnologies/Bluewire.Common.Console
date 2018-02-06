@@ -15,7 +15,7 @@ namespace Bluewire.Common.Console.Client.Shell
         {
             subscriptions.Add(subscription);
         }
-        
+
         private List<IDisposable> subscriptions = new List<IDisposable>();
 
         public virtual void Dispose()
@@ -31,7 +31,7 @@ namespace Bluewire.Common.Console.Client.Shell
                 subscriptions = null;
             }
         }
-        
+
         public virtual void IgnoreExitCode()
         {
         }

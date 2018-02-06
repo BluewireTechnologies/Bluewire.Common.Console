@@ -16,8 +16,7 @@ namespace Bluewire.Common.Console.NUnit3.Filesystem
 
         public static void Clean(FileSystemInfo entry)
         {
-            var directory = entry as DirectoryInfo;
-            if (directory != null)
+            if (entry is DirectoryInfo directory)
             {
                 foreach (var fileSystemInfo in directory.EnumerateFileSystemInfos())
                 {

@@ -11,7 +11,7 @@ namespace Bluewire.Common.Console.NUnit3.Filesystem
         public void BeforeTest(ITest test)
         {
         }
-        
+
         public void AfterTest(ITest test)
         {
             var temporaryPath = TemporaryDirectoryForTest.Get(test.Properties);

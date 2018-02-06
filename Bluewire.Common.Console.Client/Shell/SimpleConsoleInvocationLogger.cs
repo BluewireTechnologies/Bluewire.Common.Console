@@ -15,7 +15,7 @@ namespace Bluewire.Common.Console.Client.Shell
 
         private void WriteLine(string line)
         {
-            lock(this) log.WriteLine(line);
+            lock (this) log.WriteLine(line);
         }
 
         public IConsoleInvocationLogScope LogInvocation(IConsoleProcess process)

@@ -8,7 +8,7 @@ namespace Bluewire.Common.Console
     public class CancelMonitor
     {
         private readonly ManualResetEvent terminationEvent = new ManualResetEvent(false);
-        
+
         private readonly CancellationTokenSource tokenSource = new CancellationTokenSource();
 
         public CancellationToken GetToken()

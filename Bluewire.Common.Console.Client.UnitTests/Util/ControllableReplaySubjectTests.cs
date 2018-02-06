@@ -84,7 +84,7 @@ namespace Bluewire.Common.Console.Client.UnitTests.Util
             var receiver = sut.ToArray().ToTask();
             sut.OnNext(3);
             sut.OnCompleted();
-            
+
             Assert.That(await receiver, Does.Contain(3));
         }
 

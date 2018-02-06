@@ -93,7 +93,7 @@ namespace Bluewire.Common.Console.Daemons
         /// <param name="timeout"></param>
         public void WaitForShutdown(TimeSpan timeout)
         {
-            if (!ShutdownRequested) throw new InvalidOperationException("Shutdown has not been requested."); 
+            if (!ShutdownRequested) throw new InvalidOperationException("Shutdown has not been requested.");
             if (!GetShutdownCompletionTask().WaitWithUnwrapExceptions(timeout)) throw new TimeoutException();
         }
 

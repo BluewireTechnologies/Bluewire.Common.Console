@@ -33,7 +33,7 @@ namespace TestDaemon
 
         public Task<IDaemon> Start(TestDaemonArguments args, CancellationToken token)
         {
-            if(args.ExpectedConfigKey != null)
+            if (args.ExpectedConfigKey != null)
             {
                 var configValue = ConfigurationManager.AppSettings[args.ExpectedConfigKey] ?? "";
                 if (configValue != args.ExpectedConfigValue) throw new Exception("Test");

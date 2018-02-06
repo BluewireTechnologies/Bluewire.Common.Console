@@ -18,7 +18,7 @@ namespace Bluewire.Common.Console.Client.Util
     {
         private readonly Subject<T> multicast = new Subject<T>();
         private List<T> buffer = new List<T>();
-        
+
         public void Unbuffer()
         {
             lock (this)
@@ -35,10 +35,10 @@ namespace Bluewire.Common.Console.Client.Util
                 buffer = new List<T>();
             }
         }
-        
+
         public IDisposable Subscribe(IObserver<T> observer)
         {
-            lock(this)
+            lock (this)
             {
                 if (buffer == null) return multicast.Subscribe(observer);
 
@@ -48,7 +48,7 @@ namespace Bluewire.Common.Console.Client.Util
 
         public void OnNext(T value)
         {
-            lock(this)
+            lock (this)
             {
                 buffer?.Add(value);
             }
@@ -65,7 +65,7 @@ namespace Bluewire.Common.Console.Client.Util
 
         public void OnCompleted()
         {
-            lock(this)
+            lock (this)
             {
                 multicast.OnCompleted();
             }

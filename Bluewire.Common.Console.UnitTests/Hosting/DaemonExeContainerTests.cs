@@ -77,7 +77,7 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
             {
                 var task = container.Run("--key", "Key", "--value", sentinelValue);
 
-                if(WaitUntilDaemonStarts(container, task)) container.Dispose();
+                if (WaitUntilDaemonStarts(container, task)) container.Dispose();
 
                 // TestDaemon throws an unhandled exception when --value doesn't match the configured value.
                 Assert.AreEqual(expectedReturnCode, task.Result);
@@ -110,7 +110,7 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
                     var task = container.Run();
 
                     WaitUntilDaemonStarts(container, task);
-                
+
                     var configuration = new XmlDocument();
                     configuration.Load(daemon.AppDomainSetup.ConfigurationFile);
 
@@ -173,12 +173,12 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
                 Assert.Catch<Exception>(() => container.Run());
             }
         }
-        
+
         [Test]
         public void CanStartDaemonExeSpecifiedByFilePathInHostedEnvironment()
         {
             var assembly = typeof(TestDaemon.TestDaemon).Assembly;
-            
+
             var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
             Directory.CreateDirectory(path);
             try
@@ -226,7 +226,7 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
             // Task completed, so the app must've terminated.
             return false;
         }
-        
+
         private static IDisposable WriteConfigurationFile(AssemblyName assemblyName, string content)
         {
             var filePath = $"{new Uri(assemblyName.CodeBase).LocalPath}.config";
@@ -245,7 +245,7 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
 
             public void Dispose()
             {
-                if(File.Exists(path)) File.Delete(path);
+                if (File.Exists(path)) File.Delete(path);
             }
         }
     }

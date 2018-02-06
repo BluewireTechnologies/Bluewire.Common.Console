@@ -86,7 +86,7 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
         public void AwaitingATaskCompletesWhenThatTaskDoes()
         {
             var source = new TaskCompletionSource<object>();
-            
+
             var awaiter = new AwaitMultipleTasks();
             awaiter.Track(source.Task);
 

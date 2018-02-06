@@ -35,9 +35,9 @@ namespace Bluewire.Common.Console.Hosting
             this.containerName = containerName;
             ShutdownTimeout = TimeSpan.FromSeconds(15);
         }
-        
+
         public TimeSpan ShutdownTimeout { get; set; }
-        
+
         public string[] GetDaemonNames()
         {
             lock (Lock)

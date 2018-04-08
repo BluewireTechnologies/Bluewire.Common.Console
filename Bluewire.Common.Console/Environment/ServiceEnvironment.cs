@@ -20,7 +20,7 @@ namespace Bluewire.Common.Console.Environment
 
         public IDisposable BeginExecution()
         {
-            return new RedirectConsoleToFiles().RedirectTo(DaemonRunnerSettings.ConsoleLogDirectory, ApplicationName);
+            return new RedirectConsoleToFiles().RedirectTo(DaemonRunnerSettings.GetConsoleLogDirectory(ApplicationName), ApplicationName);
         }
     }
 }

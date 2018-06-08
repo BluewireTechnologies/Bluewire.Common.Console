@@ -2,24 +2,23 @@
 using System.Reflection;
 using Bluewire.Common.Console.Daemons;
 using Bluewire.Common.Console.Environment;
-using Bluewire.Common.Console.ThirdParty;
 using Moq;
 using NUnit.Framework;
 
 namespace Bluewire.Common.Console.UnitTests
 {
     [TestFixture]
-    public class DaemonRunnerTests
+    public class DaemonSessionTests
     {
         private Mock<IRunAsConsoleApplication> runAsConsoleApplication;
         private Mock<ITestAsConsoleApplication> testAsConsoleApplication;
         private Mock<IRunAsService> runAsService;
         private Mock<IRunAsServiceInstaller> runAsServiceInstaller;
         private Mock<IRunAsHostedService> runAsHostedService;
-        private DaemonRunner<NoArguments> runner;
-        private IDaemonisable<NoArguments> daemon;
+        private DaemonSession runner;
+        private IDaemonisable daemon;
 
-        private ServiceInstallerArguments<NoArguments> serviceInstallerArguments;
+        private ServiceInstallerArguments serviceInstallerArguments;
         private string[] passthroughArguments;
 
         private const string DAEMON_NAME = "Daemon";
@@ -33,24 +32,21 @@ namespace Bluewire.Common.Console.UnitTests
             runAsServiceInstaller = new Mock<IRunAsServiceInstaller>();
             runAsHostedService = new Mock<IRunAsHostedService>();
 
-            runner = new DaemonRunner<NoArguments>(runAsConsoleApplication.Object, runAsService.Object, runAsServiceInstaller.Object, runAsHostedService.Object, testAsConsoleApplication.Object);
+            runner = new DaemonSession(runAsConsoleApplication.Object, runAsService.Object, runAsServiceInstaller.Object, runAsHostedService.Object, testAsConsoleApplication.Object);
 
-            var daemon = new Mock<IDaemonisable<NoArguments>>();
-            daemon.Setup(d => d.Configure()).Returns(() => new SessionArguments<NoArguments>(new NoArguments(), new OptionSet()));
-            daemon.SetupGet(d => d.Name).Returns(DAEMON_NAME);
-            this.daemon = daemon.Object;
+            daemon = Mock.Of<IDaemonisable>(d => d.Name == DAEMON_NAME);
 
             // I can't figure out if Moq provides direct access to recorded invocations. The docs are unhelpful.
             serviceInstallerArguments = null;
             passthroughArguments = null;
-            runAsServiceInstaller.Setup(s => s.Run(It.IsAny<ApplicationEnvironment>(), It.IsAny<ServiceInstallerArguments<NoArguments>>(), It.IsAny<string[]>())).Callback((ApplicationEnvironment env, ServiceInstallerArguments<NoArguments> sia, string[] a) =>
+            runAsServiceInstaller.Setup(s => s.Run(It.IsAny<ApplicationEnvironment>(), It.IsAny<ServiceInstallerArguments>(), It.IsAny<string[]>())).Callback((ApplicationEnvironment env, ServiceInstallerArguments sia, string[] a) =>
             {
                 serviceInstallerArguments = sia;
                 passthroughArguments = a;
             });
         }
 
-        private void VerifyServiceArguments(Action<ServiceInstallerArguments<NoArguments>, string[]> asserts)
+        private void VerifyServiceArguments(Action<ServiceInstallerArguments, string[]> asserts)
         {
             Assert.IsNotNull(serviceInstallerArguments, "IRunAsServiceInstaller#Run(IDaemon, ServiceInstallerArguments, string[]) was not called.");
             Assert.IsNotNull(passthroughArguments, "IRunAsServiceInstaller#Run(IDaemon, ServiceInstallerArguments, string[]) was not called.");
@@ -68,9 +64,9 @@ namespace Bluewire.Common.Console.UnitTests
         [Test]
         public void IfInvokedInAnInitialisedHostedEnvironment_RunsDaemonAsAHostedService()
         {
-            runner.Run(new InitialisedHostedEnvironment(new HostedEnvironmentDefinition(), new HostedEnvironment()), daemon, "arg");
+            runner.Run(new InitialisedHostedEnvironment(new HostedEnvironmentDefinition(Assembly.GetExecutingAssembly().GetName()), new HostedEnvironment()), daemon, "arg");
 
-            runAsHostedService.Verify(s => s.Run(It.IsAny<InitialisedHostedEnvironment>(), daemon, It.IsAny<NoArguments>()));
+            runAsHostedService.Verify(s => s.Run(It.IsAny<InitialisedHostedEnvironment>(), daemon));
         }
 
         [Test]
@@ -85,7 +81,7 @@ namespace Bluewire.Common.Console.UnitTests
         {
             runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "arg");
 
-            runAsConsoleApplication.Verify(s => s.Run(It.IsAny<ApplicationEnvironment>(), daemon, It.IsAny<NoArguments>()));
+            runAsConsoleApplication.Verify(s => s.Run(It.IsAny<ApplicationEnvironment>(), daemon));
         }
 
         [Test]
@@ -161,7 +157,7 @@ namespace Bluewire.Common.Console.UnitTests
         {
             runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "--", "--install", "arg");
 
-            runAsConsoleApplication.Verify(s => s.Run(It.IsAny<ApplicationEnvironment>(), daemon, It.IsAny<NoArguments>()));
+            runAsConsoleApplication.Verify(s => s.Run(It.IsAny<ApplicationEnvironment>(), daemon));
         }
 
         [Test]
@@ -169,7 +165,7 @@ namespace Bluewire.Common.Console.UnitTests
         {
             runner.Run(new ApplicationEnvironment(Assembly.GetExecutingAssembly()), daemon, "--test");
 
-            testAsConsoleApplication.Verify(s => s.Test(It.IsAny<ApplicationEnvironment>(), daemon, It.IsAny<NoArguments>()));
+            testAsConsoleApplication.Verify(s => s.Test(It.IsAny<ApplicationEnvironment>(), daemon));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -6,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Bluewire.Common.Console.Hosting;
+using Bluewire.Common.Console.UnitTests.TestHelpers;
+using log4net.Config;
 using NUnit.Framework;
 
 namespace Bluewire.Common.Console.UnitTests.Hosting
@@ -179,12 +182,11 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
         {
             var assembly = typeof(TestDaemon.TestDaemon).Assembly;
 
-            var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-            Directory.CreateDirectory(path);
-            try
+            using (var bundle = new TemporaryAssemblyBundle())
             {
-                var daemonFile = CopyAssembly(assembly, path);
-                CopyAssembly(typeof(DaemonRunner).Assembly, path);
+                var daemonFile = bundle.Add(assembly);
+                bundle.Add(typeof(DaemonRunner).Assembly);
+                bundle.Add(typeof(XmlConfigurator).Assembly);
 
                 var daemon = HostedDaemonExe.FromAssemblyFile(daemonFile);
 
@@ -196,17 +198,6 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
                     Assert.AreEqual(1, container.GetDaemonNames().Length);
                 }
             }
-            finally
-            {
-                Directory.Delete(path, true);
-            }
-        }
-
-        private static string CopyAssembly(Assembly assembly, string directory)
-        {
-            var targetPath = Path.Combine(directory, Path.GetFileName(assembly.Location));
-            File.Copy(assembly.Location, targetPath);
-            return targetPath;
         }
 
         /// <summary>

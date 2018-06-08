@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Bluewire.Common.Console.ThirdParty;
 using NUnit.Framework;
 
 namespace Bluewire.Common.Console.UnitTests
@@ -10,8 +9,8 @@ namespace Bluewire.Common.Console.UnitTests
         [Test]
         public void CanMarshalAsyncSessionBackToMain()
         {
-            var session = new ConsoleSession<NoArguments>(new NoArguments(), new OptionSet());
-            var exitCode = session.Run(new string[0], async a => await DoSomethingAsyncAndReturn(42));
+            var session = new ConsoleSession();
+            var exitCode = session.Run(new string[0], async () => await DoSomethingAsyncAndReturn(42));
 
             Assert.That(exitCode, Is.EqualTo(42));
         }

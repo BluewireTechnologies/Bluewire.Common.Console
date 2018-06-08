@@ -1,13 +1,13 @@
 ﻿using System;
-using System.ServiceProcess;
+using Bluewire.Common.Console.ThirdParty;
 
 namespace Bluewire.Common.Console.Daemons
 {
-    public class ServiceInstallerArguments<T>
+    public class ServiceInstallerArguments : IReceiveOptions
     {
-        public IDaemonisable<T> Daemon { get; private set; }
+        public IDaemonisable Daemon { get; }
 
-        public ServiceInstallerArguments(IDaemonisable<T> daemon)
+        public ServiceInstallerArguments(IDaemonisable daemon)
         {
             this.Daemon = daemon;
         }
@@ -70,6 +70,17 @@ namespace Bluewire.Common.Console.Daemons
         {
             AssertOnlyOneRequest();
             RunUninstall = true;
+        }
+
+        void IReceiveOptions.ReceiveFrom(OptionSet options)
+        {
+            options.Add("test", "Start and stop the application to verify its configuration. This will run it under the current user account.", i => Test());
+            options.Add("install", "Install this application as a service.", i => Install());
+            options.Add("uninstall", "Uninstall this service.", i => Uninstall());
+            options.Add("reinstall", "Reinstall this service.", i => Reinstall());
+            options.Add("service-name=", $"Use the specified name for the service. Default: {ServiceName}", i => ServiceName = i);
+            options.Add("service-user=", "Run the service under the specified account. Default: LocalService", i => ServiceUser = i);
+            options.Add("service-password=", i => ServicePassword = i);
         }
     }
 }

@@ -92,5 +92,14 @@ namespace Bluewire.Common.Console.Daemons
                 return true;
             }
         }
+
+        static TaskHelpers()
+        {
+            var completedTcs = new TaskCompletionSource<object>();
+            completedTcs.SetResult(null);
+            CompletedTask = completedTcs.Task;
+        }
+
+        public static Task CompletedTask { get; }
     }
 }

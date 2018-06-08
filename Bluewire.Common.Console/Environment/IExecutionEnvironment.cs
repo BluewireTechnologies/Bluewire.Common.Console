@@ -1,9 +1,10 @@
-﻿using Bluewire.Common.Console.Logging;
+﻿using System;
 
 namespace Bluewire.Common.Console.Environment
 {
     public interface IExecutionEnvironment
     {
-        OutputDescriptorBase CreateOutputDescriptor();
+        string ApplicationName { get; }
+        IDisposable BeginExecution();
     }
 }

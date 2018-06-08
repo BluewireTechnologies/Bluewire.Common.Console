@@ -14,8 +14,8 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
         public void RequestingShutdownCausesMonitorToTerminate()
         {
             var daemonisable = new MockDaemonisable("MockDaemon");
-            var monitor = new HostedDaemonMonitor<object>(daemonisable);
-            monitor.Start(new object());
+            var monitor = new HostedDaemonMonitor(daemonisable);
+            monitor.Start();
 
             monitor.RequestShutdown();
 
@@ -26,8 +26,8 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
         public void RequestingShutdownCausesDaemonToBeDisposed()
         {
             var daemonisable = new MockDaemonisable("MockDaemon");
-            var monitor = new HostedDaemonMonitor<object>(daemonisable);
-            monitor.Start(new object());
+            var monitor = new HostedDaemonMonitor(daemonisable);
+            monitor.Start();
 
             monitor.RequestShutdown();
 
@@ -40,8 +40,8 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
         public void CanRequestShutdownMultipleTimes()
         {
             var daemonisable = new MockDaemonisable("MockDaemon");
-            var monitor = new HostedDaemonMonitor<object>(daemonisable);
-            monitor.Start(new object());
+            var monitor = new HostedDaemonMonitor(daemonisable);
+            monitor.Start();
 
             monitor.RequestShutdown();
             monitor.RequestShutdown();
@@ -54,8 +54,8 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
         public void CanWaitForShutdown()
         {
             var daemonisable = new MockDaemonisable("MockDaemon");
-            var monitor = new HostedDaemonMonitor<object>(daemonisable);
-            monitor.Start(new object());
+            var monitor = new HostedDaemonMonitor(daemonisable);
+            monitor.Start();
 
             monitor.RequestShutdown();
 
@@ -68,8 +68,8 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
         public void ShutdownOccursWithoutAnExplicitWaitForTermination()
         {
             var daemonisable = new MockDaemonisable("MockDaemon");
-            var monitor = new HostedDaemonMonitor<object>(daemonisable);
-            monitor.Start(new object());
+            var monitor = new HostedDaemonMonitor(daemonisable);
+            monitor.Start();
 
             monitor.RequestShutdown();
 
@@ -80,8 +80,8 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
         public void CanWaitForShutdownMultipleTimes()
         {
             var daemonisable = new MockDaemonisable("MockDaemon");
-            var monitor = new HostedDaemonMonitor<object>(daemonisable);
-            monitor.Start(new object());
+            var monitor = new HostedDaemonMonitor(daemonisable);
+            monitor.Start();
 
             monitor.RequestShutdown();
 
@@ -98,8 +98,8 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
         {
             var daemonisable = new MockDaemonisable("MockDaemon");
             var wait = BlockShutdown(daemonisable.Daemon);
-            var monitor = new HostedDaemonMonitor<object>(daemonisable);
-            monitor.Start(new object());
+            var monitor = new HostedDaemonMonitor(daemonisable);
+            monitor.Start();
 
             var task = monitor.RequestShutdown();
 
@@ -116,8 +116,8 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
         {
             var daemonisable = new MockDaemonisable("MockDaemon");
             var wait = BlockShutdown(daemonisable.Daemon);
-            var monitor = new HostedDaemonMonitor<object>(daemonisable);
-            monitor.Start(new object());
+            var monitor = new HostedDaemonMonitor(daemonisable);
+            monitor.Start();
 
             monitor.RequestShutdown();
 
@@ -130,8 +130,8 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
         public void WaitForShutdownThrowsInvalidOperationExceptionIfShutdownHasNotBeenRequested()
         {
             var daemonisable = new MockDaemonisable("MockDaemon");
-            var monitor = new HostedDaemonMonitor<object>(daemonisable);
-            monitor.Start(new object());
+            var monitor = new HostedDaemonMonitor(daemonisable);
+            monitor.Start();
 
             Assert.Throws<InvalidOperationException>(() => monitor.WaitForShutdown(TimeSpan.Zero));
         }
@@ -140,8 +140,8 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
         public void ShutdownTaskRequestedAfterTerminationIsCompleted()
         {
             var daemonisable = new MockDaemonisable("MockDaemon");
-            var monitor = new HostedDaemonMonitor<object>(daemonisable);
-            monitor.Start(new object());
+            var monitor = new HostedDaemonMonitor(daemonisable);
+            monitor.Start();
 
             monitor.RequestShutdown();
 
@@ -154,10 +154,10 @@ namespace Bluewire.Common.Console.UnitTests.Daemons
         [Test]
         public void WaitForStartPropagatesFailures()
         {
-            var daemonisable = Mock.Of<IDaemonisable<object>>(d => d.Name == "MockDaemon");
-            Mock.Get(daemonisable).Setup(d => d.Start(It.IsAny<object>(), It.IsAny<CancellationToken>())).Throws(new OutOfMemoryException());
-            var monitor = new HostedDaemonMonitor<object>(daemonisable);
-            monitor.Start(new object());
+            var daemonisable = Mock.Of<IDaemonisable>(d => d.Name == "MockDaemon");
+            Mock.Get(daemonisable).Setup(d => d.Start(It.IsAny<CancellationToken>())).Throws(new OutOfMemoryException());
+            var monitor = new HostedDaemonMonitor(daemonisable);
+            monitor.Start();
 
             Assert.Throws<OutOfMemoryException>(() => monitor.WaitForStart());
         }

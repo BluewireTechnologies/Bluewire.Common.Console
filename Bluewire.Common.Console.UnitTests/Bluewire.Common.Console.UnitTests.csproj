@@ -56,23 +56,34 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Arguments\ArgumentListTests.cs" />
     <Compile Include="Async\ConsoleAsyncContextTests.cs" />
     <Compile Include="CancelMonitorTests.cs" />
     <Compile Include="ConsoleSessionTests.cs" />
-    <Compile Include="DaemonRunnerTests.cs" />
+    <Compile Include="DaemonSessionTests.cs" />
     <Compile Include="Daemons\HostedDaemonMonitorTests.cs" />
     <Compile Include="Daemons\MockDaemonisable.cs" />
     <Compile Include="Hosting\AwaitMultipleTasksTests.cs" />
     <Compile Include="Hosting\BindingRedirectsTests.cs" />
     <Compile Include="Hosting\DaemonExeContainerTests.cs" />
     <Compile Include="Hosting\HostedDaemonTrackerTests.cs" />
-    <Compile Include="Logging\LoggingConfigurerTests.cs" />
+    <Compile Include="Logging\SimpleConsoleLoggingPolicyTests.cs" />
+    <Compile Include="Logging\TestEnvironment.cs" />
+    <Compile Include="TestHelpers\Attributes.cs" />
+    <Compile Include="TestHelpers\TemporaryAssemblyBundle.cs" />
+    <Compile Include="TestHelpers\ConfigurationTestHelpers.cs" />
+    <Compile Include="Logging\DefaultDaemonLoggingPolicyTests.cs" />
+    <Compile Include="Logging\Log4NetHelpersTests.cs" />
     <Compile Include="Progress\FormattingHelpersTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceAccountCredentialsFactoryTests.cs" />
     <Compile Include="VerbosityListTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Bluewire.Common.Console.NUnit3\Bluewire.Common.Console.NUnit3.csproj">
+      <Project>{3254e82f-4b75-4984-8f08-e015da88a656}</Project>
+      <Name>Bluewire.Common.Console.NUnit3</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Bluewire.Common.Console\Bluewire.Common.Console.csproj">
       <Project>{63C2CCD8-973D-4611-B5D4-D5A5CEF7E53C}</Project>
       <Name>Bluewire.Common.Console</Name>
@@ -102,6 +113,12 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Logging\ConfigureRootForDebug.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="..\StyleCopAnalyzers.props" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -4,6 +4,6 @@ namespace Bluewire.Common.Console.Daemons
 {
     public interface IRunAsService
     {
-        int Run<T>(ServiceEnvironment environment, IDaemonisable<T> daemon, string[] staticArgs);
+        int Run(ServiceEnvironment environment, IDaemonisable daemon, string[] staticArgs);
     }
 }

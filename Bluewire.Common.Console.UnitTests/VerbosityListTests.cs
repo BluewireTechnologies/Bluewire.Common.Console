@@ -16,7 +16,7 @@ namespace Bluewire.Common.Console.UnitTests
         [Test]
         public void DefaultVerbosityCanBeOverridden()
         {
-            var list = new VerbosityList<Level>(Level.Warn, Level.Info, Level.Debug).Default(Level.Debug);
+            var list = new VerbosityList<Level>(Level.Warn, Level.Info, Level.Debug) { Default = Level.Debug };
             Assert.AreEqual(Level.Debug, list.CurrentVerbosity);
         }
 
@@ -29,7 +29,7 @@ namespace Bluewire.Common.Console.UnitTests
         [Test]
         public void QuietSelectsAnEarlierLevelInTheList()
         {
-            var list = new VerbosityList<Level>(Level.Warn, Level.Info, Level.Debug).Default(Level.Info);
+            var list = new VerbosityList<Level>(Level.Warn, Level.Info, Level.Debug) { Default = Level.Info };
             list.Quiet();
             Assert.AreEqual(Level.Warn, list.CurrentVerbosity);
         }
@@ -37,7 +37,7 @@ namespace Bluewire.Common.Console.UnitTests
         [Test]
         public void VerboseSelectsALaterLevelInTheList()
         {
-            var list = new VerbosityList<Level>(Level.Warn, Level.Info, Level.Debug).Default(Level.Info);
+            var list = new VerbosityList<Level>(Level.Warn, Level.Info, Level.Debug) { Default = Level.Info };
             list.Verbose();
             Assert.AreEqual(Level.Debug, list.CurrentVerbosity);
         }
@@ -46,7 +46,7 @@ namespace Bluewire.Common.Console.UnitTests
         public void OverridingDefaultVerbosity_SelectsEarliestOccurrenceOfTheSpecifiedLevel()
         {
             var list = new VerbosityList<Level>(Level.Warn, Level.Info, Level.Warn, Level.Debug);
-            list.Default(Level.Warn);
+            list.Default = Level.Warn;
             list.Verbose();
             Assert.AreEqual(Level.Info, list.CurrentVerbosity);
         }
@@ -54,7 +54,7 @@ namespace Bluewire.Common.Console.UnitTests
         [Test]
         public void RequestingQuieterThanQuietestLevel_SelectsQuietestLevel()
         {
-            var list = new VerbosityList<Level>(Level.Warn, Level.Info, Level.Debug).Default(Level.Info);
+            var list = new VerbosityList<Level>(Level.Warn, Level.Info, Level.Debug) { Default = Level.Info };
             list.Quiet();
             list.Quiet();
             list.Quiet();
@@ -64,7 +64,7 @@ namespace Bluewire.Common.Console.UnitTests
         [Test]
         public void RequestingMoreVerboseThanMostVerboseLevel_SelectsMostVerboseLevel()
         {
-            var list = new VerbosityList<Level>(Level.Warn, Level.Info, Level.Debug).Default(Level.Info);
+            var list = new VerbosityList<Level>(Level.Warn, Level.Info, Level.Debug) { Default = Level.Info };
             list.Verbose();
             list.Verbose();
             list.Verbose();

@@ -19,7 +19,18 @@ namespace Bluewire.Common.Console.NUnit3.Filesystem
             if (!Directory.Exists(temporaryPath)) return;
             if (TestContext.CurrentContext.Result.Outcome.Status == TestStatus.Passed)
             {
-                FileSystemHelpers.CleanDirectory(temporaryPath);
+                try
+                {
+                    FileSystemHelpers.CleanDirectory(temporaryPath);
+                }
+                catch (IOException)
+                {
+                    // Some libraries release files during finalisation, not disposal. This is probably
+                    // most common with wrappers around native libraries.
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    FileSystemHelpers.CleanDirectory(temporaryPath);
+                }
             }
         }
 

@@ -6,7 +6,9 @@
         <NugetProjects Include="Bluewire.Common.Console.Formatting\Bluewire.Common.Console.Formatting.csproj" />
         <NugetProjects Include="Bluewire.Common.Console.Client\Bluewire.Common.Console.Client.csproj" />
         <NugetProjects Include="Bluewire.Common.Console.NUnit3\Bluewire.Common.Console.NUnit3.csproj" />
-        <OutputBinaryProjects Include="SquashStdErr\SquashStdErr.csproj" />
+        <OutputBinaryProjects Include="SquashStdErr\SquashStdErr.csproj">
+          <UseSemVer>True</UseSemVer>
+        </OutputBinaryProjects>
     
         <!-- Full list of NUnit test projects -->
         <NUnitProjects Include="**\*.UnitTests.csproj" />

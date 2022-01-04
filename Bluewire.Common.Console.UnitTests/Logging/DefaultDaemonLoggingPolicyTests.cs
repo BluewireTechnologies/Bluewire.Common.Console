@@ -1,7 +1,9 @@
 ﻿using System.IO;
 using System.Linq;
 using Bluewire.Common.Console.Logging;
+using Bluewire.Common.Console.NUnit3.Filesystem;
 using Bluewire.Common.Console.UnitTests.TestHelpers;
+using Bluewire.Common.Console.Util;
 using log4net;
 using log4net.Config;
 using NUnit.Framework;
@@ -99,6 +101,21 @@ namespace Bluewire.Common.Console.UnitTests.Logging
                 Assert.That(appenders.Select(a => a.Name), Is.EquivalentTo(new[]{ "DefaultLogAppender" }));
 
                 Assert.IsTrue(LogManager.GetLogger("any").IsDebugEnabled);
+            }
+        }
+
+        [Test]
+        public void TreatsForwardSlashInRelativeLoggingPathAsPathSeparator()
+        {
+            var configFilePath = ConfigurationTestHelpers.GetConfigurationStreamAsTempFile("Logging.ConfigureRootForDebug.xml");
+
+            var policy = new DefaultDaemonLoggingPolicy() { Log4NetConfigurationFilePath = configFilePath, LogDirectory = "logs/" };
+            using (LoggingPolicy.Register(new TestEnvironment(), policy))
+            {
+                var expectedInitialisedPath = Path.Combine(ConfigurationReader.Default.DefaultBasePath, "logs\\");
+
+                Assert.That(policy.InitialisedLogDirectory, Is.EqualTo(expectedInitialisedPath));
+                Assert.That(Path.Combine(policy.InitialisedLogDirectory, "sub"), Is.EqualTo(Path.Combine(expectedInitialisedPath, "sub")));
             }
         }
     }

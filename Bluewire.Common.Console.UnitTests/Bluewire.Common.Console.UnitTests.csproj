@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net45</TargetFrameworks>
+    <TargetFrameworks>net48</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="*.ncrunchproject" />
@@ -25,9 +25,14 @@
     <ProjectReference Include="..\TestDaemon\TestDaemon.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="JetBrains.dotCover.CommandLineTools" Version="2021.3.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="log4net">
       <Version>2.0.12</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
     <PackageReference Include="Moq">
       <Version>4.10.1</Version>
     </PackageReference>
@@ -40,9 +45,11 @@
     <PackageReference Include="NUnit.Extension.TeamCityEventListener">
       <Version>1.0.5</Version>
     </PackageReference>
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="System.Threading.Tasks.Extensions">
       <Version>4.5.2</Version>
     </PackageReference>
+    <PackageReference Include="TeamCity.VSTest.TestAdapter" Version="1.0.36" />
   </ItemGroup>
   <Import Project="..\StyleCopAnalyzers.props" />
 </Project>

@@ -182,6 +182,34 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
             }
         }
 
+        [Test]
+        public void HostingProcessCanCleanUpShadowCopy()
+        {
+            var assembly = typeof(TestDaemon.TestDaemon).Assembly;
+
+            using (var bundle = new TemporaryAssemblyBundle())
+            {
+                var daemonFile = bundle.Add(assembly);
+                bundle.Add(typeof(DaemonRunner).Assembly);
+                bundle.Add(typeof(XmlConfigurator).Assembly);
+
+                string temporaryContainer;
+                using (var scope = ProcessDaemonExe.FromShadowCopiedAssemblyFile(daemonFile))
+                {
+                    var daemon = scope.Daemon;
+                    temporaryContainer = scope.TemporaryContainer;
+
+                    using (var container = new DaemonExeProcess(daemon))
+                    {
+                        var task = container.Run();
+
+                        Assert.That(WaitUntilDaemonStarts(task), Is.True);
+                    }
+                }
+                Assert.That(Directory.Exists(temporaryContainer), Is.False);
+            }
+        }
+
         /// <summary>
         /// We have no control over how the daemon runs. We can't even be sure that a daemon will be started.
         /// Therefore, we can't wait on a 'start' event. For the purposes of testing, we do know that a daemon

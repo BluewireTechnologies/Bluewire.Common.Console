@@ -182,19 +182,19 @@ namespace Bluewire.Common.Console.Hosting
 
         public class ShadowCopiedProcessDaemonExe : IDisposable
         {
-            private readonly string temporaryContainer;
+            internal string TemporaryContainer { get; }
 
             internal ShadowCopiedProcessDaemonExe(ProcessDaemonExe daemon, string temporaryContainer)
             {
                 Daemon = daemon;
-                this.temporaryContainer = temporaryContainer;
+                this.TemporaryContainer = temporaryContainer;
             }
 
             public ProcessDaemonExe Daemon { get; }
 
             public void CleanUp()
             {
-                Directory.Delete(temporaryContainer);
+                Directory.Delete(TemporaryContainer, true);
             }
 
             public void Dispose()

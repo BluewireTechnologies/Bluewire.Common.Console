@@ -7,17 +7,14 @@
     <None Remove="*.ncrunchproject" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Bluewire.Common.Console.NUnit3\Bluewire.Common.Console.NUnit3.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0" />
     <PackageReference Include="NUnit">
-      <Version>3.11.0</Version>
+      <Version>3.13.3</Version>
     </PackageReference>
-    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="TeamCity.VSTest.TestAdapter" Version="1.0.36" />
   </ItemGroup>
   <Import Project="..\StyleCopAnalyzers.props" />

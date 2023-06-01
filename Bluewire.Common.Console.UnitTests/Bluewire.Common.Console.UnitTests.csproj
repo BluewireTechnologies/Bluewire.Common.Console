@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Bluewire.Common.Console.NUnit3\Bluewire.Common.Console.NUnit3.csproj" />
     <ProjectReference Include="..\Bluewire.Common.Console\Bluewire.Common.Console.csproj" />
+    <ProjectReference Include="..\Bluewire.Common.ProcessJanitor\Bluewire.Common.ProcessJanitor.csproj" />
     <ProjectReference Include="..\TestDaemon\TestDaemon.csproj" />
   </ItemGroup>
   <ItemGroup>

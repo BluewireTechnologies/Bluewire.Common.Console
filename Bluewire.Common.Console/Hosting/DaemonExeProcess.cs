@@ -14,19 +14,19 @@ namespace Bluewire.Common.Console.Hosting
     {
         private readonly ILog log;
 
-        private readonly ProcessDaemonExe daemon;
+        internal ProcessDaemonExe Daemon { get; }
         private Task<int> processedTask;
 
         private readonly object syncObject = new object();
         private bool disposing;
-        private Process process;
+        internal Process Process { get; private set; }
 
         public TimeSpan ShutdownTimeout { get; set; } = TimeSpan.FromSeconds(15);
 
         public DaemonExeProcess(ProcessDaemonExe daemon)
         {
             log = LogManager.GetLogger(daemon.AssemblyName.Name + ".Container");
-            this.daemon = daemon;
+            this.Daemon = daemon;
         }
 
         public Task<int> Run(params string[] args)
@@ -68,9 +68,9 @@ namespace Bluewire.Common.Console.Hosting
 
         private void ShutDownProcess(DateTimeOffset deadline)
         {
-            if (process == null) return;
-            StopProcess(process);
-            if (!process.WaitForExit((int)Until(deadline).TotalMilliseconds))
+            if (Process == null) return;
+            StopProcess(Process);
+            if (!Process.WaitForExit((int)Until(deadline).TotalMilliseconds))
             {
                 log.Warn("Timed out while waiting for process to shut down.");
             }
@@ -132,23 +132,23 @@ namespace Bluewire.Common.Console.Hosting
             // Must have the lock!
 
             AssertNotDisposing();
-            Debug.Assert(process == null);
+            Debug.Assert(Process == null);
 
-            daemon.OnBeforeStart();
+            Daemon.OnBeforeStart();
 
-            var startInfo = new ProcessStartInfo(daemon.ApplicationSourceFile, GetQuotedArguments(args))
+            var startInfo = new ProcessStartInfo(Daemon.ApplicationSourceFile, GetQuotedArguments(args))
             {
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                WorkingDirectory = daemon.ApplicationSourceDirectory,
+                WorkingDirectory = Daemon.ApplicationSourceDirectory,
             };
             var tcs = new TaskCompletionSource<int>();
             try
             {
-                process = Process.Start(startInfo);
-                Debug.Assert(process != null);
-                process.EnableRaisingEvents = true;
-                process.Exited += (s, e) => tcs.SetResult(process.ExitCode);
+                Process = Process.Start(startInfo);
+                Debug.Assert(Process != null);
+                Process.EnableRaisingEvents = true;
+                Process.Exited += (s, e) => tcs.SetResult(Process.ExitCode);
             }
             catch (Exception ex)
             {

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29326.143
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bluewire.Common.Console", "Bluewire.Common.Console\Bluewire.Common.Console.csproj", "{63C2CCD8-973D-4611-B5D4-D5A5CEF7E53C}"
 EndProject
@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bluewire.Common.Console.NUn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bluewire.Common.Console.Formatting", "Bluewire.Common.Console.Formatting\Bluewire.Common.Console.Formatting.csproj", "{2EC604E1-5484-4DF5-8115-27960CEE06D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SquashStdErr", "SquashStdErr\SquashStdErr.csproj", "{FE054664-11BA-4543-8F60-D2FF25BF1172}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SquashStdErr", "SquashStdErr\SquashStdErr.csproj", "{FE054664-11BA-4543-8F60-D2FF25BF1172}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bluewire.Common.ProcessJanitor", "Bluewire.Common.ProcessJanitor\Bluewire.Common.ProcessJanitor.csproj", "{3FEAC573-B6C0-40C0-A67C-65C91027F2A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{FE054664-11BA-4543-8F60-D2FF25BF1172}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE054664-11BA-4543-8F60-D2FF25BF1172}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE054664-11BA-4543-8F60-D2FF25BF1172}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FEAC573-B6C0-40C0-A67C-65C91027F2A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FEAC573-B6C0-40C0-A67C-65C91027F2A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FEAC573-B6C0-40C0-A67C-65C91027F2A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FEAC573-B6C0-40C0-A67C-65C91027F2A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

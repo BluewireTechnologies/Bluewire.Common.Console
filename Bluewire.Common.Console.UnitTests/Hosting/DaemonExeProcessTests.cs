@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Bluewire.Common.Console.Hosting;
 using Bluewire.Common.Console.UnitTests.TestHelpers;
+using Bluewire.Common.ProcessJanitor;
 using log4net.Config;
 using NUnit.Framework;
 
@@ -178,6 +179,68 @@ namespace Bluewire.Common.Console.UnitTests.Hosting
                         var task = container.Run();
                         Assert.That(WaitUntilDaemonStarts(task), Is.True);
                     }
+                }
+            }
+        }
+
+        [Test]
+        public void HostingProcessCanCleanUpShadowCopy()
+        {
+            var assembly = typeof(TestDaemon.TestDaemon).Assembly;
+
+            using (var bundle = new TemporaryAssemblyBundle())
+            {
+                var daemonFile = bundle.Add(assembly);
+                bundle.Add(typeof(DaemonRunner).Assembly);
+                bundle.Add(typeof(XmlConfigurator).Assembly);
+
+                string temporaryContainer;
+                using (var scope = ProcessDaemonExe.FromShadowCopiedAssemblyFile(daemonFile))
+                {
+                    var daemon = scope.Daemon;
+                    temporaryContainer = scope.TemporaryContainer;
+
+                    using (var container = new DaemonExeProcess(daemon))
+                    {
+                        var task = container.Run();
+
+                        Assert.That(WaitUntilDaemonStarts(task), Is.True);
+                    }
+                }
+                Assert.That(Directory.Exists(temporaryContainer), Is.False);
+            }
+        }
+
+        [Test]
+        public void JanitorProcessCanCleanUpShadowCopy()
+        {
+            var assembly = typeof(TestDaemon.TestDaemon).Assembly;
+
+            using (var bundle = new TemporaryAssemblyBundle())
+            {
+                var daemonFile = bundle.Add(assembly);
+                bundle.Add(typeof(DaemonRunner).Assembly);
+                bundle.Add(typeof(XmlConfigurator).Assembly);
+
+                using (var scope = ProcessDaemonExe.FromShadowCopiedAssemblyFile(daemonFile))
+                {
+                    var daemon = scope.Daemon;
+
+                    Task janitorTask;
+
+                    using (var container = new DaemonExeProcess(daemon))
+                    {
+                        var task = container.Run();
+
+                        Assert.That(WaitUntilDaemonStarts(task), Is.True);
+                        var janitor = new DaemonJanitor();
+                        janitor.ErrorMessage += System.Console.WriteLine;
+                        janitorTask = janitor.WatchAndTerminateOnExit(container, scope);
+                        Assert.That(janitorTask.IsCompleted, Is.False);
+                    }
+
+                    Assert.That(janitorTask.Wait(5000), Is.True);
+                    Assert.That(Directory.Exists(scope.TemporaryContainer), Is.False);
                 }
             }
         }

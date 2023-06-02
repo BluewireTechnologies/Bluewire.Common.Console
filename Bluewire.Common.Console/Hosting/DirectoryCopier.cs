@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Bluewire.Common.Console.Hosting
 {
@@ -40,6 +41,7 @@ namespace Bluewire.Common.Console.Hosting
                 {
                     if (File.Exists(item.Destination)) throw new ArgumentException($"Destination file already exists: {item.Destination}");
                     if (Directory.Exists(item.Destination)) throw new ArgumentException($"Destination file already exists as a directory: {item.Destination}");
+                    if (IsExcludedFile(Path.GetFileName(item.Source))) continue;
                     File.Copy(item.Source, item.Destination);
                 }
                 else
@@ -47,6 +49,14 @@ namespace Bluewire.Common.Console.Hosting
                     Directory.CreateDirectory(item.Destination);
                 }
             }
+        }
+
+        private static bool IsExcludedFile(string name)
+        {
+            // NUnit runner trace files.
+            if (Regex.IsMatch(name, @"^InternalTrace\.\d+\.log")) return true;
+
+            return false;
         }
 
         struct Pair

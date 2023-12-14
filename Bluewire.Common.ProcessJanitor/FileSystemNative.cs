@@ -24,7 +24,7 @@ namespace Bluewire.Common.ProcessJanitor
             // Assume FullName normalizes/fixes case and path separators to Path.DirectorySeparatorChar
             if (StringComparer.OrdinalIgnoreCase.Equals(Normalise(dir1.FullName), Normalise(dir2.FullName))) return true;
 
-            if( !resolveJunctionAndNetworkPaths ) return false;
+            if ( !resolveJunctionAndNetworkPaths ) return false;
             return AreFileSystemObjectsEqual(RemoveRoot(Normalise(dir1.FullName)), RemoveRoot(Normalise(dir2.FullName)));
         }
 

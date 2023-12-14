@@ -61,7 +61,7 @@ namespace Bluewire.Common.ProcessJanitor
                 var watchExePath = Path.GetFullPath(WatchExe);
                 watchProcess = Process.GetProcessById(WatchPid);
                 var processExePath = Path.GetFullPath(watchProcess.MainModule?.FileName ?? "");
-                if (!StringComparer.OrdinalIgnoreCase.Equals(processExePath, watchExePath)) 
+                if (!StringComparer.OrdinalIgnoreCase.Equals(processExePath, watchExePath))
                 {
                     System.Console.Error.WriteLine("Executable specified for --watch-exe does not match the --watch-pid process.");
                     System.Console.Error.WriteLine("Specified executable: " + watchExePath);

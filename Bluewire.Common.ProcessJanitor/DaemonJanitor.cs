@@ -57,8 +57,8 @@ namespace Bluewire.Common.ProcessJanitor
             process.BeginErrorReadLine();
             process.OutputDataReceived += (s, e) =>
             {
-                if(e.Data == null) return;
-                if(e.Data != expectedText)
+                if (e.Data == null) return;
+                if (e.Data != expectedText)
                 {
                     ErrorMessage($"WARNING: Expected '{expectedText}', got '{e.Data}'");
                 }
@@ -66,7 +66,7 @@ namespace Bluewire.Common.ProcessJanitor
             };
             process.ErrorDataReceived += (s, e) =>
             {
-                if(e.Data != null) ErrorMessage(e.Data);
+                if (e.Data != null) ErrorMessage(e.Data);
             };
 
             // Wait for the janitor to start.

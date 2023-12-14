@@ -37,8 +37,14 @@ namespace Bluewire.Common.Console.Daemons
                     waitHandle,
                     (o, timeout) =>
                     {
-                        if (timeout) tcs.TrySetException(new TimeoutException());
-                        else tcs.TrySetResult(null);
+                        if (timeout)
+                        {
+                            tcs.TrySetException(new TimeoutException());
+                        }
+                        else
+                        {
+                            tcs.TrySetResult(null);
+                        }
                     },
                     null,
                     limitMilliseconds,

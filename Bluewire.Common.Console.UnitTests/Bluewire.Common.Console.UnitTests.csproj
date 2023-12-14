@@ -26,12 +26,12 @@
     <ProjectReference Include="..\TestDaemon\TestDaemon.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.dotCover.CommandLineTools" Version="2021.3.3">
+    <PackageReference Include="JetBrains.dotCover.CommandLineTools" Version="2023.2.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="log4net">
-      <Version>2.0.12</Version>
+      <Version>2.0.15</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Moq">
